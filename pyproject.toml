@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "Matt Clifford", email = "mc15445@bristol.ac.uk"},
 ]
-dependencies = ["numpy>=2.3.5", "scipy>=1.16.3", "scikit-learn>=1.7.2", "pandas>=2.3.3", "ucimlrepo>=0.0.7", "tqdm>=4.67.1", "torch>=2.7.1", "torchvision>=0.22.1"]
+dependencies = ["numpy>=2.3.5", "scipy>=1.16.3", "scikit-learn>=1.7.2", "pandas>=2.3.3", "ucimlrepo>=0.0.7", "tqdm>=4.67.1", "torch>=2.7.1", "torchvision>=0.22.1", "umap-learn>=0.5.9.post2"]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}

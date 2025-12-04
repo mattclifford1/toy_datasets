@@ -7,6 +7,16 @@ import sklearn.datasets
 import sklearn.utils
 
 
+def get_synthetic_sep_data_moons(N1=10000,
+                           N2=10000,
+                           scale=True,
+                           test_nums=(10000, 10000)):
+
+    data = get_moons((N1, N2))
+    data_test = get_moons(test_nums)
+    return {'data': data, 'data_test': data_test}
+
+
 def _generic_loader(load_func, samples=[100, 100], test=False, **kwargs):
     '''
     sample from the a sklearn synthetic dataset

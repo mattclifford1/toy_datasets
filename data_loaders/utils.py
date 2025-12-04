@@ -1,6 +1,10 @@
+import functools
+
+from sklearn.decomposition import PCA, KernelPCA
 from sklearn import preprocessing
 from sklearn.utils import shuffle
 import numpy as np
+import umap
 
 
 RANDOM_STATE = 42
@@ -145,3 +149,33 @@ def proportional_downsample(data, percent_of_data=1, seed=True, **kwargs):
             # apply the shuffle
             data[key] = val[new_inds]
     return data
+
+
+def make_data_dim_reducer(data_getter):
+    @functools.wraps(data_getter)
+    def _wrapper(*args, **kwargs):
+        data_dict = data_getter(*args, **kwargs)
+        if data_dict['data']['X'].shape[1] > 2:
+            dim_reducer = get_dim_reducer(data_dict['data'])
+        else:
+            dim_reducer = None
+        data_dict['dim_reducer'] = dim_reducer
+        return data_dict
+    return _wrapper
+
+
+def get_dim_reducer(data, reducer='PCA'):
+    X = data['X']
+    y = data['y']
+    if reducer == 'PCA':
+        reducer_model = PCA(n_components=2, svd_solver='full').fit(X)
+    elif reducer == 'kernelPCA':
+        reducer_model = KernelPCA(
+            n_components=2, kernel='rbf', n_jobs=-1).fit(X)
+    elif reducer == 'UMAP':
+        reducer_model = umap.UMAP().fit(X)
+    elif reducer == 'UMAP_supervised':
+        reducer_model = umap.UMAP().fit(X, y=y)
+    else:
+        reducer = None
+    return reducer_model

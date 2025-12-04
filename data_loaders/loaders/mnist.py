@@ -56,7 +56,7 @@ def get_mnist(size=60000, minority_id=[0], binary=True, classes_remove=[], ratio
         y[y != 11] = 0
         y[y == 11] = 1
     # formatting
-    print(len(y), sum(y))
+    # print(len(y), sum(y))
     data = {'X':X, 'y':y}
     # shuffle the dataset
     data = utils.shuffle_data(data, seed=seed)

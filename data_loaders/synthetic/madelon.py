@@ -9,6 +9,37 @@ import numpy as np
 from data_loaders import utils
 
 
+@utils.make_data_dim_reducer
+def get_non_sep_data_high_dim(N1=10000,
+                              N2=10000,
+                              scale=True,
+                              test_nums=[10000, 10000]):
+    data, data_test = get_non_separable(
+        N1=N1, N2=N2, scale=scale, test_nums=test_nums, dims=100, gen_num=3)
+
+    return {'data': data, 'data_test': data_test}
+
+
+def get_non_sep_datasets(N1=10000,
+                     N2=10000,
+                     scale=True,
+                     test_nums=[10000, 10000]):
+    data, data_test = get_non_separable(
+        N1=N1, N2=N2, scale=scale, test_nums=test_nums)
+
+    return {'data': data, 'data_test': data_test}
+
+
+def get_sep_datasets(N1=10000,
+                 N2=10000,
+                 scale=True,
+                 test_nums=[10000, 10000]):
+    data, data_test = get_separable(
+        N1=N1, N2=N2, scale=scale, test_nums=test_nums)
+
+    return {'data': data, 'data_test': data_test}
+
+
 def get_separable(N1=10000,
                   N2=10000,
                   scale=True,

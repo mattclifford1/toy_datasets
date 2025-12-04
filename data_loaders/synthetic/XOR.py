@@ -1,5 +1,24 @@
 import numpy as np
-from data_loaders import normal
+from data_loaders import utils
+from data_loaders.synthetic import normal
+
+
+def get_XOR(N1, 
+            N2,
+            scale=True,
+            test_nums=[10000, 10000]):
+    # sample data
+    data = get_XOR(num_samples=[N1, N2])
+    data_test = get_XOR(num_samples=test_nums)
+    
+    #scale
+    if scale == True:
+        scaler = utils.normaliser(data)
+        data = scaler(data)
+        data_test = scaler(data_test)
+
+    return {'data': data, 'data_test': data_test}
+
 
 def get_XOR(num_samples=[100, 100]):
     mu = 5
