@@ -8,7 +8,8 @@ import os
 
 
 def get_mnist(size=60000, minority_id=[0], binary=True, classes_remove=[], ratio=False, split=0.1, equal_test=False, seed=True):  # 60000 is full dataset
-    download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    download_dir = os.path.join(this_dir, '..', 'datasets')
     train_loader = torch_data.DataLoader(
         datasets.MNIST(download_dir, train=True, download=True,
                     transform=transforms.Compose([
