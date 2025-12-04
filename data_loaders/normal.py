@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn.utils
-from deltas.data.utils import set_seed
+from utils import set_seed
 
 
 def get_two_classes(means=[[0, 0], [10, 10]], 

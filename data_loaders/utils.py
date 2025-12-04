@@ -1,7 +1,9 @@
 from sklearn import preprocessing
 from sklearn.utils import shuffle
 import numpy as np
-from deltas.misc.use_two import RANDOM_STATE
+
+
+RANDOM_STATE = 42
 
 
 class normaliser:
