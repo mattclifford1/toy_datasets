@@ -16,6 +16,7 @@ def get_separable(N1=10000,
     
     return _get_data(N1=N1, N2=N2, scale=scale, test_nums=test_nums, gen_num=5)
 
+
 def get_non_separable(N1=10000,
                   N2=10000,
                   scale=True,
@@ -24,6 +25,7 @@ def get_non_separable(N1=10000,
                   gen_num=9):
     
     return _get_data(N1=N1, N2=N2, scale=scale, test_nums=test_nums, gen_num=gen_num, dims=dims)
+
 
 def _get_data(N1=10000,
               N2=10000,
