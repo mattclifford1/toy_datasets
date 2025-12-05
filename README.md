@@ -11,3 +11,13 @@ install the dev group from pdm/pyproject. then install this dir as editable
 ```
 python -m pip install -e .
 ```
+
+# todo
+ - fix the splitting for normal dist loader
+ - finish any other synthetic loaders
+ - MIMIC loaders
+ - have main with the new class method
+ - abstract
+   - do dim reduction
+   - do scaling
+   - other things for feature parity?

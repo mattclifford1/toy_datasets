@@ -1,3 +1,4 @@
+# author: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
 Sonar rocks vs mines UCI dataset: https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+(Sonar,+Mines+vs.+Rocks)
 instances: 208
@@ -14,29 +15,40 @@ order of aspect angle, but they do not encode the angle directly.
 
 post processed data: https://www.kaggle.com/datasets/mattcarter865/mines-vs-rocks
 '''
-# author: Matt Clifford <matt.clifford@bristol.ac.uk>
 
 import os
 import pandas as pd
-from data_loaders import utils
+from data_loaders.abstract_loader import AbstractLoader
+
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_sonar(**kwargs):
-    data = {}
-    df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
-                     'datasets', 'sonar_rocks_mines', 'data.csv'), header=None)
-    df = df.replace({60: {'R': 0, 'M': 1}})
-    data['y'] = df.pop(60).to_numpy() # type: ignore
-    data['X'] = df.to_numpy()
-    data['feature_names'] = df.columns.to_list()
-    # add name and description
-    with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'sonar_rocks_mines', 'description.txt'), 'r') as f:
-        data['description'] = f.read()
-    # shuffle the dataset
-    data = utils.shuffle_data(data)  # type: ignore
-    # split into train, test
-    train_data, test_data = utils.proportional_split(  # type: ignore
-        data, size=0.7)  # type: ignore
-    return train_data, test_data
+class sonar_rocks_loader(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 split_size=0.7,
+                 **kwargs):
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                         dataset_name='Sonar Rocks vs Mines',
+                         **kwargs)
+        
+    def load_data(self):
+        data = {}
+        df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
+                        'datasets', 'sonar_rocks_mines', 'data.csv'), header=None)
+        df = df.replace({60: {'R': 0, 'M': 1}})
+        data['y'] = df.pop(60).to_numpy() # type: ignore
+        data['X'] = df.to_numpy()
+        data['feature_names'] = df.columns.to_list()
+        # add name and description
+        with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'sonar_rocks_mines', 'description.txt'), 'r') as f:
+            data['description'] = f.read()
+        return data
+
+
+if __name__ == "__main__":
+    loader = sonar_rocks_loader()
+    # loader.plot_dataset()
+    loader.plot_train_test_split()

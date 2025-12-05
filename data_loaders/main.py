@@ -31,7 +31,7 @@ AVAILABLE_DATASETS = {
         'Breast Cancer': sklearn_toy.get_breast_cancer,
         'Iris': sklearn_toy.get_iris,
         'Wine': sklearn_toy.get_wine,
-        'Pima Indian Diabetes': diabetes.get_diabetes_indian,
+        'Pima Indian Diabetes': diabetes.get_diabetes_indian, 
         'Habermans breast cancer': Habermans_breast_cancer.get_Habermans_breast_cancer,
         'Sonar Rocks vs Mines': sonar_rocks.get_sonar,
         'Banknote Authentication': banknote.get_banknote,
@@ -57,6 +57,10 @@ AVAILABLE_DATASETS = {
         'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
         'Moon Separable': sklearn_synthetic.get_synthetic_sep_data_moons,
     }
+
+
+def get_available_dataset_list():
+    return list(AVAILABLE_DATASETS.keys())
 
 
 def print_available_datasets():
@@ -92,12 +96,15 @@ def get_dataset(dataset='Breast Cancer', _print=True, scale=False, **kwargs):
 
     test0 = len(data_set['data_test']['y'])-sum(data_set['data_test']['y'])
     test1 = sum(data_set['data_test']['y'])
+
+    # print some info about dataset
     if _print == True:
-        print(f"{dataset}: {test0+train0+test1+train1}")
-        print(f"Number of attribues: {data_set['data']['X'].shape[1]}")
-        print( f"Classes total: {test0+train0} - {test1+train1}\n")
-        print(f"Classes train: {train0} - {train1}")
-        print(f"Classes test:  {test0} - {test1}")
+        print(f"Dataset: {dataset}")
+        print(f"    - Number of features: {data_set['data']['X'].shape[1]}")
+        print(f"    - Total instances: {test0+train0+test1+train1}")
+        print(f"      - Classes total: {test0+train0}:{test1+train1}")
+        print(f"      -         train: {train0}:{train1}")
+        print(f"      -         test:  {test0}:{test1}")
     
     return data_set
 

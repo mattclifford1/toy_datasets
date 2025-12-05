@@ -1,37 +1,72 @@
+# author: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
 Get datasets from the costcla package
     - credit scoring and direct marketing
 '''
-# author: Matt Clifford <matt.clifford@bristol.ac.uk>
 
 import os
 import pandas as pd
-from data_loaders import utils
+from data_loaders.abstract_loader import AbstractLoader
+
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
-class costcla_dataset:
-    def __init__(self, dataset):
-        available_datasets = ['CreditScoring_Kaggle2011_costcla',
-                              'CreditScoring_PAKDD2009_costcla',
-                              'DirectMarketing_costcla']
-        if dataset not in available_datasets:
-            raise Exception(
-                f'dataset: {dataset} not in costcla available datasets: {available_datasets}')
-        self.dataset = dataset
 
-    def __call__(self, percent_of_data=5, **kwargs):
-        # get dataset
-        data = _get_costcla_dataset(self.dataset)
-        # shuffle the dataset
-        data = utils.shuffle_data(data) # type: ignore
-        # reduce the size of the dataset
-        data = utils.proportional_downsample(
-            data, percent_of_data=percent_of_data, **kwargs)  # type: ignore
-        # split into train, test
-        train_data, test_data = utils.proportional_split(data, size=0.7, ratio=10) # type: ignore
-        return train_data, test_data
+class costcla_CreditScoring_Kaggle2011_loader(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 split_size=0.7,
+                 split_ratio=10,
+                 percent_of_data=5,
+                 **kwargs):
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                         split_ratio=split_ratio, 
+                         dataset_name='CreditScoring_Kaggle2011_costcla',
+                         set_seed=True,
+                         percent_of_data=percent_of_data,
+                         **kwargs)
+        
+    def load_data(self):
+        return _get_costcla_dataset('CreditScoring_Kaggle2011_costcla')
 
+
+class costcla_CreditScoring_PAKDD2009_loader(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 split_size=0.7,
+                 split_ratio=10,
+                 percent_of_data=5,
+                 **kwargs):
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                         split_ratio=split_ratio, 
+                         dataset_name='CreditScoring_PAKDD2009_costcla',
+                         set_seed=True,
+                         percent_of_data=percent_of_data,
+                         **kwargs)
+        
+    def load_data(self):
+        return _get_costcla_dataset('CreditScoring_PAKDD2009_costcla')
+    
+
+class costcla_DirectMarketing_loader(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 split_size=0.7,
+                 split_ratio=10,
+                 percent_of_data=5,
+                 **kwargs):
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                         split_ratio=split_ratio, 
+                         dataset_name='DirectMarketing_costcla',
+                         set_seed=True,
+                         percent_of_data=percent_of_data,
+                         **kwargs)
+        
+    def load_data(self):
+        return _get_costcla_dataset('DirectMarketing_costcla')
 
 
 def _get_costcla_dataset(dataset="CreditScoring_Kaggle2011_costcla", normalise=False):
@@ -66,6 +101,6 @@ def _get_costcla_dataset(dataset="CreditScoring_Kaggle2011_costcla", normalise=F
 
 
 if __name__ == '__main__':
-    train_data, test_data = _get_costcla_dataset()
-    print(train_data['X'].shape)
-    print(train_data['y'].shape)
+    loader = costcla_CreditScoring_Kaggle2011_loader()
+    # loader.plot_dataset()
+    loader.plot_train_test_split()

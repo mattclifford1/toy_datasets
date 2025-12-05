@@ -2,6 +2,7 @@ import functools
 
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import numpy as np
 import umap
@@ -57,12 +58,32 @@ def shuffle_dataset(data, seed=True):
     return data
 
 
-def proportional_split(data, size=0.8, seed=True, ratio=None, equal_test=False):
+def stratified_subsample(X, y, n_samples, random_state=42):
+    '''
+    Taken from mnists_path_dataset Repo https://github.com/mattclifford1/mnist_paths_dataset/blob/main/data_utils.py
+    '''
+    X_sub, _, y_sub, _ = train_test_split(
+        X, y,
+        train_size=n_samples,
+        stratify=y,
+        random_state=random_state
+    )
+    return X_sub, y_sub
+
+
+def proportional_split(data, 
+                       size=0.8, 
+                       seed=True, 
+                       ratio=None, 
+                       equal_test=False,
+                       ratio_test=None
+                       ):
     '''
     create a train, test split that preserves the class distributions
         data: data dict holder
         size: size of the train set (0.5 means equal train, test size)
         ratio: make imbalance ratio in the train set - assumes class 1 is minority
+        TODO: implement ratio for test set 
     '''
     if size <= 0 or size > 1:
         raise ValueError(

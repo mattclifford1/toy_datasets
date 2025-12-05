@@ -1,13 +1,15 @@
+# author: Jonny Erskine <jonathan.erskine@bristol.ac.uk>
+# author2: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
 Generate guassian data
 '''
-# author: Jonny Erskine <jonathan.erskine@bristol.ac.uk>
-# author2: Matt Clifford <matt.clifford@bristol.ac.uk>
-
 import sklearn.utils
-import random
 import numpy as np
-from data_loaders import utils
+from data_loaders.abstract_loader import AbstractLoader
+
+
+# class gaussian_loader(AbstractLoader):
+
 
 def get_gaussian(samples=200,
                  gaussian_means=[[0, 0], [1, 1]],
@@ -40,6 +42,7 @@ def get_gaussian(samples=200,
         y = np.append(y, [label]*class_samples)
     X, y = sklearn.utils.shuffle(X, y, random_state=seed)
     return {'X': X, 'y':y, 'means':gaussian_means, 'covariances':gaussian_covs}
+
 
 class GaussClass():
     def __init__(self, mean, covariance):

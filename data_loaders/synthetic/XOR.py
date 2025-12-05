@@ -8,8 +8,8 @@ def get_XOR(N1,
             scale=True,
             test_nums=[10000, 10000]):
     # sample data
-    data = get_XOR(num_samples=[N1, N2])
-    data_test = get_XOR(num_samples=test_nums)
+    data = get_XOR_single(num_samples=[N1, N2])
+    data_test = get_XOR_single(num_samples=test_nums)
     
     #scale
     if scale == True:
@@ -20,7 +20,7 @@ def get_XOR(N1,
     return {'data': data, 'data_test': data_test}
 
 
-def get_XOR(num_samples=[100, 100]):
+def get_XOR_single(num_samples=[100, 100]):
     mu = 5
     cov = [[1, 0], [0, 1]]
     covs = [cov, cov]

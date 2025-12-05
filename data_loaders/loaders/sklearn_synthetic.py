@@ -7,6 +7,7 @@ import sklearn.datasets
 import sklearn.utils
 from data_loaders import utils
 
+
 def _generic_loader(load_func, samples=200, test=False, **kwargs):
     '''
     sample from the a sklearn synthetic dataset
