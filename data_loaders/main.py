@@ -1,79 +1,97 @@
 from data_loaders import utils
+import data_loaders
 from data_loaders.synthetic import (
     XOR,
     normal,
     madelon,
     sklearn_synthetic
 )
+
+# move these to above?
 from data_loaders.loaders import (
-    sklearn_toy, 
+    sklearn_toy,
+    sklearn_synthetic
+)
+
+from data_loaders.loaders import (
+    abalone_gender, 
+    banknote, 
+    breast_cancer_W,
+    cervical_cancer, 
+    chronic_kidney_disease,
+    costcla,
     diabetes, 
     Habermans_breast_cancer, 
-    sonar_rocks, 
-    banknote, 
-    abalone_gender, 
-    ionosphere, 
-    wheat_seeds, 
-    costcla,
-    mnist,
-    breast_cancer_W,
-    hepititus,
     heart_disease,
+    hepititus,
+    ionosphere, 
     MIMIC_III,
-    MIMIC_IV
+    MIMIC_IV,
+    mnist,
+    sonar_rocks, 
+    wheat_seeds, 
 )
 
 
 AVAILABLE_DATASETS = {
-        # 'Gaussian': sample_dataset_to_proportions(get_gaussian),
-        # 'Moons': sample_dataset_to_proportions(get_moons),
-        'Gaussian': normal.get_normal_data_2_classes,
-        'Breast Cancer': sklearn_toy.get_breast_cancer,
-        'Iris': sklearn_toy.get_iris,
-        'Wine': sklearn_toy.get_wine,
-        'Pima Indian Diabetes': diabetes.get_diabetes_indian, 
-        'Habermans breast cancer': Habermans_breast_cancer.get_Habermans_breast_cancer,
-        'Sonar Rocks vs Mines': sonar_rocks.get_sonar,
-        'Banknote Authentication': banknote.get_banknote,
-        'Abalone Gender': abalone_gender.get_abalone,
-        'Ionosphere': ionosphere.get_ionosphere,
-        'Wheat Seeds': wheat_seeds.get_wheat_seeds,
-        'Credit Scoring 1': costcla.costcla_dataset('CreditScoring_Kaggle2011_costcla'),
-        'Credit Scoring 2': costcla.costcla_dataset('CreditScoring_PAKDD2009_costcla'),
-        'Direct Marketing': costcla.costcla_dataset('DirectMarketing_costcla'),
-        'MNIST': mnist.get_mnist,
-        'Wisconsin Breast Cancer':  breast_cancer_W.get_Wisconsin_breast_cancer,
-        'Hepatitis': hepititus.get_hepatitis,
-        'Heart Disease': heart_disease.get_HD,
-        'MIMIC-III': MIMIC_III.get_mortality,
-        'MIMIC-III-mortality': MIMIC_III.get_mortality,
-        'MIMIC-III-sepsis': MIMIC_III.get_sepsis,
-        'MIMIC-IV': MIMIC_IV.get_ready_for_discharge,
-        # 'Circles': sample_dataset_to_proportions(get_circles),
-        # 'Blobs': sample_dataset_to_proportions(get_blobs),
-        'XOR': XOR.get_XOR,
-        'Madelon Separable': madelon.get_sep_datasets,
-        'Madelon Non-Separable': madelon.get_non_sep_datasets,
-        'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
-        'Moon Separable': sklearn_synthetic.get_synthetic_sep_data_moons,
+    # synthetic datasets
+    # 'Gaussian': sample_dataset_to_proportions(get_gaussian),
+    # 'Moons': sample_dataset_to_proportions(get_moons),
+
+    # TODO: the ones int he synthetic folder
+
+    # 'sklearn synthietc moons': todo
+    # 'sklearn toy': todo
+
+    # 'UCI Toy Datasets':
+    # 'Gaussian': normal.get_normal_data_2_classes,
+    # # 'Circles': sample_dataset_to_proportions(get_circles),
+    # # 'Blobs': sample_dataset_to_proportions(get_blobs),
+    # 'XOR': XOR.get_XOR,
+    # 'Madelon Separable': madelon.get_sep_datasets,
+    # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
+    # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
+    # 'Moon Separable': sklearn_synthetic.get_synthetic_sep_data_moons,
+    # 'Iris': sklearn_toy.get_iris,
+    # 'Wine': sklearn_toy.get_wine,
+    # 'Breast Cancer': sklearn_toy.get_breast_cancer,
+
+    # real datasets
+    'Abalone Gender':               abalone_gender.abalone_gender_loader,
+    'Banknote Authentication':      banknote.banknote_loader,
+    'Breast Cancer Wisconsin':      breast_cancer_W.breast_cancer_W_loader,
+    'Cervical Cancer':              cervical_cancer.cervical_cancer_loader,
+    'Chronic Kidney Disease':       chronic_kidney_disease.chronic_kidney_disease_loader,
+    'Costcla Credit Scoring Kaggle 2011': costcla.costcla_CreditScoring_Kaggle2011_loader,
+    'Costcla Credit Scoring PAKDD 2009':  costcla.costcla_CreditScoring_PAKDD2009_loader,
+    'Costcla Direct Marketing':     costcla.costcla_DirectMarketing_loader,
+    'Diabetes Pima Indian':         diabetes.diabetes_pima_indians_loader,
+    'Habermans Breast Cancer':      Habermans_breast_cancer.habermans_breast_cancer_loader,
+    'Heart Disease':                heart_disease.heart_disease_loader,
+    'Hepatitis':                    hepititus.hepatitis_loader,
+    'Ionosphere':                   ionosphere.ionosphere_loader,
+    # 'MIMIC-III Mortality': MIMIC_III.MIMIC_III_mortality_loader,
+    # 'MIMIC-III Sepsis': MIMIC_III.MIMIC_III_sepsis_loader,
+    # 'MIMIC-IV Ready For Discharge': MIMIC_IV.MIMIC_IV_ready_for_discharge_loader,
+    'MNIST': mnist.mnist_loader,
+    'Sonar Rocks vs Mines': sonar_rocks.sonar_rocks_loader,
+    'Wheat Seeds': wheat_seeds.wheat_seeds_loader,
     }
 
 
-def get_available_dataset_list():
-    return list(AVAILABLE_DATASETS.keys())
+def get_data_set(dataset_name, **kwargs):
+    if dataset_name not in AVAILABLE_DATASETS.keys():
+        raise ValueError(f"Dataset {dataset_name} not available. Choose from: {list(AVAILABLE_DATASETS.keys())}")
+    loader_class = AVAILABLE_DATASETS[dataset_name]
+    # initialise loader
+    loader = loader_class(**kwargs)
+    return loader
 
 
-def print_available_datasets():
-    '''
-    TODO: get info about each dataset and print here
-    '''
-    print('Available datasets:')
-    for key in AVAILABLE_DATASETS.keys():
-        print(f' - {key}')
 
-
+### OLD WAY OF DOING IT HERE ----> MAKE THIS INTO NEW METHOD ASAP
 @utils.make_data_dim_reducer
-def get_dataset(dataset='Breast Cancer', _print=True, scale=False, **kwargs):
+def get_dataset_old(dataset='Breast Cancer', _print=True, scale=False, **kwargs):
     # check input correct dataset name
     if dataset not in AVAILABLE_DATASETS.keys():
         raise ValueError(f'dataset needs to be one of:{AVAILABLE_DATASETS.keys()}')
@@ -110,9 +128,6 @@ def get_dataset(dataset='Breast Cancer', _print=True, scale=False, **kwargs):
 
 
 
-
-
-
 @utils.make_data_dim_reducer
 def get_MNIST(scale=False):
     mnist.get_mnist()
@@ -126,7 +141,11 @@ def get_MNIST(scale=False):
 
 
 if __name__ == '__main__':
-    data = get_dataset(dataset='Madelon Non-Separable')
-    print(data['data']['X'].shape)
-    print(data['data_test']['X'].shape)
-    print_available_datasets()
+    # data = get_dataset(dataset='Madelon Non-Separable')
+    # print(data['data']['X'].shape)
+    # print(data['data_test']['X'].shape)
+    
+    data_loaders.print_available_datasets()
+
+    loader = get_data_set('Hepatitis')
+    loader.plot_train_test_split()

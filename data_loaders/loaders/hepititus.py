@@ -11,7 +11,7 @@ from data_loaders.abstract_loader import AbstractLoader
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class hepititus_loader(AbstractLoader):
+class hepatitis_loader(AbstractLoader):
     def __init__(self,
                  shuffle=True,
                  split_size=0.5,
@@ -44,6 +44,6 @@ class hepititus_loader(AbstractLoader):
         
 
 if __name__ == "__main__":
-    loader = hepititus_loader()
+    loader = hepatitis_loader()
     # loader.plot_dataset()
     loader.plot_train_test_split()

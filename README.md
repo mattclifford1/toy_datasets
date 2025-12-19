@@ -17,7 +17,9 @@ python -m pip install -e .
  - finish any other synthetic loaders
  - MIMIC loaders
  - have main with the new class method
- - abstract
+ - add to abstract (from get_dataset)
    - do dim reduction
-   - do scaling
+   - do scaling 
    - other things for feature parity?
+ - other thigns to add to abstract
+   - have the dim reduction plotting the same for train and test
