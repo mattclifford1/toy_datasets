@@ -1,1 +1,1 @@
-from .sklearn_synthetic import _generic_sklearn_loader
+from .sklearn_synthetic_utils import _generic_sklearn_loader

@@ -29,18 +29,3 @@ def _generic_sklearn_loader(load_func, samples=200, test=False, **kwargs):
     data = {'X': X, 'y':y}
     return data
 
-
-def get_normal(samples=200, test=False, normal_dims=20, **kwargs):
-    '''
-    sample from the circles data distribution
-    ** read docs to add more params here
-    https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification
-    returns:
-        - data: dict containing 'X', 'y'
-    '''
-    data = _generic_loader(load_func=sklearn.datasets.make_classification,
-                           samples=samples,
-                           test=test,
-                           n_features=normal_dims
-                           )
-    return data

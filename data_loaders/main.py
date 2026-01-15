@@ -5,10 +5,11 @@ from data_loaders.synthetic import (
     moons,
     blobs,
     circles,
+    classification,
     normal,
     madelon,
-    sklearn_synthetic,
-    sklearn_synthetic_old
+    sklearn_synthetic_old,
+    sklearn_synthetic_utils
 )
 from data_loaders.loaders import (
     abalone_gender, 
@@ -52,6 +53,7 @@ AVAILABLE_DATASETS = {
     'Moons': moons.moons_generator,
     'Blobs': blobs.blobs_generator,
     'Circles': circles.circles_generator,
+    'Sklearn Normal': classification.sklearn_normal_generator,
     # 'Iris': sklearn_toy.get_iris,
     # 'Wine': sklearn_toy.get_wine,
     # 'Breast Cancer': sklearn_toy.get_breast_cancer,
