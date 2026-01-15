@@ -3,6 +3,7 @@ import data_loaders
 from data_loaders.synthetic import (
     XOR,
     moons,
+    blobs,
     normal,
     madelon,
     sklearn_synthetic,
@@ -48,6 +49,7 @@ AVAILABLE_DATASETS = {
     # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
     # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
     'Moons': moons.moons_generator,
+    'Blobs': blobs.blobs_generator,
     # 'Iris': sklearn_toy.get_iris,
     # 'Wine': sklearn_toy.get_wine,
     # 'Breast Cancer': sklearn_toy.get_breast_cancer,
