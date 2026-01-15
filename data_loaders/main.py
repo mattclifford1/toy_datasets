@@ -4,15 +4,9 @@ from data_loaders.synthetic import (
     XOR,
     normal,
     madelon,
-    sklearn_synthetic
+    sklearn_synthetic,
+    sklearn_synthetic_old
 )
-
-# move these to above?
-from data_loaders.loaders import (
-    sklearn_toy,
-    sklearn_synthetic
-)
-
 from data_loaders.loaders import (
     abalone_gender, 
     banknote, 
@@ -28,6 +22,7 @@ from data_loaders.loaders import (
     MIMIC_III,
     MIMIC_IV,
     mnist,
+    sklearn_toy,
     sonar_rocks, 
     wheat_seeds, 
 )
@@ -47,7 +42,7 @@ AVAILABLE_DATASETS = {
     # 'Gaussian': normal.get_normal_data_2_classes,
     # # 'Circles': sample_dataset_to_proportions(get_circles),
     # # 'Blobs': sample_dataset_to_proportions(get_blobs),
-    # 'XOR': XOR.get_XOR,
+    'XOR': XOR.XOR_generator,
     # 'Madelon Separable': madelon.get_sep_datasets,
     # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
     # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
@@ -141,11 +136,11 @@ def get_MNIST(scale=False):
 
 
 if __name__ == '__main__':
-    # data = get_dataset(dataset='Madelon Non-Separable')
-    # print(data['data']['X'].shape)
-    # print(data['data_test']['X'].shape)
-    
     data_loaders.print_available_datasets()
 
-    loader = get_data_set('Hepatitis')
-    loader.plot_train_test_split()
+
+    dataset_str = "Abalone Gender"
+    print(f"\n===========\nLoading {dataset_str}\n===========\n")
+    dataset = data_loaders.get_dataset("Abalone Gender")
+    print(dataset)
+    dataset.plot_train_test_split()

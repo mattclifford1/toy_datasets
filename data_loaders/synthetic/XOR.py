@@ -1,37 +1,71 @@
 import numpy as np
+import sklearn.utils
 from data_loaders import utils
-from data_loaders.synthetic import normal
+from data_loaders.utils import set_seed
+from data_loaders.abstract_loader import AbstractLoader
 
 
-def get_XOR(N1, 
-            N2,
-            scale=True,
-            test_nums=[10000, 10000]):
-    # sample data
-    data = get_XOR_single(num_samples=[N1, N2])
-    data_test = get_XOR_single(num_samples=test_nums)
-    
-    #scale
-    if scale == True:
-        scaler = utils.normaliser(data)
-        data = scaler(data)
-        data_test = scaler(data_test)
+class XOR_generator(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 num_train=1000,
+                 num_test=2000,
+                 train_ratio=10,
+                 split_size=0.5,
+                #  test_ratio=1,
+                 set_seed=True,
+                 scale=True,
+                 **kwargs):
+        self.num_train = num_train
+        self.num_test = num_test
+        self.num_samples = [num_train + num_test//2, num_train + num_test//2]
+         # work out the split size and ratio from the numbers
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                         dataset_name='XOR Synthetic',
+                         **kwargs)
+        
+    def load_data(self):
+        data = self._get_XOR_single(num_samples=self.num_samples)
+        return data
 
-    return {'data': data, 'data_test': data_test}
+
+    def _get_two_normal_classes(self, means=[[0, 0], [10, 10]], 
+                        covs=[[[1, 0], [0, 1]],
+                            [[1, 1], [1, 1]]], 
+                        num_samples=[3, 2],
+                        seed=None):
+        labels = [0, 1]
+        X = []
+        y = []
+        for mean, cov, num_sample, label in zip(means, covs, num_samples, labels):
+            set_seed(seed)
+            X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
+            y.append(np.ones(num_sample)*label)
+        X = np.vstack(X)
+        y = np.hstack(y)
+        X, y = sklearn.utils.shuffle(X, y, random_state=seed)
+        return {'X': X, 'y': y}
 
 
-def get_XOR_single(num_samples=[100, 100]):
-    mu = 5
-    cov = [[1, 0], [0, 1]]
-    covs = [cov, cov]
-    top_data = normal.get_two_classes(means=[[-mu, -mu], [mu, -mu]],
-                                      covs=covs,
-                                      num_samples=[num_samples[0]//2, num_samples[1]//2])
-    bot_data = normal.get_two_classes(means=[[mu, mu], [-mu, mu]],
-                                      covs=covs,
-                                      num_samples=[num_samples[0]//2, num_samples[1]//2])
+    def _get_XOR_single(self, num_samples=[100, 100]):
+        mu = 5
+        cov = [[1, 0], [0, 1]]
+        covs = [cov, cov]
+        top_data = self._get_two_normal_classes(means=[[-mu, -mu], [mu, -mu]],
+                                        covs=covs,
+                                        num_samples=[num_samples[0]//2, num_samples[1]//2])
+        bot_data = self._get_two_normal_classes(means=[[mu, mu], [-mu, mu]],
+                                        covs=covs,
+                                        num_samples=[num_samples[0]//2, num_samples[1]//2])
 
-    X = np.vstack([top_data['X'], bot_data['X']])
-    y = np.hstack([top_data['y'], bot_data['y']])
+        X = np.vstack([top_data['X'], bot_data['X']])
+        y = np.hstack([top_data['y'], bot_data['y']])
 
-    return {'X': X, 'y': y}
+        return {'X': X, 'y': y}
+
+
+if __name__ == "__main__":
+    loader = XOR_generator()
+    # loader.plot_dataset()
+    loader.plot_train_test_split()
