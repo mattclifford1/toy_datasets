@@ -8,7 +8,7 @@ import sklearn.utils
 from data_loaders import utils
 
 
-def _generic_loader(load_func, samples=200, test=False, **kwargs):
+def _generic_sklearn_loader(load_func, samples=200, test=False, **kwargs):
     '''
     sample from the a sklearn synthetic dataset
     returns:
@@ -18,26 +18,17 @@ def _generic_loader(load_func, samples=200, test=False, **kwargs):
     if test == True and load_func != sklearn.datasets.make_blobs:
         seed += 1
 
-    X, y = load_func(n_samples=[int(samples/2)]*2,
-                     random_state=seed,
-                     shuffle=False,
-                     **kwargs)
+    X, y = load_func(
+        n_samples=samples,
+        random_state=seed,
+        shuffle=False,
+        **kwargs
+        )
     
     X, y = sklearn.utils.shuffle(X, y, random_state=seed)
     data = {'X': X, 'y':y}
     return data
 
-def get_moons(samples=200, test=False, moons_noise=0.2, **kwargs):
-    '''
-    sample from the half moons data distribution
-    returns:
-        - data: dict containing 'X', 'y'
-    '''
-    data = _generic_loader(load_func=sklearn.datasets.make_moons,
-                           samples=samples,
-                           test=test,
-                           noise=moons_noise)
-    return data
 
 def get_normal(samples=200, test=False, normal_dims=20, **kwargs):
     '''
