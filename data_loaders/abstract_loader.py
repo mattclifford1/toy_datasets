@@ -138,6 +138,9 @@ class AbstractLoader(ABC):
             y_test=test_data['y'],
             dataset_name=self.dataset_name
         )
+
+    def __str__(self):
+        return f"Data Loader for {self.dataset_name} dataset"
     
 
     

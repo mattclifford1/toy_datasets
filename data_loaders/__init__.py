@@ -1,4 +1,5 @@
 from data_loaders.main import AVAILABLE_DATASETS
+from data_loaders.main import get_dataset
 
 
 def get_available_dataset_list():

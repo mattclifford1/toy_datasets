@@ -6,6 +6,9 @@ for now no PyPi upload so just install directly from github
 
 todo: make a release version and install by adding to pyproject (get from python-utils how to) 
 
+# examples
+see the examples.py for examples of how to use
+
 # dev
 install the dev group from pdm/pyproject. then install this dir as editable
 ```

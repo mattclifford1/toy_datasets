@@ -79,7 +79,7 @@ AVAILABLE_DATASETS = {
     }
 
 
-def get_data_set(dataset_name, **kwargs):
+def get_dataset(dataset_name, **kwargs):
     if dataset_name not in AVAILABLE_DATASETS.keys():
         raise ValueError(f"Dataset {dataset_name} not available. Choose from: {list(AVAILABLE_DATASETS.keys())}")
     loader_class = AVAILABLE_DATASETS[dataset_name]
