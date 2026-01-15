@@ -44,29 +44,3 @@ def get_normal(samples=200, test=False, normal_dims=20, **kwargs):
                            n_features=normal_dims
                            )
     return data
-
-def get_circles(samples=200, test=False, circles_noise=0.2, **kwargs):
-    '''
-    sample from the circles data distribution
-    returns:
-        - data: dict containing 'X', 'y'
-    '''
-    data = _generic_loader(load_func=sklearn.datasets.make_circles,
-                           samples=samples,
-                           test=test,
-                           noise=circles_noise,
-                           factor=0.8)
-    return data
-
-def get_blobs(samples=200, test=False, blobs_features=2, **kwargs):
-    '''
-    sample from the circles data distribution
-    https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs
-    returns:
-        - data: dict containing 'X', 'y'
-    '''
-    data = _generic_loader(load_func=sklearn.datasets.make_blobs,
-                           samples=samples,
-                           test=test,
-                           n_features=blobs_features)
-    return data
