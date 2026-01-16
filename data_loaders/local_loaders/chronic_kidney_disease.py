@@ -26,16 +26,112 @@ class chronic_kidney_disease_loader(AbstractLoader):
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'chronic_kidney_disease', 'data.csv'))
-        #TODO: sort out the missing values - remove or imput?
+        # remove final row error
+        df = df.drop(columns=['Unnamed: 25'])
+        # drop categorical columns
+        categorical_cols = [
+            # 'sg', # (1.005,1.010,1.015,1.020,1.025)
+            'al', # (0,1,2,3,4,5)
+            'su', # (0,1,2,3,4,5)
+        ]
+        df = df.drop(columns=categorical_cols)
+
+        binary_cols = [
+            'rbc', # (normal,abnormal)
+            'pc',  # (normal,abnormal)
+            'pcc', # (present, notpresent)
+            'ba', # (present, notpresent)
+            'htn', # (yes, no)
+            'dm', # (yes,no)
+            'cad', # (yes,no)
+            'appet', # (good, poor)
+            'pe', # (yes,no)
+            'ane' # (yes,no)
+        ]
+        # df = df.drop(columns=binary_cols)
+        # convert binary columns to 0/1
+        for col in binary_cols:
+            df[col] = df[col].map({
+                'normal': 1,
+                'abnormal': 0,
+                'present': 1,
+                'notpresent': 0,
+                'yes': 1,
+                'no': 0,
+                'good': 1,
+                'poor': 0,
+                })
+
+
+        # drop columns with too many missing values
+        df = df.drop(columns=[
+            'wc', 
+            'rc', 
+            'pcv', 
+            'sod', 
+            'pot',
+            'bgr',
+            'rbc',
+            ])
+        
+        # column name mapping
+        mapping ={
+            'age': 'age',
+            'bp': 'blood pressure',
+            'sg': 'specific gravity',
+            'al': 'albumin',
+            'su': 'sugar',
+            'rbc': 'red blood cells',
+            'pc': 'pus cell',
+            'pcc': 'pus cell clumps',
+            'ba': 'bacteria',
+            'bgr': 'blood glucose random',
+            'bu': 'blood urea',
+            'sc': 'serum creatinine',
+            'sod': 'sodium',
+            'pot': 'potassium',
+            'hemo': 'hemoglobin',
+            'pcv': 'packed cell volume',
+            'wc': 'white blood cell count',
+            'rc': 'red blood cell count',
+            'htn': 'hypertension',
+            'dm': 'diabetes mellitus',
+            'cad': 'coronary artery disease',
+            'appet': 'appetite',
+            'pe': 'pedal edema',
+            'ane': 'anemia',
+            'class': 'class',
+        }
+        df = df.rename(columns=mapping)
+
+        # fix target names change from 'ckd\t' to 'ckd' and 'no' to 'nockd'
+        df['class'] = df['class'].str.strip()
+        df['class'] = df['class'].replace({'no':'notckd'})
+
+        # strip string in all columns
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                df[col] = df[col].str.strip()
+
+        # remove rows with missing values
+        df = df.replace('?', pd.NA)
+        df = df.dropna()
+        
+        # remove rows with missing target
+        df = df[df['class'].notna()]
 
         data['y'] = df.pop('class').to_numpy()
-        # classes are ?, notpresent, notckd and ckd (chronic kidney disease) 
-        # take as ckd or not ckd for ML algorithms
-        #TODO: process 'class'
+        # convert to binary labels
+        data['y'][data['y']=='ckd'] = 1
+        data['y'][data['y']=='notckd'] = 0
+
+        # convert features to numeric
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col])
 
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
-        data['label_names'] = ['ckd', 'notckd']
+        data['label_names'] = ['Chronic Kidney Disease', 'Not Chronic Kidney Disease']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 
                             'datasets', 'chronic_kidney_disease', 'description.txt'), 'r') as f:
@@ -46,5 +142,6 @@ class chronic_kidney_disease_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = chronic_kidney_disease_loader()
-    # loader.plot_dataset()
-    loader.plot_train_test_split()
+    print(loader.get_info(long=True))
+    loader.plot_dataset()
+    # loader.plot_train_test_split()
