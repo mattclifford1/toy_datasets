@@ -1,17 +1,15 @@
 from data_loaders import utils
 import data_loaders
-from data_loaders.synthetic import (
+from data_loaders.external_loaders import MIMIC_III, MIMIC_IV
+from data_loaders.synthetic_generators import (
     XOR,
     moons,
     blobs,
     circles,
     classification,
     normal,
-    madelon,
-    sklearn_synthetic_old,
-    sklearn_synthetic_utils
 )
-from data_loaders.loaders import (
+from data_loaders.local_loaders import (
     abalone_gender, 
     banknote, 
     breast_cancer_W,
@@ -20,45 +18,32 @@ from data_loaders.loaders import (
     costcla,
     diabetes, 
     Habermans_breast_cancer, 
-    heart_disease,
     hepititus,
     ionosphere, 
-    MIMIC_III,
-    MIMIC_IV,
-    mnist,
-    sklearn_toy,
     sonar_rocks, 
     wheat_seeds, 
 )
+from data_loaders.web_loaders import heart_disease, mnist, sklearn_toy
 
 
 AVAILABLE_DATASETS = {
     # synthetic datasets
-    # 'Gaussian': sample_dataset_to_proportions(get_gaussian),
-    # 'Moons': sample_dataset_to_proportions(get_moons),
-
-    # TODO: the ones int he synthetic folder
-
-    # 'sklearn synthietc moons': todo
-    # 'sklearn toy': todo
-
-    # 'UCI Toy Datasets':
-    # 'Gaussian': normal.get_normal_data_2_classes,
-    # # 'Circles': sample_dataset_to_proportions(get_circles),
-    # # 'Blobs': sample_dataset_to_proportions(get_blobs),
     'XOR': XOR.XOR_generator,
-    # 'Madelon Separable': madelon.get_sep_datasets,
-    # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
-    # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
     'Moons': moons.moons_generator,
     'Blobs': blobs.blobs_generator,
     'Circles': circles.circles_generator,
     'Sklearn Normal': classification.sklearn_normal_generator,
+    # 'Gaussian': sample_dataset_to_proportions(get_gaussian),
+    # 'Madelon Separable': madelon.get_sep_datasets,
+    # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
+    # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
+
+    # toy datasets from sklearn
     # 'Iris': sklearn_toy.get_iris,
     # 'Wine': sklearn_toy.get_wine,
     # 'Breast Cancer': sklearn_toy.get_breast_cancer,
 
-    # real datasets
+    # "real" datasets
     'Abalone Gender':               abalone_gender.abalone_gender_loader,
     'Banknote Authentication':      banknote.banknote_loader,
     'Breast Cancer Wisconsin':      breast_cancer_W.breast_cancer_W_loader,
@@ -72,12 +57,14 @@ AVAILABLE_DATASETS = {
     'Heart Disease':                heart_disease.heart_disease_loader,
     'Hepatitis':                    hepititus.hepatitis_loader,
     'Ionosphere':                   ionosphere.ionosphere_loader,
-    # 'MIMIC-III Mortality': MIMIC_III.MIMIC_III_mortality_loader,
-    # 'MIMIC-III Sepsis': MIMIC_III.MIMIC_III_sepsis_loader,
-    # 'MIMIC-IV Ready For Discharge': MIMIC_IV.MIMIC_IV_ready_for_discharge_loader,
     'MNIST': mnist.mnist_loader,
     'Sonar Rocks vs Mines': sonar_rocks.sonar_rocks_loader,
     'Wheat Seeds': wheat_seeds.wheat_seeds_loader,
+
+    # MIMIC datasets commented out for now as they require special data access downloaded separately
+    # 'MIMIC-III Mortality': MIMIC_III.MIMIC_III_mortality_loader,
+    # 'MIMIC-III Sepsis': MIMIC_III.MIMIC_III_sepsis_loader,
+    # 'MIMIC-IV Ready For Discharge': MIMIC_IV.MIMIC_IV_ready_for_discharge_loader,
     }
 
 
