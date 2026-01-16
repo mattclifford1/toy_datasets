@@ -28,9 +28,14 @@ class ionosphere_loader(AbstractLoader):
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'Ionosphere', 'data.csv'), header=None)
         df.drop(df[df[0] == 'I'].index, inplace=True)
-        df = df.replace({34: {'b': 0, 'g': 1}})
+        df[34] = df[34].map({'b': 0, 'g': 1}).astype('int64')
         data['y'] = df.pop(34).to_numpy()  # type: ignore
         data['X'] = df.to_numpy()
+        data['feature_names'] = []
+        for i in range(1, 18):
+            data['feature_names'].append(f'Pulse {i} real')
+            data['feature_names'].append(f'Pulse {i} imaginary')
+        data['label_names'] = ['bad', 'good']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'Ionosphere', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -39,5 +44,6 @@ class ionosphere_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = ionosphere_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
-    loader.plot_train_test_split()
+    # loader.plot_train_test_split()

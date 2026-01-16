@@ -45,6 +45,7 @@ class diabetes_pima_indians_loader(AbstractLoader):
             df.pop(col)
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
+        data['label_names'] = ['No Diabetes', 'Diabetes']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'diabetes_pima_indians', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -53,5 +54,6 @@ class diabetes_pima_indians_loader(AbstractLoader):
     
 if __name__ == "__main__":
     loader = diabetes_pima_indians_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
     loader.plot_train_test_split()

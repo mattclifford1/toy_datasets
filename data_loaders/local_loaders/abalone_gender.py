@@ -28,7 +28,7 @@ class abalone_gender_loader(AbstractLoader):
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'abalone', 'data.csv'), header=None)
         df.drop(df[df[0] == 'I'].index, inplace=True)
-        df = df.replace({0: {'M': 0, 'F': 1}})
+        df[0] = df[0].map({'M': 0, 'F': 1}).astype('int64')
         data['y'] = df.pop(0).to_numpy()  # type: ignore
         data['X'] = df.to_numpy()
         data['feature_names'] = ['Length',
@@ -39,6 +39,7 @@ class abalone_gender_loader(AbstractLoader):
                                 'Viscera weight',
                                 'Shell weight',
                                 'Rings']
+        data['label_names'] = ['Male', 'Female']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'abalone', 'description.txt'), 'r') as f:
             data['description'] = f.read()

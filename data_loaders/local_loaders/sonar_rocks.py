@@ -38,10 +38,12 @@ class sonar_rocks_loader(AbstractLoader):
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'sonar_rocks_mines', 'data.csv'), header=None)
-        df = df.replace({60: {'R': 0, 'M': 1}})
+        # df = df.replace({60: {'R': 0, 'M': 1}})
+        df[60] = df[60].map({'R': 0, 'M': 1}).astype('int64')
         data['y'] = df.pop(60).to_numpy() # type: ignore
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
+        data['label_names'] = ['Rock', 'Mine']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'sonar_rocks_mines', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -50,5 +52,6 @@ class sonar_rocks_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = sonar_rocks_loader()
-    # loader.plot_dataset()
-    loader.plot_train_test_split()
+    print(loader)
+    loader.plot_dataset()
+    # loader.plot_train_test_split()

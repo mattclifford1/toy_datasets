@@ -37,6 +37,7 @@ class hepatitis_loader(AbstractLoader):
         data['y'][data['y'] == 2] = 0
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
+        data['label_names'] = ['Survived', 'Died']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'hepititus', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -45,5 +46,6 @@ class hepatitis_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = hepatitis_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
-    loader.plot_train_test_split()
+    # loader.plot_train_test_split()

@@ -6,7 +6,12 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
 
-def plot_dataset(X, y, X_test=None, y_test=None, dataset_name=None):
+def plot_dataset(X, 
+                 y, 
+                 X_test=None, 
+                 y_test=None, 
+                 dataset_name=None,
+                 label_names=None):
     def embed(X):
         if X.shape[1] > 2:
             return TSNE(n_components=2, perplexity=30, random_state=42).fit_transform(X)
@@ -30,13 +35,17 @@ def plot_dataset(X, y, X_test=None, y_test=None, dataset_name=None):
     for ax, Xd, yd, title in zip(axes, Xs, ys, titles):
         X_embed_2d = embed(Xd)
         for cls in [0, 1]:
+            if label_names is not None:
+                class_label = f"Class {cls}: {label_names[cls]}"
+            else:
+                class_label = f"Class {cls}"
             ax.scatter(
                 X_embed_2d[yd == cls, 0],
                 X_embed_2d[yd == cls, 1],
                 color=colors[cls],
                 alpha=0.8,
                 s=12,
-                label=f"Class {cls}"
+                label=class_label 
             )
         ax.set_title(f"{title} set in TSNE space")
         ax.set_xlabel("TSNE Dim 1")

@@ -35,6 +35,7 @@ class chronic_kidney_disease_loader(AbstractLoader):
 
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
+        data['label_names'] = ['ckd', 'notckd']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 
                             'datasets', 'chronic_kidney_disease', 'description.txt'), 'r') as f:

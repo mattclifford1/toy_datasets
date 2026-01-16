@@ -55,7 +55,8 @@ class mnist_loader(AbstractLoader):
         # X = np.empty([self.size, 1, 28, 28], dtype=np.float32)
         y = np.zeros(self.size, dtype=np.int64)
         counter = 0
-        for batch_idx, (d, t) in tqdm(enumerate(train_loader), total=self.size//256, desc='torch to numpy MNIST', leave=False):
+        # for batch_idx, (d, t) in tqdm(enumerate(train_loader), total=self.size//256, desc='torch to numpy MNIST', leave=False):
+        for batch_idx, (d, t) in enumerate(train_loader):
             d_np = d.numpy()
             # t_np = t.numpy()
             for i in range(d.shape[0]):
@@ -78,13 +79,20 @@ class mnist_loader(AbstractLoader):
                 y[y == id] = 11  # take out of range of labels
             y[y != 11] = 0
             y[y == 11] = 1
+            # add label names
+            label_names = ['Digits 0-8', 'Digit 9']
+        else:
+            label_names = [str(i) for i in range(10)]
         # formatting
         # print(len(y), sum(y))
         data = {'X':X, 'y':y}
+        data['description'] = "The MNIST database of handwritten digits, with images of size 28x28 pixels."
+        data['label_names'] = label_names
         return data
 
 
 if __name__ == '__main__':
     loader = mnist_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
-    loader.plot_train_test_split()
+    # loader.plot_train_test_split()

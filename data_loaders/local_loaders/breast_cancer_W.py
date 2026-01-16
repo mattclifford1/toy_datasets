@@ -30,7 +30,7 @@ class breast_cancer_W_loader(AbstractLoader):
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'breast_cancer_Wisconsin', 'data.csv'))
-        data['y'] = df.pop('diagnosis')
+        data['y'] = df.pop('diagnosis').copy()
         data['y'][data['y']=='B'] = 0  
         data['y'][data['y']=='M'] = 1
         data['y'] = data['y'].to_list()
@@ -38,6 +38,7 @@ class breast_cancer_W_loader(AbstractLoader):
         df.pop('ID')
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
+        data['label_names'] = ['Benign', 'Malignant']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'breast_cancer_Wisconsin', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -46,5 +47,6 @@ class breast_cancer_W_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = breast_cancer_W_loader()
+    print(loader)
     # loader.plot_dataset()
-    loader.plot_train_test_split()
+    # loader.plot_train_test_split()

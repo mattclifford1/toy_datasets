@@ -35,6 +35,7 @@ class habermans_breast_cancer_loader(AbstractLoader):
         data['y'][data['y']==2] = 1
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
+        data['label_names'] = ['survived 5 years or longer', 'died within 5 year']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'Habermans_breast_cancer', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -43,5 +44,6 @@ class habermans_breast_cancer_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = habermans_breast_cancer_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
     loader.plot_train_test_split()

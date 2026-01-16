@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from data_loaders import utils
 import data_loaders
 from data_loaders.external_loaders import MIMIC_III, MIMIC_IV
@@ -23,7 +24,7 @@ from data_loaders.local_loaders import (
     sonar_rocks, 
     wheat_seeds, 
 )
-from data_loaders.web_loaders import heart_disease, mnist, sklearn_toy
+from data_loaders.web_loaders import heart_disease, mnist, wine, iris, breast_cancer
 
 
 AVAILABLE_DATASETS = {
@@ -39,15 +40,15 @@ AVAILABLE_DATASETS = {
     # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
 
     # toy datasets from sklearn
-    # 'Iris': sklearn_toy.get_iris,
-    # 'Wine': sklearn_toy.get_wine,
-    # 'Breast Cancer': sklearn_toy.get_breast_cancer,
+    'Iris': iris.iris_loader,
+    'Wine': wine.wine_loader,
+    'Breast Cancer': breast_cancer.breast_cancer_loader,
 
     # "real" datasets
     'Abalone Gender':               abalone_gender.abalone_gender_loader,
     'Banknote Authentication':      banknote.banknote_loader,
     'Breast Cancer Wisconsin':      breast_cancer_W.breast_cancer_W_loader,
-    'Cervical Cancer':              cervical_cancer.cervical_cancer_loader,
+    # 'Cervical Cancer':              cervical_cancer.cervical_cancer_loader,
     'Chronic Kidney Disease':       chronic_kidney_disease.chronic_kidney_disease_loader,
     'Costcla Credit Scoring Kaggle 2011': costcla.costcla_CreditScoring_Kaggle2011_loader,
     'Costcla Credit Scoring PAKDD 2009':  costcla.costcla_CreditScoring_PAKDD2009_loader,
@@ -129,12 +130,19 @@ def get_MNIST(scale=False):
 #     return {'X': X, 'y': y}
 
 
+def test_available_datasets(_print=False):
+    infos = []
+    for dataset_name in tqdm(AVAILABLE_DATASETS.keys()):
+        print(dataset_name)
+        dataset = data_loaders.get_dataset(dataset_name)
+        infos.append(dataset.get_info(long=False))
+    
+    if _print:
+        print("\n\n".join(infos))
+
+
 if __name__ == '__main__':
-    data_loaders.print_available_datasets()
-
-
-    dataset_str = "Abalone Gender"
-    print(f"\n===========\nLoading {dataset_str}\n===========\n")
-    dataset = data_loaders.get_dataset("Abalone Gender")
-    print(dataset)
-    dataset.plot_train_test_split()
+    print(f"Testing available datasets:")
+    for dataset_name in AVAILABLE_DATASETS.keys():
+        print(f"    - {dataset_name}")
+    test_available_datasets(_print=False)

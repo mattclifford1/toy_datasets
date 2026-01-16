@@ -31,6 +31,7 @@ class banknote_loader(AbstractLoader):
                                 'skewness of Wavelet Transformed image',
                                 'curtosis of Wavelet Transformed image',
                                 'entropy of image']
+        data['label_names'] = ['Authentic', 'Counterfeit']
         # add name and description
         with open(os.path.join(CURRENT_FILE, '..', 'datasets', 'banknote_authentication', 'description.txt'), 'r') as f:
             data['description'] = f.read()
@@ -39,5 +40,6 @@ class banknote_loader(AbstractLoader):
     
 if __name__ == "__main__":
     loader = banknote_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
-    loader.plot_train_test_split()
+    # loader.plot_train_test_split()

@@ -1,16 +1,11 @@
 # author: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
-loader for hepititus: https://archive.ics.uci.edu/dataset/46/hepatitis
+https://archive.ics.uci.edu/dataset/45/heart+disease
 '''
 
-import os
-import pandas as pd
 import numpy as np
 from ucimlrepo import fetch_ucirepo
 from data_loaders.abstract_loader import AbstractLoader
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class heart_disease_loader(AbstractLoader):
@@ -27,8 +22,6 @@ class heart_disease_loader(AbstractLoader):
         
     def load_data(self):
         data = {}
-        # df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
-        #                  'datasets', 'hepititus', 'data.csv'))
 
         # fetch dataset
         heart_disease = fetch_ucirepo(id=45)
@@ -54,10 +47,12 @@ class heart_disease_loader(AbstractLoader):
         data['feature_names'] = heart_disease.metadata
         # add name and description
         data['description'] = heart_disease.metadata
+        data['label_names'] = ['no heart disease', 'heart disease']
         return data
         
 
 if __name__ == "__main__":
     loader = heart_disease_loader()
+    print(loader.get_info(long=True))
     # loader.plot_dataset()
     loader.plot_train_test_split()

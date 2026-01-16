@@ -26,13 +26,32 @@ class wheat_seeds_loader(AbstractLoader):
         
     def load_data(self):
         '''
-        we remove class 3 and make it a binary problem
+        options to:
+            - we remove class 3 and make it a binary problem
+            - combine 2 classes into one
+        original classes:
+            1. Kama
+            2. Rosa
+            3. Canadian
         '''
+        drop_class_3 = False
+        combine_classes = True
+        if (drop_class_3 and combine_classes):
+            raise ValueError("Wheat seeds Cannot both drop class 3 and combine classes")
+        if (not drop_class_3) and (not combine_classes):
+            raise ValueError("Wheat seeds Must either drop class 3 or combine classes")
+        
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'wheat_seeds', 'data.csv'), header=None)
-        df.drop(df[df[7] == 3].index, inplace=True)
-        df = df.replace({7: {2: 0}})
+        if drop_class_3:
+            df.drop(df[df[7] == 3].index, inplace=True)
+            df = df.replace({7: {2: 0}})
+            data['label_names'] = ['Rosa', 'Kama']
+        if combine_classes:
+            df = df.replace({7: {2: 0, 3: 0}})
+            data['label_names'] = ['Rosa or Canadian', 'Kama']
+
         data['y'] = df.pop(7).to_numpy()  # type: ignore
         data['X'] = df.to_numpy()
         # add name and description
@@ -50,5 +69,6 @@ class wheat_seeds_loader(AbstractLoader):
 
 if __name__ == "__main__":
     loader = wheat_seeds_loader()
-    # loader.plot_dataset()
-    loader.plot_train_test_split()
+    print(loader.get_info(long=True))
+    loader.plot_dataset()
+    # loader.plot_train_test_split()

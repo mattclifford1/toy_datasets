@@ -1,0 +1,68 @@
+# author: Matt Clifford <matt.clifford@bristol.ac.uk>
+'''
+loader for the types of wine classification dataset
+'''
+import numpy as np
+from sklearn.datasets import load_wine
+from data_loaders import utils
+from data_loaders.abstract_loader import AbstractLoader
+
+
+
+class wine_loader(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 split_size=0.5,
+                #  split_ratio=10,
+                 **kwargs):
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                        #  split_ratio=split_ratio, 
+                         dataset_name='Iris',
+                         **kwargs)
+        
+    def load_data(self):
+        '''
+        The wine dataset is a classic and very easy multi-class classification
+        dataset.
+
+        =================   ==============
+        Classes                          3
+        Samples per class        [59,71,48]
+        Samples total                  178
+        Dimensionality                  13
+        Features            real, positive
+        =================   ==============
+
+        The copy of UCI ML Wine Data Set dataset is downloaded and modified to fit
+        standard format from:
+        https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data
+
+
+        wine dataset (0 vs 1,2)
+        returns:
+            - data: dict containing 'X', 'y'
+        '''
+        # get dataset
+        data_cls = load_wine()
+        # convert to binary datatset (0 vs 1,2)
+        y = data_cls.target
+        y[np.where(y>1)] = 1
+        data = {'X': data_cls.data, 'y': y}
+        # shuffle the dataset
+        data = utils.shuffle_data(data)
+        # add name and description
+        data['feature_names'] = data_cls.feature_names
+        data['description'] = data_cls.DESCR
+        names = []
+        names.append(f"{data_cls.target_names[0]}")
+        names.append(f"{data_cls.target_names[1]} and {data_cls.target_names[2]}")
+        data['label_names'] = names
+        return data
+        
+
+if __name__ == "__main__":
+    loader = wine_loader()
+    # loader.plot_dataset()
+    print(loader)
+    # loader.plot_train_test_split()
