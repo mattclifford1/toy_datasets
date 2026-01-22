@@ -1,4 +1,5 @@
 from tqdm import tqdm
+import numpy as np
 from data_loaders import utils
 import data_loaders
 from data_loaders.external_loaders import MIMIC_III, MIMIC_IV
@@ -132,9 +133,20 @@ def get_MNIST(scale=False):
 
 def test_available_datasets(_print=False):
     infos = []
-    for dataset_name in tqdm(AVAILABLE_DATASETS.keys()):
-        print(dataset_name)
+    for dataset_name in tqdm(AVAILABLE_DATASETS.keys(), desc="Testing loading datasets"):
+        if _print:
+            print(dataset_name)
         dataset = data_loaders.get_dataset(dataset_name)
+        X = dataset.get_X()
+        y = dataset.get_y()
+        if not isinstance(X, np.ndarray):
+            raise ValueError(f"Dataset {dataset_name} X is not a numpy array")
+        if not isinstance(y, np.ndarray):
+            raise ValueError(f"Dataset {dataset_name} y is not a numpy array")
+        if X.shape[0] != y.shape[0]:
+            raise ValueError(f"Dataset {dataset_name} X and y have different number of instances: {X.shape[0]} vs {y.shape[0]}")
+        if y.shape[0] < 10:
+            raise ValueError(f"Dataset {dataset_name} has less than 10 instances: {X.shape[0]}")
         infos.append(dataset.get_info(long=False))
     
     if _print:
