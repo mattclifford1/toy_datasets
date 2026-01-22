@@ -124,7 +124,7 @@ class AbstractLoader(ABC):
 
     def get_label_names(self):
         data = self.get_data_dict()
-        return data.get('label_names', 'No label names available')
+        return data.get('label_names', [0, 1, 2, 3])
     
 
     def get_dataset_name(self):

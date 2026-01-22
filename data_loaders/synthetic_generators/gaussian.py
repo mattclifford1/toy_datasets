@@ -1,14 +1,49 @@
-# author: Jonny Erskine <jonathan.erskine@bristol.ac.uk>
-# author2: Matt Clifford <matt.clifford@bristol.ac.uk>
+# author: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
 Generate guassian data
 '''
 import sklearn.utils
 import numpy as np
+from data_loaders.utils import set_seed
 from data_loaders.abstract_loader import AbstractLoader
 
 
-# class gaussian_loader(AbstractLoader):
+class gaussian_generator(AbstractLoader):
+    def __init__(self,
+                 shuffle=True,
+                 split_size=0.5,
+                 num_samples=[200, 200],
+                 **kwargs):
+        if isinstance(num_samples, int):
+            self.num_samples = [num_samples//2, num_samples//2]
+        else:
+            self.num_samples = num_samples
+        super().__init__(shuffle=shuffle,
+                         split_size=split_size, 
+                         dataset_name='Gaussian Synthetic',
+                         **kwargs)
+    
+    def load_data(self):
+        data = self._get_two_normal_classes(num_samples=self.num_samples)
+        return data
+
+
+    def _get_two_normal_classes(self, means=[[0, 0], [5, 5]], 
+                        covs=[[[1, 0], [0, 1]],
+                            [[1, 0], [0, 1]]], 
+                        num_samples=[3, 2],
+                        seed=None):
+        labels = [0, 1]
+        X = []
+        y = []
+        for mean, cov, num_sample, label in zip(means, covs, num_samples, labels):
+            set_seed(seed)
+            X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
+            y.append(np.ones(num_sample)*label)
+        X = np.vstack(X)
+        y = np.hstack(y)
+
+        return {'X': X, 'y': y}
 
 
 def get_gaussian(samples=200,
@@ -52,3 +87,9 @@ class GaussClass():
     def gen_data(self, randomseed, size):
         rng = np.random.default_rng(randomseed)
         self.data = np.array(rng.multivariate_normal(self.mean, self.cov, size))
+
+
+if __name__ == "__main__":
+    loader = gaussian_generator()
+    # loader.plot_dataset()
+    loader.plot_train_test_split()

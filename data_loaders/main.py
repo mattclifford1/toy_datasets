@@ -9,7 +9,7 @@ from data_loaders.synthetic_generators import (
     blobs,
     circles,
     classification,
-    normal,
+    gaussian,
 )
 from data_loaders.local_loaders import (
     abalone_gender, 
@@ -35,7 +35,7 @@ AVAILABLE_DATASETS = {
     'Blobs': blobs.blobs_generator,
     'Circles': circles.circles_generator,
     'Sklearn Normal': classification.sklearn_normal_generator,
-    # 'Gaussian': sample_dataset_to_proportions(get_gaussian),
+    'Gaussian': gaussian.gaussian_generator,
     # 'Madelon Separable': madelon.get_sep_datasets,
     # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
     # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
