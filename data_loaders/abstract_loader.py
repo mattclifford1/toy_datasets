@@ -41,12 +41,26 @@ class AbstractLoader(ABC):
         raise NotImplementedError("This is an abstract class")
     
 
-    def get_train_test_split(self):
+    def get_train_test_split(self,
+                             split_size=None,
+                             split_ratio=None,
+                             equal_test=None,
+                             seed=None):
         '''
         returns:
             - data: dict containing 'X', 'y'
             - data_test: dict containing 'X', 'y'
         '''
+        # use provided or default
+        if split_size is None:
+            split_size = self.split_size
+        if split_ratio is None:
+            split_ratio = self.split_ratio
+        if equal_test is None:
+            equal_test = self.equal_test
+        if seed is None:
+            seed = self.set_seed
+
         # split into train, test
         train_data, test_data = utils.proportional_split( 
             self.get_data_dict(), 
@@ -86,7 +100,7 @@ class AbstractLoader(ABC):
             if 'X' not in self.data.keys() or 'y' not in self.data.keys():
                 raise ValueError("load_data() needs to return a dict containing 'X' and 'y'")
             # shuffle
-            if self.shuffle == True:
+            if self.shuffle:
                 self.data = utils.shuffle_data(
                     self.data,
                     seed=self.set_seed
@@ -98,7 +112,11 @@ class AbstractLoader(ABC):
                     percent_of_data=self.percent_of_data,
                     seed=self.set_seed
                     )
-            
+            # scale if needed
+            if self.scale:
+                normaliser = utils.normaliser(self.data)
+                self.data['X'] = normaliser(self.data['X'])
+                
         return self.data
     
 
@@ -189,7 +207,6 @@ class AbstractLoader(ABC):
         return self.get_info()
     
 
-
 class example_dataset(AbstractLoader):
     def __init__(self,
                  **kwargs):
@@ -217,7 +234,6 @@ class example_dataset(AbstractLoader):
             }
         return data
 
-    
 
 if __name__ == "__main__":
     # show example dataset how to construct and test the features
