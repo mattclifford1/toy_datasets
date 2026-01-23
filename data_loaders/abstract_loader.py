@@ -189,7 +189,39 @@ class AbstractLoader(ABC):
         return self.get_info()
     
 
+
+class example_dataset(AbstractLoader):
+    def __init__(self,
+                 **kwargs):
+        super().__init__(shuffle=True,
+                         dataset_name='Example Dataloader',
+                         **kwargs)
     
+    def load_data(self):
+        '''
+        some example data loading function
+        '''
+        X_sample = np.array([[1, 2],
+                             [2, 3],
+                             [3, 4],
+                             [5, 6],
+                             [8, 9],
+                             [13, 14]])
+        y_sample = np.array([0, 0, 0, 1, 1, 1])
+        data = {
+            'X': X_sample,
+            'y': y_sample,
+            'description': 'This is some example data',
+            'feature_names': ['feature_1', 'feature_2'],
+            'label_names': ['class_0', 'class_1']
+            }
+        return data
+
     
-    
+
+if __name__ == "__main__":
+    # show example dataset how to construct and test the features
+    loader = example_dataset()
+    print(loader)
+    loader.plot_dataset()
 

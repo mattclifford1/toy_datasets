@@ -9,9 +9,6 @@ class XOR_generator(AbstractLoader):
     def __init__(self,
                  shuffle=True,
                  num_samples=[200, 200],
-                 split_size=0.5,
-                 set_seed=True,
-                 scale=True,
                  **kwargs):
         if isinstance(num_samples, int):
             self.num_samples = [num_samples//2, num_samples//2]
@@ -19,7 +16,6 @@ class XOR_generator(AbstractLoader):
             self.num_samples = num_samples
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
-                         split_size=split_size, 
                          dataset_name='XOR Synthetic',
                          **kwargs)
         
