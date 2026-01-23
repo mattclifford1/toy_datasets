@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:1c4a6eaba4f14ed0dfabf51a0dc1d4e2ca69f7090f57ba0366fef2b27559c978"
+content_hash = "sha256:4fcca3c67ce8b9b1f8154ef5ccfe50b92a65be5ef2f3f56da031c85b2620d646"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -823,6 +823,33 @@ files = [
     {file = "nvidia_nvtx_cu12-12.6.77-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:b90bed3df379fa79afbd21be8e04a0314336b8ae16768b58f2d34cb1d04cd7d2"},
     {file = "nvidia_nvtx_cu12-12.6.77-py3-none-manylinux2014_x86_64.whl", hash = "sha256:6574241a3ec5fdc9334353ab8c479fe75841dbe8f4532a8fc97ce63503330ba1"},
     {file = "nvidia_nvtx_cu12-12.6.77-py3-none-win_amd64.whl", hash = "sha256:2fb11a4af04a5e6c84073e6404d26588a34afd35379f0855a99797897efa75c0"},
+]
+
+[[package]]
+name = "opentsne"
+version = "1.0.4"
+requires_python = ">=3.9"
+summary = "Extensible, parallel implementations of t-SNE"
+groups = ["default"]
+dependencies = [
+    "numpy>=1.16.6",
+    "scikit-learn>=0.20",
+    "scipy",
+]
+files = [
+    {file = "opentsne-1.0.4-cp311-cp311-macosx_10_12_universal2.whl", hash = "sha256:50819514cf229b50f9cd3dcd7680ad48aca70deecad40baa05db132af42254f5"},
+    {file = "opentsne-1.0.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1563bbb017d1cfecc230ec1cc3adb33b3edf40f6b6444939645fe28611eb3853"},
+    {file = "opentsne-1.0.4-cp311-cp311-win_amd64.whl", hash = "sha256:c6b862eacf4387f8e790d9d3bf48e2e86e8135f9fbf8ea58db6e593c48950ced"},
+    {file = "opentsne-1.0.4-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:3787feeb58818569a5a8a09e12a63ba4dfc33bee89b221b530a11495c72d203c"},
+    {file = "opentsne-1.0.4-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:610626be6ff6062b96e1b122ff219fbeb34957578a0f0f420aa3cc3505ab3547"},
+    {file = "opentsne-1.0.4-cp312-cp312-win_amd64.whl", hash = "sha256:3a28e474804bf3b56ec6f2574eacaa3ffa5efc2dd30b642aa9907b31a982dcc1"},
+    {file = "opentsne-1.0.4-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:9c594f6224f6b4cf98988651aabe68e0ffd408822559f1450ee870f8e496a233"},
+    {file = "opentsne-1.0.4-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0d3bd0e2bc9f557ce75ab4b19038480364a60fc9ffcd2362838ff854bc2a0331"},
+    {file = "opentsne-1.0.4-cp313-cp313-win_amd64.whl", hash = "sha256:f681ed5957e99af9500538384bfc15b50697f99c7cd057cfe8863d50248cc228"},
+    {file = "opentsne-1.0.4-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:50fb43e2677490dc87355116a355fca09e86e9d4a45dd8cbcfcb01612c836295"},
+    {file = "opentsne-1.0.4-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1f76202a0d46c4dad19555d12af94cffc95c66f654d4d104a51ff42fc4eacd0d"},
+    {file = "opentsne-1.0.4-cp314-cp314-win_amd64.whl", hash = "sha256:1676c4e16c62cdf2ce4e3c75a91dbd2572f7c814675e13d825be8559aecb3d7c"},
+    {file = "opentsne-1.0.4.tar.gz", hash = "sha256:e90bf612be94fcbe06e3cab9531a58e4824661f38dd7c2e934569820d15c82ab"},
 ]
 
 [[package]]

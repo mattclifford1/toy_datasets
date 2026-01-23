@@ -2,7 +2,7 @@
 '''
 Visualisation functions for each dataset
 '''
-from sklearn.manifold import TSNE
+from openTSNE import TSNE as OpenTSNE
 import matplotlib.pyplot as plt
 
 
@@ -12,10 +12,6 @@ def plot_dataset(X,
                  y_test=None, 
                  dataset_name=None,
                  label_names=None):
-    def embed(X):
-        if X.shape[1] > 2:
-            return TSNE(n_components=2, perplexity=30, random_state=42).fit_transform(X)
-        return X
 
     # determine layout: one plot if test not provided, else two side by side
     if X_test is None or y_test is None:
@@ -32,8 +28,12 @@ def plot_dataset(X,
 
     colors = ["#3ea3e6", "#e56a6a"]  # blue, red
 
+    # get 2d embedder fitted on train data
+    embeder = two_dim_embedder(X)
+
+    # plot each dataset (X_train, X_test)
     for ax, Xd, yd, title in zip(axes, Xs, ys, titles):
-        X_embed_2d = embed(Xd)
+        X_embed_2d = embeder.get_transform(Xd)
         for cls in [0, 1]:
             if label_names is not None:
                 class_label = f"Class {cls}: {label_names[cls]}"
@@ -59,11 +59,49 @@ def plot_dataset(X,
     plt.show()
 
 
+class two_dim_embedder:
+    def __init__(self, 
+                 X_train,  # use the train to fit
+                 perplexity=30, 
+                 random_state=42,
+                 n_iter=1000,
+                 n_jobs=-1):
+        self.perplexity = perplexity
+        self.random_state = random_state
+        self.n_iter = n_iter
+        self.n_jobs = n_jobs
+
+        # fit TSNE on training data
+        if X_train.shape[1] > 2:
+            self.model = OpenTSNE(
+                n_components=2,
+                perplexity=self.perplexity,
+                random_state=self.random_state,
+                n_iter=self.n_iter,
+                n_jobs=self.n_jobs,
+            )
+            self.embedding_ = self.model.fit(X_train)
+            self.transform = self.embedding_.transform
+        else:
+            # data is already 2d, no embedding needed
+            self.embedding_ = None
+            self.transform = lambda X: X  # identity function
+
+
+    def get_transform(self, X):
+        # Transform ONLY (no fit) for test/other data
+        return self.transform(X)
+    
+    
 if __name__ == "__main__":
-    from data_loaders.main import get_dataset
-    train = get_dataset(dataset='Breast Cancer', scale=True)
+    import data_loaders
+    dataset_name = 'Abalone Gender'
+    dataset = data_loaders.get_dataset(dataset_name)
+    train, test = dataset.get_train_test_split()
     plot_dataset(
-        train['data']['X'], train['data']['y'],
-        X_test=train['data_test']['X'], y_test=train['data_test']['y'],
-        dataset_name='Breast Cancer'
+        train['X'], 
+        train['y'],
+        X_test=test['X'], 
+        y_test=test['y'],
+        dataset_name='Abalone Gender'
     )
