@@ -61,5 +61,5 @@ class XOR_generator(AbstractLoader):
 
 if __name__ == "__main__":
     loader = XOR_generator()
-    # loader.plot_dataset()
-    loader.plot_train_test_split()
+    loader.plot_dataset(terminal_plot=True)
+    loader.plot_train_test_split(terminal_plot=True)

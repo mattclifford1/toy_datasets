@@ -10,8 +10,8 @@ This is meant to be a *drop-in* replacement for `plt.show()`:
     plotter.disable()  # restore original matplotlib show
 
 On macOS terminals, ASCII ramps usually look rough. This module defaults to a
-Unicode *braille* renderer (2x4 dots per character) which is dramatically
-sharper.
+text renderer that shows scatter points as characters and prints axis/title
+labels as text (no braille dots).
 
 If you're using iTerm2, you can optionally render the actual PNG inline using
 its OSC 1337 protocol (looks best) by passing `mode="iterm2"`.
@@ -37,7 +37,7 @@ except ImportError as e:
     raise ImportError("terminal_plots requires pillow: pip install pillow") from e
 
 
-Mode = Literal["braille", "ascii", "iterm2", "auto"]
+Mode = Literal["braille", "ascii", "iterm2", "text", "auto"]
 
 
 # --- Rasterize Matplotlib figure to a PIL image --------------------------------
@@ -116,6 +116,167 @@ def _pil_to_ascii(img: Image.Image, *, cols: int, rows: int) -> str:
         row = arr[r * cols : (r + 1) * cols]
         lines.append("".join(_ASCII_RAMP[int(v / 255 * n)] for v in row))
     return "\n".join(lines)
+
+
+# --- Text plot renderer (scatter + axes labels) --------------------------------
+
+def _linspace(start: float, end: float, count: int) -> list[float]:
+    if count <= 1:
+        return [start]
+    step = (end - start) / (count - 1)
+    return [start + i * step for i in range(count)]
+
+
+def _format_tick(value: float) -> str:
+    if value == 0:
+        return "0"
+    abs_value = abs(value)
+    if abs_value >= 1000 or abs_value < 0.01:
+        return f"{value:.1e}"
+    return f"{value:.2g}"
+
+
+def _get_suptitle(fig) -> str:
+    suptitle = getattr(fig, "_suptitle", None)
+    if suptitle is None:
+        return ""
+    text = suptitle.get_text()
+    return text.strip()
+
+
+def _render_axes_text(ax, *, cols: int, rows: int, figure_title: str = "") -> str:
+    title = ax.get_title()
+    xlabel = ax.get_xlabel()
+    ylabel = ax.get_ylabel()
+
+    header = []
+    if figure_title:
+        header.append(figure_title.center(cols))
+    if title:
+        header.append(title.center(cols))
+    if xlabel or ylabel:
+        header.append(f"x: {xlabel} | y: {ylabel}".strip())
+
+    header_lines = len(header)
+    footer_lines = 2
+
+    plot_height = max(6, rows - header_lines - footer_lines)
+
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+    if xmax == xmin:
+        xmax = xmin + 1
+    if ymax == ymin:
+        ymax = ymin + 1
+
+    yticks = _linspace(ymin, ymax, 5)
+    ylabels = [_format_tick(v) for v in yticks]
+    max_y_label = max(len(s) for s in ylabels) if ylabels else 0
+    left_margin = max(6, max_y_label + 1)
+
+    plot_width = max(10, cols - left_margin)
+    grid = [[" "] * plot_width for _ in range(plot_height)]
+
+    for r in range(plot_height):
+        grid[r][0] = "|"
+    for c in range(plot_width):
+        grid[plot_height - 1][c] = "-"
+    grid[plot_height - 1][0] = "+"
+
+    def place_point(x: float, y: float, ch: str) -> None:
+        if x < xmin or x > xmax or y < ymin or y > ymax:
+            return
+        col = int(round((x - xmin) / (xmax - xmin) * (plot_width - 1)))
+        row = int(round((ymax - y) / (ymax - ymin) * (plot_height - 1)))
+        if 0 <= row < plot_height and 0 <= col < plot_width:
+            existing = grid[row][col]
+            if existing in (" ", "|", "-", "+"):
+                grid[row][col] = ch
+            elif existing != ch:
+                grid[row][col] = "*"
+
+    def place_line(x0: float, y0: float, x1: float, y1: float, ch: str) -> None:
+        if xmax == xmin or ymax == ymin:
+            return
+        col0 = int(round((x0 - xmin) / (xmax - xmin) * (plot_width - 1)))
+        row0 = int(round((ymax - y0) / (ymax - ymin) * (plot_height - 1)))
+        col1 = int(round((x1 - xmin) / (xmax - xmin) * (plot_width - 1)))
+        row1 = int(round((ymax - y1) / (ymax - ymin) * (plot_height - 1)))
+
+        dcol = abs(col1 - col0)
+        drow = abs(row1 - row0)
+        steps = max(dcol, drow, 1)
+        for step in range(steps + 1):
+            t = step / steps
+            col = int(round(col0 + (col1 - col0) * t))
+            row = int(round(row0 + (row1 - row0) * t))
+            if 0 <= row < plot_height and 0 <= col < plot_width:
+                existing = grid[row][col]
+                if existing in (" ", "|", "-", "+"):
+                    grid[row][col] = ch
+                elif existing != ch:
+                    grid[row][col] = "*"
+
+    marker_cycle = ["o", "x", "+", "*", "#"]
+    collections = [c for c in ax.collections if hasattr(c, "get_offsets")]
+    for idx, collection in enumerate(collections):
+        ch = marker_cycle[idx % len(marker_cycle)]
+        offsets = collection.get_offsets()
+        try:
+            for x, y in offsets:
+                place_point(float(x), float(y), ch)
+        except Exception:
+            continue
+
+    for line in ax.lines:
+        xdata = line.get_xdata(orig=False)
+        ydata = line.get_ydata(orig=False)
+        if len(xdata) < 2:
+            for x, y in zip(xdata, ydata):
+                place_point(float(x), float(y), ".")
+            continue
+        marker = line.get_marker()
+        if marker in ("o", "x", "+", "*"):
+            ch = marker
+        else:
+            ch = "."
+        for i in range(len(xdata) - 1):
+            place_line(float(xdata[i]), float(ydata[i]), float(xdata[i + 1]), float(ydata[i + 1]), ch)
+
+    y_tick_rows = []
+    for v in yticks:
+        row = int(round((ymax - v) / (ymax - ymin) * (plot_height - 1)))
+        y_tick_rows.append(row)
+
+    lines = []
+    for r in range(plot_height):
+        if r in y_tick_rows:
+            v = yticks[y_tick_rows.index(r)]
+            label = _format_tick(v).rjust(left_margin - 1)
+        else:
+            label = " " * (left_margin - 1)
+        lines.append(label + " " + "".join(grid[r]))
+
+    xticks = _linspace(xmin, xmax, 5)
+    xtick_cols = [
+        int(round((v - xmin) / (xmax - xmin) * (plot_width - 1))) for v in xticks
+    ]
+    tick_line = [" "] * (left_margin + plot_width)
+    for c in xtick_cols:
+        if 0 <= c < plot_width:
+            tick_line[left_margin + c] = "+"
+    lines.append("".join(tick_line))
+
+    label_line = [" "] * (left_margin + plot_width)
+    for v, c in zip(xticks, xtick_cols):
+        label = _format_tick(v)
+        start = left_margin + c - len(label) // 2
+        start = max(left_margin, min(start, left_margin + plot_width - len(label)))
+        for i, ch in enumerate(label):
+            label_line[start + i] = ch
+    lines.append("".join(label_line))
+
+    return "\n".join(header + lines)
 
 
 # --- iTerm2 inline image (best overall if supported) ---------------------------
@@ -201,7 +362,7 @@ class TerminalPlotter:
 
         chosen: Mode
         if self.mode == "auto":
-            chosen = "iterm2" if _is_iterm2() else "braille"
+            chosen = "iterm2" if _is_iterm2() else "text"
         else:
             chosen = self.mode
 
@@ -217,7 +378,7 @@ class TerminalPlotter:
             if chosen == "iterm2":
                 if not _is_iterm2():
                     # Fall back gracefully
-                    chosen_local: Mode = "braille"
+                    chosen_local: Mode = "text"
                 else:
                     pil = _fig_to_pil(fig, dpi=self.dpi)
                     buf = io.BytesIO()
@@ -229,9 +390,16 @@ class TerminalPlotter:
                 if chosen_local == "iterm2":
                     pass
                 else:
-                    # Render via braille fallback
-                    pil = _fig_to_pil(fig, dpi=self.dpi)
-                    print(_pil_to_braille(pil, cols=cols, rows=rows))
+                    # Render via text fallback
+                    axes = fig.axes or []
+                    if axes:
+                        figure_title = _get_suptitle(fig)
+                        rows_per = rows if len(axes) == 1 else max(10, rows // len(axes))
+                        for ax_idx, ax in enumerate(axes):
+                            if ax_idx:
+                                print("\n")
+                            fig_title = figure_title if ax_idx == 0 else ""
+                            print(_render_axes_text(ax, cols=cols, rows=rows_per, figure_title=fig_title))
 
             elif chosen == "braille":
                 pil = _fig_to_pil(fig, dpi=self.dpi)
@@ -240,6 +408,18 @@ class TerminalPlotter:
             elif chosen == "ascii":
                 pil = _fig_to_pil(fig, dpi=self.dpi)
                 print(_pil_to_ascii(pil, cols=cols, rows=rows))
+
+            elif chosen == "text":
+                axes = fig.axes or []
+                if not axes:
+                    return
+                figure_title = _get_suptitle(fig)
+                rows_per = rows if len(axes) == 1 else max(10, rows // len(axes))
+                for ax_idx, ax in enumerate(axes):
+                    if ax_idx:
+                        print("\n")
+                    fig_title = figure_title if ax_idx == 0 else ""
+                    print(_render_axes_text(ax, cols=cols, rows=rows_per, figure_title=fig_title))
 
             else:
                 raise ValueError(f"Unknown mode: {chosen}")
@@ -287,9 +467,9 @@ if __name__ == "__main__":
 
     plt.show()
 
-    plotter.disable()
+    # plotter.disable()
 
-    # plotter = enable_terminal_show()          # defaults to mode="auto" (braille unless iTerm2)
+    # plotter = enable_terminal_show()          # defaults to mode="auto" (text unless iTerm2)
     # plotter = enable_terminal_show(mode="braille")  # force braille
     # plotter = enable_terminal_show(mode="iterm2")   # if you're on iTerm2: best quality (inline PNG)
 

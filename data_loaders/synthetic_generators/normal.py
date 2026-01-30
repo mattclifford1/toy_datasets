@@ -67,5 +67,5 @@ class normal_data_loader(AbstractLoader):
 if __name__ == "__main__":
     loader = normal_data_loader()
     loader.get_train_test_split()
-    # loader.plot_dataset()
+    loader.plot_dataset(terminal_plot=True)
     # loader.plot_train_test_split()

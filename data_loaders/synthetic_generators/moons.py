@@ -32,5 +32,5 @@ class moons_generator(AbstractLoader):
 
 if __name__ == "__main__":
     loader = moons_generator()
-    # loader.plot_dataset()
-    loader.plot_train_test_split()
+    loader.plot_dataset(terminal_plot=True)
+    loader.plot_train_test_split(terminal_plot=True)
