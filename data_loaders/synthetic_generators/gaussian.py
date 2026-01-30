@@ -96,4 +96,4 @@ class GaussClass():
 if __name__ == "__main__":
     loader = gaussian_generator()
     # loader.plot_dataset()
-    loader.plot_train_test_split()
+    loader.plot_train_test_split(terminal_plot=True)

@@ -164,6 +164,33 @@ def _render_axes_text(ax, *, cols: int, rows: int, figure_title: str = "") -> st
                 elif existing != ch:
                     grid[row][col] = "*"
 
+    def place_rect(x0: float, y0: float, x1: float, y1: float, ch: str) -> None:
+        if xmax == xmin or ymax == ymin:
+            return
+        left = min(x0, x1)
+        right = max(x0, x1)
+        bottom = min(y0, y1)
+        top = max(y0, y1)
+        if right < xmin or left > xmax or top < ymin or bottom > ymax:
+            return
+        col0 = int(round((left - xmin) / (xmax - xmin) * (plot_width - 1)))
+        col1 = int(round((right - xmin) / (xmax - xmin) * (plot_width - 1)))
+        row_top = int(round((ymax - top) / (ymax - ymin) * (plot_height - 1)))
+        row_bottom = int(round((ymax - bottom) / (ymax - ymin) * (plot_height - 1)))
+        col0, col1 = sorted((col0, col1))
+        row_top, row_bottom = sorted((row_top, row_bottom))
+        col0 = max(0, min(col0, plot_width - 1))
+        col1 = max(0, min(col1, plot_width - 1))
+        row_top = max(0, min(row_top, plot_height - 1))
+        row_bottom = max(0, min(row_bottom, plot_height - 1))
+        for r in range(row_top, row_bottom + 1):
+            for c in range(col0, col1 + 1):
+                existing = grid[r][c]
+                if existing in (" ", "|", "-", "+"):
+                    grid[r][c] = ch
+                elif existing != ch:
+                    grid[r][c] = "*"
+
     marker_cycle = ["o", "x", "+", "*", "#"]
     collections = [c for c in ax.collections if hasattr(c, "get_offsets")]
     for idx, collection in enumerate(collections):
@@ -190,6 +217,21 @@ def _render_axes_text(ax, *, cols: int, rows: int, figure_title: str = "") -> st
         for i in range(len(xdata) - 1):
             place_line(float(xdata[i]), float(ydata[i]), float(xdata[i + 1]), float(ydata[i + 1]), ch)
 
+    # Bar charts are drawn as Rectangle patches.
+    for patch in ax.patches:
+        if not hasattr(patch, "get_width") or not hasattr(patch, "get_height"):
+            continue
+        try:
+            x = float(patch.get_x())
+            y = float(patch.get_y())
+            width = float(patch.get_width())
+            height = float(patch.get_height())
+        except Exception:
+            continue
+        if width == 0 or height == 0:
+            continue
+        place_rect(x, y, x + width, y + height, "#")
+
     y_tick_rows = []
     for v in yticks:
         row = int(round((ymax - v) / (ymax - ymin) * (plot_height - 1)))
@@ -204,7 +246,9 @@ def _render_axes_text(ax, *, cols: int, rows: int, figure_title: str = "") -> st
             label = " " * (left_margin - 1)
         lines.append(label + " " + "".join(grid[r]))
 
-    xticks = _linspace(xmin, xmax, 5)
+    xticks = list(ax.get_xticks())
+    if not xticks:
+        xticks = _linspace(xmin, xmax, 5)
     xtick_cols = [
         int(round((v - xmin) / (xmax - xmin) * (plot_width - 1))) for v in xticks
     ]
@@ -214,9 +258,16 @@ def _render_axes_text(ax, *, cols: int, rows: int, figure_title: str = "") -> st
             tick_line[left_margin + c] = "+"
     lines.append("".join(tick_line))
 
+    xtick_labels = [t.get_text() for t in ax.get_xticklabels()]
+    use_labels = any(lbl.strip() for lbl in xtick_labels) and len(xtick_labels) >= len(xticks)
     label_line = [" "] * (left_margin + plot_width)
-    for v, c in zip(xticks, xtick_cols):
-        label = _format_tick(v)
+    for idx, (v, c) in enumerate(zip(xticks, xtick_cols)):
+        if use_labels:
+            label = xtick_labels[idx].strip()
+        else:
+            label = _format_tick(v)
+        if not label:
+            continue
         start = left_margin + c - len(label) // 2
         start = max(left_margin, min(start, left_margin + plot_width - len(label)))
         for i, ch in enumerate(label):
