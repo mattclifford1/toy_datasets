@@ -1,25 +1,22 @@
 import functools
 
-from sklearn.decomposition import PCA, KernelPCA
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import numpy as np
-import umap
+
 
 
 RANDOM_STATE = 42
 
 
 class normaliser:
-    def __init__(self, train_data):
+    def __init__(self, train_X):
         self.scaler = preprocessing.MinMaxScaler(
-            feature_range=(-1,1)).fit(train_data['X'])
+            feature_range=(-1,1)).fit(train_X)
 
-    def __call__(self, data):
-        '''expect data as a dict with 'X', 'y' keys'''
-        data['X'] = self.scaler.transform(data['X'])
-        return data
+    def __call__(self, X):
+        return self.scaler.transform(X)
     
     def transform_instance(self, X):
         return self.scaler.transform([X])[0]
@@ -172,31 +169,16 @@ def proportional_downsample(data, percent_of_data=1, seed=True, **kwargs):
     return data
 
 
-def make_data_dim_reducer(data_getter):
-    @functools.wraps(data_getter)
-    def _wrapper(*args, **kwargs):
-        data_dict = data_getter(*args, **kwargs)
-        if data_dict['data']['X'].shape[1] > 2:
-            dim_reducer = get_dim_reducer(data_dict['data'])
-        else:
-            dim_reducer = None
-        data_dict['dim_reducer'] = dim_reducer
-        return data_dict
-    return _wrapper
+# def make_data_dim_reducer(data_getter):
+#     @functools.wraps(data_getter)
+#     def _wrapper(*args, **kwargs):
+#         data_dict = data_getter(*args, **kwargs)
+#         if data_dict['data']['X'].shape[1] > 2:
+#             dim_reducer = get_dim_reducer(data_dict['data'])
+#         else:
+#             dim_reducer = None
+#         data_dict['dim_reducer'] = dim_reducer
+#         return data_dict
+#     return _wrapper
 
 
-def get_dim_reducer(data, reducer='PCA'):
-    X = data['X']
-    y = data['y']
-    if reducer == 'PCA':
-        reducer_model = PCA(n_components=2, svd_solver='full').fit(X)
-    elif reducer == 'kernelPCA':
-        reducer_model = KernelPCA(
-            n_components=2, kernel='rbf', n_jobs=-1).fit(X)
-    elif reducer == 'UMAP':
-        reducer_model = umap.UMAP().fit(X)
-    elif reducer == 'UMAP_supervised':
-        reducer_model = umap.UMAP().fit(X, y=y)
-    else:
-        reducer = None
-    return reducer_model

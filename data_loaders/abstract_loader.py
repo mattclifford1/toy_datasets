@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from data_loaders import utils
 from data_loaders.visulalisation import plot_dataset
+from data_loaders.embeddings import dim_reducer
 
 
 class AbstractLoader(ABC):
@@ -19,6 +20,8 @@ class AbstractLoader(ABC):
                  set_seed=True,
                  dataset_name=None,
                  scale=False,
+                 dim_reducer=None,
+                 reduce_to_dim=2,
                  **kwargs):
         self.shuffle = shuffle
         self.split_size = split_size
@@ -29,7 +32,9 @@ class AbstractLoader(ABC):
         self.already_loaded = False
         self.dataset_name = dataset_name
         self.set_seed = set_seed
-        self.scale = scale #TODO: implement scaling in loaders
+        self.scale = scale
+        self.dim_reducer = dim_reducer
+        self.reduce_to_dim = reduce_to_dim
 
     
     @abstractmethod
@@ -69,8 +74,26 @@ class AbstractLoader(ABC):
             equal_test=self.equal_test,
             ratio_test=self.split_ratio_test,  # not implemented yet
             seed=self.set_seed
-            ) 
+            )
         
+        # reduce dims
+        if self.dim_reducer is not None:
+            reducer = dim_reducer(
+                X_train=train_data['X'],
+                y_train=train_data['y'],
+                reducer=self.dim_reducer,
+                num_dims=self.reduce_to_dim
+            )
+            train_data['X'] = reducer.transform(train_data['X'])
+            test_data['X'] = reducer.transform(test_data['X'])
+        
+        # scale if needed
+        if self.scale:
+            # only fit the scaler on the train data
+            normaliser = utils.normaliser(train_data['X'])
+            train_data['X'] = normaliser(train_data['X'])
+            test_data['X'] = normaliser(test_data['X'])
+
         # print info
         print(f"\nDataset: {self.name} - Train/Test split")
         print(f"    - Train instances: {len(train_data['y'])}")
@@ -112,10 +135,6 @@ class AbstractLoader(ABC):
                     percent_of_data=self.percent_of_data,
                     seed=self.set_seed
                     )
-            # scale if needed
-            if self.scale:
-                normaliser = utils.normaliser(self.data)
-                self.data['X'] = normaliser(self.data['X'])
                 
         return self.data
     
@@ -221,18 +240,18 @@ class example_dataset(AbstractLoader):
         '''
         some example data loading function
         '''
-        X_sample = np.array([[1, 2],
-                             [2, 3],
-                             [3, 4],
-                             [5, 6],
-                             [8, 9],
-                             [13, 14]])
+        X_sample = np.array([[1, 2, 4],
+                             [2, 3, 5],
+                             [3, 4, 6],
+                             [5, 6, 7],
+                             [8, 9, 10],
+                             [13, 14, 15]])
         y_sample = np.array([0, 0, 0, 1, 1, 1])
         data = {
             'X': X_sample,
             'y': y_sample,
             'description': 'This is some example data',
-            'feature_names': ['feature_1', 'feature_2'],
+            'feature_names': ['feature_1', 'feature_2', 'feature_3'],
             'label_names': ['class_0', 'class_1']
             }
         return data
@@ -240,8 +259,9 @@ class example_dataset(AbstractLoader):
 
 if __name__ == "__main__":
     # show example dataset how to construct and test the features
-    loader = example_dataset()
+    loader = example_dataset(scale=True,
+                             dim_reducer='PCA',
+                             reduce_to_dim=2)
     print(loader)
     loader.plot_dataset(terminal_plot=True)
-    # loader.plot_dataset()
-
+    loader.plot_train_test_split(terminal_plot=True)

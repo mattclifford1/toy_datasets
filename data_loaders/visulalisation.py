@@ -2,10 +2,10 @@
 '''
 Visualisation functions for each dataset
 '''
-from openTSNE import TSNE as OpenTSNE
 import matplotlib.pyplot as plt
 
 from data_loaders.terminal_plots import enable_terminal_show
+from data_loaders.embeddings import dim_reducer
 
 
 def plot_dataset(X, 
@@ -14,7 +14,8 @@ def plot_dataset(X,
                  y_test=None, 
                  dataset_name=None,
                  label_names=None,
-                 terminal_plot=False):
+                 terminal_plot=False,
+                 dim_reducer_method='TSNE'):
     if terminal_plot:
             plot_env = enable_terminal_show()
     # determine layout: one plot if test not provided, else two side by side
@@ -33,11 +34,11 @@ def plot_dataset(X,
     colors = ["#3ea3e6", "#e56a6a"]  # blue, red
 
     # get 2d embedder fitted on train data
-    embeder = two_dim_embedder(X)
+    embedder = dim_reducer(X, y, reducer=dim_reducer_method)
 
     # plot each dataset (X_train, X_test)
     for ax, Xd, yd, title in zip(axes, Xs, ys, titles):
-        X_embed_2d = embeder.get_transform(Xd)
+        X_embed_2d = embedder.transform(Xd)
         for cls in [0, 1]:
             if label_names is not None:
                 class_label = f"Class {cls}: {label_names[cls]}"
@@ -51,9 +52,9 @@ def plot_dataset(X,
                 s=12,
                 label=class_label 
             )
-        ax.set_title(f"{title} set in TSNE space")
-        ax.set_xlabel(embeder.dim1_name)
-        ax.set_ylabel(embeder.dim2_name)
+        ax.set_title(f"{title} set in {embedder.reducer_name} space")
+        ax.set_xlabel(embedder.feature_names[0])
+        ax.set_ylabel(embedder.feature_names[1])
         ax.legend()
 
     if dataset_name is not None:
@@ -67,42 +68,7 @@ def plot_dataset(X,
         plot_env.disable()
 
 
-class two_dim_embedder:
-    def __init__(self, 
-                 X_train,  # use the train to fit
-                 perplexity=30, 
-                 random_state=42,
-                 n_iter=1000,
-                 n_jobs=-1):
-        self.perplexity = perplexity
-        self.random_state = random_state
-        self.n_iter = n_iter
-        self.n_jobs = n_jobs
 
-        # fit TSNE on training data
-        if X_train.shape[1] > 2:
-            self.model = OpenTSNE(
-                n_components=2,
-                perplexity=self.perplexity,
-                random_state=self.random_state,
-                n_iter=self.n_iter,
-                n_jobs=self.n_jobs,
-            )
-            self.dim1_name = "TSNE Dim 1"
-            self.dim2_name = "TSNE Dim 2"
-            self.embedding_ = self.model.fit(X_train)
-            self.transform = self.embedding_.transform
-        else:
-            # data is already 2d, no embedding needed
-            self.embedding_ = None
-            self.transform = lambda X: X  # identity function
-            self.dim1_name = "Feature 1"
-            self.dim2_name = "Feature 2"
-
-
-    def get_transform(self, X):
-        # Transform ONLY (no fit) for test/other data
-        return self.transform(X)
     
     
 if __name__ == "__main__":
@@ -115,5 +81,7 @@ if __name__ == "__main__":
         train['y'],
         X_test=test['X'], 
         y_test=test['y'],
-        dataset_name='Abalone Gender'
+        dataset_name='Abalone Gender',
+        terminal_plot=True,
+        dim_reducer_method='PCA'
     )

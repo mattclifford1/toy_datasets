@@ -81,7 +81,7 @@ def get_dataset(dataset_name, **kwargs):
 
 
 ### OLD WAY OF DOING IT HERE ----> MAKE THIS INTO NEW METHOD ASAP
-@utils.make_data_dim_reducer
+# @utils.make_data_dim_reducer
 def get_dataset_old(dataset='Breast Cancer', _print=True, scale=False, **kwargs):
     # check input correct dataset name
     if dataset not in AVAILABLE_DATASETS.keys():
@@ -117,18 +117,6 @@ def get_dataset_old(dataset='Breast Cancer', _print=True, scale=False, **kwargs)
     
     return data_set
 
-
-
-@utils.make_data_dim_reducer
-def get_MNIST(scale=False):
-    mnist.get_mnist()
-
-
-
-# def get_SMOTE_data(data):
-#     oversample = SMOTE()
-#     X, y = oversample.fit_resample(data['X'], data['y'])
-#     return {'X': X, 'y': y}
 
 
 def test_available_datasets(_print=False):
