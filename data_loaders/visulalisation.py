@@ -24,12 +24,12 @@ def plot_dataset(X,
         axes = [ax]
         Xs = [X]
         ys = [y]
-        titles = ["Train"]
+        titles = ["Full Dataset"]
     else:
         fig, axes = plt.subplots(1, 2, figsize=(12, 6))
         Xs = [X, X_test]
         ys = [y, y_test]
-        titles = ["Train", "Test"]
+        titles = ["Train set", "Test set"]
 
     colors = ["#3ea3e6", "#e56a6a"]  # blue, red
 
@@ -52,7 +52,7 @@ def plot_dataset(X,
                 s=12,
                 label=class_label 
             )
-        ax.set_title(f"{title} set in {embedder.reducer_name} space")
+        ax.set_title(f"{title} in {embedder.reducer_name} space")
         ax.set_xlabel(embedder.feature_names[0])
         ax.set_ylabel(embedder.feature_names[1])
         ax.legend()
