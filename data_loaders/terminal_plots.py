@@ -289,10 +289,12 @@ if __name__ == "__main__":
 
     plotter.disable()
 
-    plotter = enable_terminal_show()          # defaults to mode="auto" (braille unless iTerm2)
+    # plotter = enable_terminal_show()          # defaults to mode="auto" (braille unless iTerm2)
     # plotter = enable_terminal_show(mode="braille")  # force braille
     # plotter = enable_terminal_show(mode="iterm2")   # if you're on iTerm2: best quality (inline PNG)
 
-    plt.plot([1,2,3],[1,4,9])
+    # scatter plot with x and o markers
+    plt.scatter([1,2,3],[1,4,9], marker='x', c='red')
+    plt.scatter([1.5,2.5],[2,6], marker='o', c='blue')
     plt.show()
     plotter.disable()
