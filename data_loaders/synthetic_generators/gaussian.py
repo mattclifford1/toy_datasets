@@ -15,6 +15,7 @@ class gaussian_generator(AbstractLoader):
                  means=[[0, 0], [5, 5]],
                  covs=[[[1, 0], [0, 1]],
                        [[1, 0], [0, 1]]],
+                name='Gaussian Synthetic',
                  **kwargs):
         self.means = means
         self.covs = covs
@@ -23,7 +24,7 @@ class gaussian_generator(AbstractLoader):
         else:
             self.num_samples = num_samples
         super().__init__(shuffle=shuffle,
-                         dataset_name='Gaussian Synthetic',
+                         dataset_name=name,
                          **kwargs)
     
     def load_data(self):

@@ -4,7 +4,7 @@ Visualisation functions for each dataset
 '''
 import matplotlib.pyplot as plt
 
-from data_loaders.terminal_plots import enable_terminal_show
+from data_loaders.terminal_plots import terminal_show
 from data_loaders.embeddings import dim_reducer
 
 
@@ -16,15 +16,14 @@ def plot_dataset(X,
                  label_names=None,
                  terminal_plot=False,
                  dim_reducer_method='TSNE'):
-    if terminal_plot:
-            plot_env = enable_terminal_show()
+    
     # determine layout: one plot if test not provided, else two side by side
     if X_test is None or y_test is None:
         fig, ax = plt.subplots(figsize=(6, 6))
         axes = [ax]
         Xs = [X]
         ys = [y]
-        titles = ["Full Dataset"]
+        titles = ["Dataset"]
     else:
         fig, axes = plt.subplots(1, 2, figsize=(12, 6))
         Xs = [X, X_test]
@@ -61,14 +60,10 @@ def plot_dataset(X,
         fig.suptitle(f"{dataset_name} dataset", fontsize=14)
 
     plt.tight_layout()
-    plt.show()
-
-    # reset terminal plot to previous state
     if terminal_plot:
-        plot_env.disable()
-
-
-
+        terminal_show()
+    else:
+        plt.show()
     
     
 if __name__ == "__main__":

@@ -395,6 +395,13 @@ def enable_terminal_show(
         margin_cols=margin_cols,
     ).enable()
 
+def terminal_show():
+    """Shortcut to enable terminal plotting with default settings."""
+    plot_env = enable_terminal_show()
+    plt.show()
+    # reset terminal plot to previous state
+    plot_env.disable()
+
 
 if __name__ == "__main__":
     import numpy as np
