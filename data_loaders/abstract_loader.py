@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from data_loaders import utils
 from data_loaders.visulalisation import plot_dataset
+from data_loaders.terminal_plots import enable_terminal_show
 
 
 class AbstractLoader(ABC):
@@ -72,7 +73,7 @@ class AbstractLoader(ABC):
             ) 
         
         # print info
-        print(f"\nDataset: {self.get_dataset_name()} - Train/Test split")
+        print(f"\nDataset: {self.name} - Train/Test split")
         print(f"    - Train instances: {len(train_data['y'])}")
         label, counts = np.unique(train_data['y'], return_counts=True)
         for labels in zip(label, counts):
@@ -144,16 +145,16 @@ class AbstractLoader(ABC):
         data = self.get_data_dict()
         return data.get('label_names', [0, 1, 2, 3])
     
-
-    def get_dataset_name(self):
+    
+    @property
+    def name(self):
         if hasattr(self, 'dataset_name'):
             if self.dataset_name is not None:
                 return self.dataset_name
         return 'No dataset name available'
     
-    
     def get_info(self, long=True):
-        msg = f"Data Loader for {self.get_dataset_name()}"
+        msg = f"Data Loader for {self.name}"
         if long == True:
             msg += f"\n\n Description:\n{self.get_description()}"
 
@@ -180,28 +181,35 @@ class AbstractLoader(ABC):
         return msg
 
 
-    def plot_dataset(self):
+    def plot_dataset(self, terminal_plot=False):
         data = self.get_data_dict()
+        if terminal_plot:
+            enable_terminal_show()
         plot_dataset(
             X=data['X'], 
             y=data['y'],
             X_test=None, 
             y_test=None,
-            dataset_name=self.get_dataset_name(),
+            dataset_name=self.name,
             label_names=self.get_label_names()
         )
+        # reset terminal plot to previous state
 
 
-    def plot_train_test_split(self):
+
+    def plot_train_test_split(self, terminal_plot=False):
         train_data, test_data = self.get_train_test_split()
+        if terminal_plot:
+            enable_terminal_show()
         plot_dataset(
             X=train_data['X'], 
             y=train_data['y'],
             X_test=test_data['X'], 
             y_test=test_data['y'],
-            dataset_name=self.get_dataset_name(),
+            dataset_name=self.name,
             label_names=self.get_label_names()
         )
+        # reset terminal plot to previous state
 
     def __str__(self):
         return self.get_info()
