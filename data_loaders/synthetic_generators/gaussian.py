@@ -28,19 +28,16 @@ class gaussian_generator(AbstractLoader):
                          **kwargs)
     
     def load_data(self):
-        data = self._get_two_normal_classes(num_samples=self.num_samples)
+        data = self._get_two_normal_classes()
         return data
 
 
     def _get_two_normal_classes(self, 
-                        covs=[[[1, 0], [0, 1]],
-                            [[1, 0], [0, 1]]], 
-                        num_samples=[3, 2],
                         seed=None):
         labels = [0, 1]
         X = []
         y = []
-        for mean, cov, num_sample, label in zip(self.means, self.covs, num_samples, labels):
+        for mean, cov, num_sample, label in zip(self.means, self.covs, self.num_samples, labels):
             set_seed(seed)
             X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
             y.append(np.ones(num_sample)*label)
