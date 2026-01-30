@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from data_loaders import utils
 from data_loaders.visulalisation import plot_dataset
-from data_loaders.terminal_plots import enable_terminal_show
 
 
 class AbstractLoader(ABC):
@@ -183,36 +182,29 @@ class AbstractLoader(ABC):
 
     def plot_dataset(self, terminal_plot=False):
         data = self.get_data_dict()
-        if terminal_plot:
-            plot_env = enable_terminal_show()
+        
         plot_dataset(
             X=data['X'], 
             y=data['y'],
             X_test=None, 
             y_test=None,
             dataset_name=self.name,
-            label_names=self.get_label_names()
+            label_names=self.get_label_names(),
+            terminal_plot=terminal_plot
         )
-        # reset terminal plot to previous state
-        if terminal_plot:
-            plot_env.disable()
 
 
     def plot_train_test_split(self, terminal_plot=False):
         train_data, test_data = self.get_train_test_split()
-        if terminal_plot:
-            plot_env = enable_terminal_show()
         plot_dataset(
             X=train_data['X'], 
             y=train_data['y'],
             X_test=test_data['X'], 
             y_test=test_data['y'],
             dataset_name=self.name,
-            label_names=self.get_label_names()
+            label_names=self.get_label_names(),
+            terminal_plot=terminal_plot
         )
-        # reset terminal plot to previous state
-        if terminal_plot:
-            plot_env.disable()
 
     def __str__(self):
         return self.get_info()

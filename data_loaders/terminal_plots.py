@@ -37,7 +37,7 @@ except ImportError as e:
     raise ImportError("terminal_plots requires pillow: pip install pillow") from e
 
 
-Mode = Literal["braille", "ascii", "iterm2", "text", "auto"]
+Mode = Literal["ascii", "iterm2", "text", "auto"]
 
 
 # --- Rasterize Matplotlib figure to a PIL image --------------------------------
@@ -49,60 +49,7 @@ def _fig_to_pil(fig, *, dpi: int = 150) -> Image.Image:
     return Image.open(buf)
 
 
-# --- Braille renderer (best looking text-mode option) --------------------------
-
-# Braille dot bit positions (Unicode braille patterns):
-# Dots are numbered:
-#   1 4
-#   2 5
-#   3 6
-#   7 8
-# And bits map to: 1<<0 .. 1<<7
-_BRAILLE_BITS = {
-    (0, 0): 0,  # dot 1
-    (0, 1): 1,  # dot 2
-    (0, 2): 2,  # dot 3
-    (0, 3): 6,  # dot 7
-    (1, 0): 3,  # dot 4
-    (1, 1): 4,  # dot 5
-    (1, 2): 5,  # dot 6
-    (1, 3): 7,  # dot 8
-}
-
-
-def _pil_to_braille(img: Image.Image, *, cols: int, rows: int) -> str:
-    """Convert an image to braille characters.
-
-    Each terminal character represents a 2x4 pixel block.
-    """
-    # Resize to pixel grid matching braille resolution
-    px_w, px_h = cols * 2, rows * 4
-    g = img.convert("L").resize((px_w, px_h))
-
-    # Dither down to 1-bit (helps a lot for plots)
-    bw = g.convert("1", dither=Image.FLOYDSTEINBERG)
-    pix = bw.load()
-
-    out_lines = []
-    for r in range(rows):
-        line_chars = []
-        y0 = r * 4
-        for c in range(cols):
-            x0 = c * 2
-            bits = 0
-            for dx in (0, 1):
-                for dy in (0, 1, 2, 3):
-                    # In mode "1", white is 255, black is 0.
-                    # We want a dot for "ink" (black).
-                    if pix[x0 + dx, y0 + dy] == 0:
-                        bits |= 1 << _BRAILLE_BITS[(dx, dy)]
-            line_chars.append(chr(0x2800 + bits))
-        out_lines.append("".join(line_chars))
-
-    return "\n".join(out_lines)
-
-
-# --- ASCII fallback ------------------------------------------------------------
+# --- ASCII  ------------------------------------------------------------
 
 _ASCII_RAMP = " .:-=+*#%@"  # light -> dark
 
@@ -401,10 +348,6 @@ class TerminalPlotter:
                             fig_title = figure_title if ax_idx == 0 else ""
                             print(_render_axes_text(ax, cols=cols, rows=rows_per, figure_title=fig_title))
 
-            elif chosen == "braille":
-                pil = _fig_to_pil(fig, dpi=self.dpi)
-                print(_pil_to_braille(pil, cols=cols, rows=rows))
-
             elif chosen == "ascii":
                 pil = _fig_to_pil(fig, dpi=self.dpi)
                 print(_pil_to_ascii(pil, cols=cols, rows=rows))
@@ -466,12 +409,6 @@ if __name__ == "__main__":
     plt.grid(True)
 
     plt.show()
-
-    # plotter.disable()
-
-    # plotter = enable_terminal_show()          # defaults to mode="auto" (text unless iTerm2)
-    # plotter = enable_terminal_show(mode="braille")  # force braille
-    # plotter = enable_terminal_show(mode="iterm2")   # if you're on iTerm2: best quality (inline PNG)
 
     # scatter plot with x and o markers
     plt.scatter([1,2,3],[1,4,9], marker='x', c='red')

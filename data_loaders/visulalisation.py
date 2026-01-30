@@ -5,14 +5,18 @@ Visualisation functions for each dataset
 from openTSNE import TSNE as OpenTSNE
 import matplotlib.pyplot as plt
 
+from data_loaders.terminal_plots import enable_terminal_show
+
 
 def plot_dataset(X, 
                  y, 
                  X_test=None, 
                  y_test=None, 
                  dataset_name=None,
-                 label_names=None):
-
+                 label_names=None,
+                 terminal_plot=False):
+    if terminal_plot:
+            plot_env = enable_terminal_show()
     # determine layout: one plot if test not provided, else two side by side
     if X_test is None or y_test is None:
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -48,8 +52,8 @@ def plot_dataset(X,
                 label=class_label 
             )
         ax.set_title(f"{title} set in TSNE space")
-        ax.set_xlabel("TSNE Dim 1")
-        ax.set_ylabel("TSNE Dim 2")
+        ax.set_xlabel(embeder.dim1_name)
+        ax.set_ylabel(embeder.dim2_name)
         ax.legend()
 
     if dataset_name is not None:
@@ -57,6 +61,10 @@ def plot_dataset(X,
 
     plt.tight_layout()
     plt.show()
+
+    # reset terminal plot to previous state
+    if terminal_plot:
+        plot_env.disable()
 
 
 class two_dim_embedder:
@@ -80,12 +88,16 @@ class two_dim_embedder:
                 n_iter=self.n_iter,
                 n_jobs=self.n_jobs,
             )
+            self.dim1_name = "TSNE Dim 1"
+            self.dim2_name = "TSNE Dim 2"
             self.embedding_ = self.model.fit(X_train)
             self.transform = self.embedding_.transform
         else:
             # data is already 2d, no embedding needed
             self.embedding_ = None
             self.transform = lambda X: X  # identity function
+            self.dim1_name = "Feature 1"
+            self.dim2_name = "Feature 2"
 
 
     def get_transform(self, X):
