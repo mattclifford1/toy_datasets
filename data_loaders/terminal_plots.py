@@ -4,9 +4,10 @@
 This is meant to be a *drop-in* replacement for `plt.show()`:
 
     from data_loaders.terminal_plots import enable_terminal_show
-    enable_terminal_show()
+    plotter = enable_terminal_show()
     ...
     plt.show()  # renders in terminal
+    plotter.disable()  # restore original matplotlib show
 
 On macOS terminals, ASCII ramps usually look rough. This module defaults to a
 Unicode *braille* renderer (2x4 dots per character) which is dramatically
@@ -25,6 +26,7 @@ import base64
 import io
 import os
 import shutil
+import functools
 from typing import Literal, Optional
 
 import matplotlib.pyplot as plt
@@ -138,41 +140,55 @@ def _print_iterm2_inline_png(png_bytes: bytes, *, width_cols: Optional[int] = No
 
 # --- Public API ----------------------------------------------------------------
 
-def enable_terminal_show(
-    *,
-    mode: Mode = "auto",
-    width: Optional[int] = None,
-    height: Optional[int] = None,
-    clear: bool = True,
-    close: bool = True,
-    dpi: int = 150,
-    margin_cols: int = 2,
-) -> callable:
-    """Monkey-patch `matplotlib.pyplot.show()` to render figures in the terminal.
+class TerminalPlotter:
+    """Enable/disable a terminal renderer for matplotlib via a show() monkey-patch."""
 
-    Parameters
-    ----------
-    mode:
-        - "auto": use iTerm2 inline images if available; otherwise braille.
-        - "iterm2": force inline PNG rendering (requires iTerm2).
-        - "braille": unicode braille (good looking, works everywhere).
-        - "ascii": basic ASCII ramp (least pretty).
-    width/height:
-        Output size in terminal character cells. If both are None, uses terminal size.
-        For braille, each cell is effectively 2x4 pixels.
-    clear:
-        Clear screen before printing.
-    close:
-        Close figures after rendering.
-    dpi:
-        Rasterization DPI before converting.
-    margin_cols:
-        Leave some columns at the right edge to avoid wrapping.
-    """
+    def __init__(
+        self,
+        *,
+        mode: Mode = "auto",
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        clear: bool = True,
+        close: bool = True,
+        dpi: int = 150,
+        margin_cols: int = 2,
+    ) -> None:
+        self.mode = mode
+        self.width = width
+        self.height = height
+        self.clear = clear
+        self.close = close
+        self.dpi = dpi
+        self.margin_cols = margin_cols
+        self._original_show = None
+        self._patched_show = None
 
-    original_show = plt.show
+    def enable(self) -> "TerminalPlotter":
+        if self._original_show is None:
+            self._original_show = plt.show
+            @functools.wraps(self._original_show)
+            def terminal_show(*args, **kwargs):
+                return self._terminal_show(*args, **kwargs)
 
-    def terminal_show(*args, **kwargs):
+            self._patched_show = terminal_show
+            plt.show = terminal_show
+        return self
+
+    def disable(self) -> None:
+        if self._original_show is not None:
+            plt.show = self._original_show
+            self._original_show = None
+            self._patched_show = None
+
+    def __enter__(self) -> "TerminalPlotter":
+        return self.enable()
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        self.disable()
+        return False
+
+    def _terminal_show(self, *args, **kwargs) -> None:
         fnums = plt.get_fignums()
         if not fnums:
             return
@@ -180,16 +196,16 @@ def enable_terminal_show(
         term_cols, term_rows = shutil.get_terminal_size((120, 40))
 
         # Default sizing: leave a little margin so lines don't wrap.
-        cols = width if width is not None else max(20, term_cols - margin_cols)
-        rows = height if height is not None else max(10, term_rows - 2)
+        cols = self.width if self.width is not None else max(20, term_cols - self.margin_cols)
+        rows = self.height if self.height is not None else max(10, term_rows - 2)
 
         chosen: Mode
-        if mode == "auto":
+        if self.mode == "auto":
             chosen = "iterm2" if _is_iterm2() else "braille"
         else:
-            chosen = mode
+            chosen = self.mode
 
-        if clear:
+        if self.clear:
             print("\033[2J\033[H", end="")
 
         for i, n in enumerate(fnums):
@@ -203,7 +219,7 @@ def enable_terminal_show(
                     # Fall back gracefully
                     chosen_local: Mode = "braille"
                 else:
-                    pil = _fig_to_pil(fig, dpi=dpi)
+                    pil = _fig_to_pil(fig, dpi=self.dpi)
                     buf = io.BytesIO()
                     pil.save(buf, format="PNG")
                     _print_iterm2_inline_png(buf.getvalue(), width_cols=cols)
@@ -214,31 +230,53 @@ def enable_terminal_show(
                     pass
                 else:
                     # Render via braille fallback
-                    pil = _fig_to_pil(fig, dpi=dpi)
+                    pil = _fig_to_pil(fig, dpi=self.dpi)
                     print(_pil_to_braille(pil, cols=cols, rows=rows))
 
             elif chosen == "braille":
-                pil = _fig_to_pil(fig, dpi=dpi)
+                pil = _fig_to_pil(fig, dpi=self.dpi)
                 print(_pil_to_braille(pil, cols=cols, rows=rows))
 
             elif chosen == "ascii":
-                pil = _fig_to_pil(fig, dpi=dpi)
+                pil = _fig_to_pil(fig, dpi=self.dpi)
                 print(_pil_to_ascii(pil, cols=cols, rows=rows))
 
             else:
                 raise ValueError(f"Unknown mode: {chosen}")
 
-            if close:
+            if self.close:
                 plt.close(fig)
 
-    plt.show = terminal_show
-    return original_show
+
+def enable_terminal_show(
+    *,
+    mode: Mode = "auto",
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    clear: bool = True,
+    close: bool = True,
+    dpi: int = 150,
+    margin_cols: int = 2,
+) -> TerminalPlotter:
+    """Monkey-patch `matplotlib.pyplot.show()` to render figures in the terminal.
+
+    Returns a TerminalPlotter instance so you can call .disable() later.
+    """
+    return TerminalPlotter(
+        mode=mode,
+        width=width,
+        height=height,
+        clear=clear,
+        close=close,
+        dpi=dpi,
+        margin_cols=margin_cols,
+    ).enable()
 
 
 if __name__ == "__main__":
     import numpy as np
 
-    enable_terminal_show(mode="auto")
+    plotter = enable_terminal_show(mode="auto")
 
     x = np.linspace(0, 2 * np.pi, 300)
     plt.plot(x, np.sin(x))
@@ -248,10 +286,13 @@ if __name__ == "__main__":
     plt.grid(True)
 
     plt.show()
-        
-    enable_terminal_show()          # defaults to mode="auto" (braille unless iTerm2)
-    # enable_terminal_show(mode="braille")  # force braille
-    # enable_terminal_show(mode="iterm2")   # if you're on iTerm2: best quality (inline PNG)
+
+    plotter.disable()
+
+    plotter = enable_terminal_show()          # defaults to mode="auto" (braille unless iTerm2)
+    # plotter = enable_terminal_show(mode="braille")  # force braille
+    # plotter = enable_terminal_show(mode="iterm2")   # if you're on iTerm2: best quality (inline PNG)
 
     plt.plot([1,2,3],[1,4,9])
     plt.show()
+    plotter.disable()

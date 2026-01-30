@@ -184,7 +184,7 @@ class AbstractLoader(ABC):
     def plot_dataset(self, terminal_plot=False):
         data = self.get_data_dict()
         if terminal_plot:
-            enable_terminal_show()
+            plot_env = enable_terminal_show()
         plot_dataset(
             X=data['X'], 
             y=data['y'],
@@ -194,13 +194,14 @@ class AbstractLoader(ABC):
             label_names=self.get_label_names()
         )
         # reset terminal plot to previous state
-
+        if terminal_plot:
+            plot_env.disable()
 
 
     def plot_train_test_split(self, terminal_plot=False):
         train_data, test_data = self.get_train_test_split()
         if terminal_plot:
-            enable_terminal_show()
+            plot_env = enable_terminal_show()
         plot_dataset(
             X=train_data['X'], 
             y=train_data['y'],
@@ -210,6 +211,8 @@ class AbstractLoader(ABC):
             label_names=self.get_label_names()
         )
         # reset terminal plot to previous state
+        if terminal_plot:
+            plot_env.disable()
 
     def __str__(self):
         return self.get_info()
@@ -247,5 +250,6 @@ if __name__ == "__main__":
     # show example dataset how to construct and test the features
     loader = example_dataset()
     print(loader)
-    loader.plot_dataset()
+    loader.plot_dataset(terminal_plot=True)
+    # loader.plot_dataset()
 
