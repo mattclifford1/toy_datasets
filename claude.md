@@ -10,7 +10,7 @@ Always use PDM (Python Dependency Manager) for environment and dependency manage
 - `pdm install -G dev` - Install with dev dependencies
 - `pdm add <package>` - Add a new dependency
 - `pdm run <command>` - Run command in the PDM environment
-- For editable install: `python -m pip install -e .`
+- `pdm add -e path/to/package --dev` - Install a package in development mode
 
 Config in `pyproject.toml` with `distribution = false` (application mode, not library).
 
