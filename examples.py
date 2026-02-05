@@ -1,7 +1,9 @@
 """
 Examples demonstrating how to use the toy_datasets package.
 
-Run with: pdm run python examples.py
+Run with:
+    pdm run python examples.py           # Core examples
+    pdm run python examples.py --plot    # Include terminal plotting (requires sixel/kitty)
 """
 import numpy as np
 import data_loaders
@@ -206,7 +208,81 @@ def reproducibility():
     print(f"Different seed (123): arrays equal = {np.array_equal(X1, X3)}")
 
 
+def terminal_plotting():
+    """Demonstrate terminal-based plotting (requires sixel/kitty support)."""
+    print("\n" + "=" * 60)
+    print("TERMINAL PLOTTING")
+    print("=" * 60)
+    print("(Requires terminal with sixel/kitty graphics support)")
+    print()
+
+    # Plot a 2D synthetic dataset
+    print("Moons dataset:")
+    moons = data_loaders.get_dataset('Moons', num_samples=200, moons_noise=0.15)
+    moons.plot_dataset(terminal_plot=True)
+
+    print("\nXOR dataset:")
+    xor = data_loaders.get_dataset('XOR', num_samples=[100, 100])
+    xor.plot_dataset(terminal_plot=True)
+
+    print("\nCircles dataset:")
+    circles = data_loaders.get_dataset('Circles', n_samples=200)
+    circles.plot_dataset(terminal_plot=True)
+
+
+def terminal_plotting_train_test():
+    """Demonstrate train/test split visualization in terminal."""
+    print("\n" + "=" * 60)
+    print("TERMINAL PLOTTING - TRAIN/TEST SPLIT")
+    print("=" * 60)
+    print("(Requires terminal with sixel/kitty graphics support)")
+    print()
+
+    # Plot train/test split for Blobs
+    print("Blobs train/test split:")
+    blobs = data_loaders.get_dataset('Blobs', n_samples=300, centers=3, split_size=0.7)
+    blobs.plot_train_test_split(terminal_plot=True)
+
+
+def terminal_plotting_with_reduction():
+    """Demonstrate plotting high-dimensional data with PCA reduction."""
+    print("\n" + "=" * 60)
+    print("TERMINAL PLOTTING - WITH DIMENSIONALITY REDUCTION")
+    print("=" * 60)
+    print("(Requires terminal with sixel/kitty graphics support)")
+    print()
+
+    # Plot Iris with PCA reduction to 2D
+    print("Iris dataset (PCA reduced to 2D):")
+    iris = data_loaders.get_dataset(
+        'Iris',
+        dim_reducer='PCA',
+        reduce_to_dim=2
+    )
+    iris.plot_train_test_split(terminal_plot=True)
+
+    # Plot Wine with PCA reduction
+    print("\nWine dataset (PCA reduced to 2D):")
+    wine = data_loaders.get_dataset(
+        'Wine',
+        dim_reducer='PCA',
+        reduce_to_dim=2
+    )
+    wine.plot_train_test_split(terminal_plot=True)
+
+
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Run toy_datasets examples')
+    parser.add_argument(
+        '--no_plots',
+        action='store_true',
+        help='Skip terminal plotting examples (requires sixel/kitty terminal)'
+    )
+    args = parser.parse_args()
+
+    # Core examples (always run)
     basic_usage()
     train_test_split()
     scaling_and_normalization()
@@ -217,6 +293,17 @@ if __name__ == "__main__":
     class_balancing()
     reproducibility()
     list_all_datasets()
+
+    # Terminal plotting examples (optional)
+    if not args.no_plots:
+        terminal_plotting()
+        terminal_plotting_train_test()
+        terminal_plotting_with_reduction()
+    else:
+        print("\n" + "-" * 60)
+        print("Tip: Run with --no_plots flag to skip terminal plotting examples")
+        print("  pdm run python examples.py --no_plots")
+        print("-" * 60)
 
     print("\n" + "=" * 60)
     print("EXAMPLES COMPLETE")
