@@ -25,7 +25,7 @@ class normaliser:
 def set_seed(seed):
     if seed == True:
         np.random.seed(seed=RANDOM_STATE)
-    elif type(seed) == int:
+    elif isinstance(seed, int):
         np.random.seed(seed=seed)
     elif seed == False:
         np.random.seed(seed=None)

@@ -5,7 +5,7 @@ Generic class for data loaders to inherit from
 from abc import ABC, abstractmethod
 import numpy as np
 from data_loaders import utils
-from data_loaders.visulalisation import plot_dataset
+from data_loaders.visualisation import plot_dataset
 from data_loaders.embeddings import dim_reducer
 
 
