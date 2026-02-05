@@ -4,7 +4,7 @@ Python package providing a unified interface for loading synthetic and real-worl
 
 ## Development Environment
 
-Uses PDM (Python Dependency Manager) for environment and dependency management.
+Always use PDM (Python Dependency Manager) for environment and dependency management.
 
 - `pdm install` - Install dependencies and create virtual environment
 - `pdm install -G dev` - Install with dev dependencies

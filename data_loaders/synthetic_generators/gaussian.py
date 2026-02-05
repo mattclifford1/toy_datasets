@@ -1,96 +1,266 @@
 # author: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
-Generate guassian data
+Generate Gaussian data with flexible covariance and mean configurations.
 '''
-import sklearn.utils
 import numpy as np
 from data_loaders.utils import set_seed
 from data_loaders.abstract_loader import AbstractLoader
 
 
 class gaussian_generator(AbstractLoader):
-    def __init__(self,
-                 shuffle=True,
-                 num_samples=[200, 200],
-                 means=[[0, 0], [5, 5]],
-                 covs=[[[1, 0], [0, 1]],
-                       [[1, 0], [0, 1]]],
-                name='Gaussian Synthetic',
-                 **kwargs):
-        self.means = means
-        self.covs = covs
-        if isinstance(num_samples, int):
-            self.num_samples = [num_samples//2, num_samples//2]
+    """
+    Generate 2-class multivariate Gaussian data for binary classification.
+
+    Supports automatic covariance matrix generation (spherical, diagonal,
+    symmetric, random) or manual specification. Means can be auto-generated
+    with configurable separation or manually specified.
+
+    Parameters
+    ----------
+    num_samples : int or list of int
+        Total samples (split equally) or per-class sample counts [class0, class1].
+        Default: [200, 200]
+    n_features : int
+        Number of features/dimensions.
+        Default: 2
+    means : list of array-like, optional
+        Mean vector for each class [mean0, mean1]. If None, auto-generated
+        based on class_separation. Shape: (2, n_features)
+    class_separation : float
+        Distance between class means when auto-generating.
+        Default: 5.0
+    covs : list of array-like, optional
+        Covariance matrix for each class [cov0, cov1]. If None, auto-generated
+        based on cov_type. Shape: (2, n_features, n_features)
+    cov_type : str
+        Type of auto-generated covariance: 'spherical', 'diagonal', 'symmetric', 'random'.
+        Default: 'spherical'
+    cov_scale : float or list of float
+        Scale factor(s) for covariance. Single value applies to both classes,
+        or provide [scale0, scale1]. Default: 1.0
+    cov_correlation : float
+        Correlation strength for 'symmetric' cov_type (-1 to 1).
+        Default: 0.5
+    random_cov_range : tuple
+        (min, max) range for random covariance elements.
+        Default: (0.5, 2.0)
+    shuffle : bool
+        Whether to shuffle the data. Default: True
+    name : str
+        Dataset name. Default: 'Gaussian Synthetic'
+
+    Examples
+    --------
+    # Simple 2-class with spherical covariance
+    >>> loader = gaussian_generator(num_samples=400, class_separation=3.0)
+
+    # Different scales per class
+    >>> loader = gaussian_generator(cov_type='diagonal', cov_scale=[1.0, 2.0])
+
+    # Custom means with correlated features
+    >>> loader = gaussian_generator(
+    ...     means=[[0, 0], [5, 0]],
+    ...     cov_type='symmetric',
+    ...     cov_correlation=0.7
+    ... )
+
+    # Fully custom specification
+    >>> loader = gaussian_generator(
+    ...     means=[[0, 0], [3, 3]],
+    ...     covs=[[[1, 0.5], [0.5, 1]], [[2, -0.3], [-0.3, 1]]]
+    ... )
+    """
+
+    def __init__(
+        self,
+        shuffle=True,
+        num_samples=None,
+        n_features=2,
+        means=None,
+        class_separation=5.0,
+        covs=None,
+        cov_type='spherical',
+        cov_scale=1.0,
+        cov_correlation=0.5,
+        random_cov_range=(0.5, 2.0),
+        name='Gaussian Synthetic',
+        **kwargs
+    ):
+        # Infer n_features from means if provided
+        if means is not None:
+            if len(means) != 2:
+                raise ValueError(f"means must have exactly 2 classes, got {len(means)}")
+            n_features = len(means[0])
+
+        self.n_features = n_features
+
+        # Handle num_samples
+        if num_samples is None:
+            self.num_samples = [200, 200]
+        elif isinstance(num_samples, int):
+            self.num_samples = [num_samples // 2, num_samples // 2]
         else:
-            self.num_samples = num_samples
-        super().__init__(shuffle=shuffle,
-                         dataset_name=name,
-                         **kwargs)
-    
+            if len(num_samples) != 2:
+                raise ValueError(f"num_samples must have 2 values, got {len(num_samples)}")
+            self.num_samples = list(num_samples)
+
+        # Generate or use provided means
+        if means is not None:
+            self.means = [np.array(m) for m in means]
+        else:
+            self.means = self._generate_means(n_features, class_separation)
+
+        # Validate covs if provided
+        if covs is not None and len(covs) != 2:
+            raise ValueError(f"covs must have exactly 2 matrices, got {len(covs)}")
+
+        # Generate or use provided covariances
+        if covs is not None:
+            self.covs = [np.array(c) for c in covs]
+        else:
+            self.covs = self._generate_covs(
+                n_features, cov_type, cov_scale,
+                cov_correlation, random_cov_range
+            )
+
+        # Store config for metadata
+        self.cov_type = cov_type if covs is None else 'custom'
+        self.class_separation = class_separation
+
+        super().__init__(
+            shuffle=shuffle,
+            dataset_name=name,
+            **kwargs
+        )
+
+    def _generate_means(self, n_features, separation):
+        """Generate class means at origin and diagonal offset."""
+        return [
+            np.zeros(n_features),
+            np.ones(n_features) * separation
+        ]
+
+    def _generate_covs(self, n_features, cov_type, scale, correlation, random_range):
+        """Generate covariance matrices based on type."""
+        # Handle per-class scales
+        if isinstance(scale, (int, float)):
+            scales = [scale, scale]
+        else:
+            scales = list(scale)
+
+        covs = []
+        for i in range(2):
+            cov = self._make_cov_matrix(
+                n_features, cov_type, scales[i], correlation, random_range, seed=i
+            )
+            covs.append(cov)
+        return covs
+
+    def _make_cov_matrix(self, n_features, cov_type, scale, correlation,
+                         random_range, seed=None):
+        """Create a single covariance matrix of the specified type."""
+        if cov_type == 'spherical':
+            # Identity scaled - same variance in all directions
+            return np.eye(n_features) * scale
+
+        elif cov_type == 'diagonal':
+            # Different variance per feature
+            if seed is not None:
+                np.random.seed(42 + seed)
+            diag = np.random.uniform(0.5, 2.0, n_features) * scale
+            return np.diag(diag)
+
+        elif cov_type == 'symmetric':
+            # Symmetric with specified correlation
+            cov = np.eye(n_features) * scale
+            for i in range(n_features):
+                for j in range(i + 1, n_features):
+                    cov[i, j] = correlation * scale
+                    cov[j, i] = correlation * scale
+            return cov
+
+        elif cov_type == 'random':
+            # Random positive definite matrix
+            if seed is not None:
+                np.random.seed(42 + seed)
+            # Generate random matrix and make it positive definite
+            A = np.random.uniform(random_range[0], random_range[1],
+                                  (n_features, n_features))
+            cov = np.dot(A, A.T) / n_features * scale
+            return cov
+
+        else:
+            raise ValueError(
+                f"Unknown cov_type: {cov_type}. "
+                f"Choose from: 'spherical', 'diagonal', 'symmetric', 'random'"
+            )
+
     def load_data(self):
-        data = self._get_two_normal_classes()
+        """Generate the Gaussian data."""
+        X_list = []
+        y_list = []
+
+        for label, (mean, cov, n_samples) in enumerate(
+            zip(self.means, self.covs, self.num_samples)
+        ):
+            set_seed(self.set_seed)
+            X_class = np.random.multivariate_normal(mean, cov, size=n_samples)
+            X_list.append(X_class)
+            y_list.append(np.full(n_samples, label))
+
+        X = np.vstack(X_list)
+        y = np.hstack(y_list)
+
+        data = {
+            'X': X,
+            'y': y,
+            'description': self._make_description(),
+            'feature_names': [f'Feature {i+1}' for i in range(self.n_features)],
+            'label_names': ['Class 0', 'Class 1'],
+        }
         return data
 
+    def _make_description(self):
+        """Generate a description of the dataset configuration."""
+        total = sum(self.num_samples)
+        desc = f"Gaussian synthetic dataset for binary classification.\n\n"
+        desc += f"Total samples: {total}\n"
+        desc += f"Features: {self.n_features}\n"
+        desc += f"Covariance type: {self.cov_type}\n\n"
 
-    def _get_two_normal_classes(self, 
-                        seed=None):
-        labels = [0, 1]
-        X = []
-        y = []
-        for mean, cov, num_sample, label in zip(self.means, self.covs, self.num_samples, labels):
-            set_seed(seed)
-            X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
-            y.append(np.ones(num_sample)*label)
-        X = np.vstack(X)
-        y = np.hstack(y)
+        for i, (mean, cov, n) in enumerate(
+            zip(self.means, self.covs, self.num_samples)
+        ):
+            desc += f"Class {i}: {n} samples\n"
+            desc += f"  Mean: {np.round(mean, 2).tolist()}\n"
+            desc += f"  Cov diagonal: {np.round(np.diag(cov), 2).tolist()}\n"
 
-        return {'X': X, 'y': y}
-
-
-def get_gaussian(samples=200,
-                 gaussian_means=[[0, 0], [1, 1]],
-                 gaussian_covs=[[[1, 0], [0, 1]],
-                                [[1, 0], [0, 1]]],
-                 test=False,
-                 **kwargs):
-    '''
-    sample from two Gaussian dataset
-
-    returns:
-        - data: dict containing 'X', 'y'
-    '''
-
-    X = np.empty([0, 2])
-    y = np.empty([0], dtype=np.int64)
-    labels = [0, 1]
-    for mean, cov, label in zip(gaussian_means, gaussian_covs, labels):
-        # equal proportion of class samples
-        class_samples = int(samples/len(labels))
-        # set up current class' sampler
-        gaussclass = GaussClass(mean, cov)
-        # get random seed
-        seed = 42+label
-        if test == True:
-            seed += 1
-        # sample points
-        gaussclass.gen_data(seed, class_samples)
-        X = np.vstack([X, gaussclass.data])
-        y = np.append(y, [label]*class_samples)
-    X, y = sklearn.utils.shuffle(X, y, random_state=seed)
-    return {'X': X, 'y':y, 'means':gaussian_means, 'covariances':gaussian_covs}
-
-
-class GaussClass():
-    def __init__(self, mean, covariance):
-        self.mean = np.array(mean)
-        self.cov = covariance
-
-    def gen_data(self, randomseed, size):
-        rng = np.random.default_rng(randomseed)
-        self.data = np.array(rng.multivariate_normal(self.mean, self.cov, size))
+        return desc
 
 
 if __name__ == "__main__":
-    loader = gaussian_generator()
-    # loader.plot_dataset()
-    loader.plot_train_test_split(terminal_plot=True)
+    # Example: 2-class spherical
+    print("2-class spherical:")
+    loader = gaussian_generator(num_samples=400, class_separation=4.0)
+    print(loader.get_info(long=False))
+    loader.plot_dataset(terminal_plot=True)
+
+    # Example: Different scales per class
+    print("\nDifferent scales per class:")
+    loader = gaussian_generator(
+        cov_type='diagonal',
+        cov_scale=[0.5, 2.0],
+        class_separation=6.0
+    )
+    print(loader.get_info(long=False))
+    loader.plot_dataset(terminal_plot=True)
+
+    # Example: Custom means with symmetric covariance
+    print("\nSymmetric covariance with correlation:")
+    loader = gaussian_generator(
+        means=[[0, 0], [4, 4]],
+        cov_type='symmetric',
+        cov_correlation=0.8
+    )
+    print(loader.get_info(long=False))
+    loader.plot_dataset(terminal_plot=True)
