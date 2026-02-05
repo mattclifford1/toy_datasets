@@ -18,7 +18,7 @@ class wine_loader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          split_size=split_size, 
                         #  split_ratio=split_ratio, 
-                         dataset_name='Iris',
+                         dataset_name='Wine',
                          **kwargs)
         
     def load_data(self):
