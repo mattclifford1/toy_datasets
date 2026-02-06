@@ -90,6 +90,62 @@ loader.plot_dataset()           # Visualize the dataset
 loader.plot_train_test_split()  # Visualize train/test split
 ```
 
+## Visualization
+
+### Basic Plotting
+
+```python
+# Default behavior: creates figure and calls plt.show()
+loader = data_loaders.get_dataset('Moons')
+fig, ax = loader.plot_dataset()  # Returns (fig, ax) for further customization
+
+# Train/test split visualization
+fig, axes = loader.plot_train_test_split()  # Returns (fig, [ax1, ax2])
+```
+
+### Custom Axes Integration
+
+Plot on your own matplotlib axes for full control:
+
+```python
+import matplotlib.pyplot as plt
+
+# Single dataset on custom axes
+fig, ax = plt.subplots(figsize=(8, 8))
+loader.plot_dataset(ax=ax)  # Returns None when axes provided
+ax.set_title("My Custom Title")
+plt.show()
+
+# Train/test split on custom axes
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+loader.plot_train_test_split(ax=(ax1, ax2))
+fig.suptitle("Custom Comparison")
+plt.show()
+```
+
+### Multiple Datasets in Grid
+
+```python
+# Compare multiple datasets
+fig, axes = plt.subplots(2, 2, figsize=(14, 14))
+datasets = ['XOR', 'Moons', 'Circles', 'Blobs']
+
+for ax, name in zip(axes.flat, datasets):
+    data_loaders.get_dataset(name).plot_dataset(ax=ax)
+    ax.set_title(name)
+
+plt.tight_layout()
+plt.show()
+```
+
+### Terminal Plotting
+
+```python
+# Render plots directly in terminal (supports sixel/kitty protocols)
+loader.plot_dataset(terminal_plot=True)
+loader.plot_train_test_split(terminal_plot=True)
+```
+
 ## Common Options
 
 ```python

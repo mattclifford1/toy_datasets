@@ -199,30 +199,68 @@ class AbstractLoader(ABC):
         return msg
 
 
-    def plot_dataset(self, terminal_plot=False):
+    def plot_dataset(self,
+                     terminal_plot=False,
+                     ax=None):
+        """
+        Plot the dataset.
+
+        Parameters
+        ----------
+        terminal_plot : bool, default=False
+            If True, render plot in terminal
+        ax : matplotlib.axes.Axes, optional
+            If provided, plot on this axes instead of creating new figure
+
+        Returns
+        -------
+        tuple or None
+            Returns (fig, ax) when new figure is created, None otherwise
+        """
         data = self.get_data_dict()
-        
-        plot_dataset(
-            X=data['X'], 
+
+        return plot_dataset(
+            X=data['X'],
             y=data['y'],
-            X_test=None, 
+            X_test=None,
             y_test=None,
             dataset_name=self.name,
             label_names=self.get_label_names(),
-            terminal_plot=terminal_plot
+            terminal_plot=terminal_plot,
+            ax=ax  # Pass through
         )
 
 
-    def plot_train_test_split(self, terminal_plot=False):
+    def plot_train_test_split(self,
+                              terminal_plot=False,
+                              ax=None):
+        """
+        Create train/test split and plot both datasets.
+
+        Parameters
+        ----------
+        terminal_plot : bool, default=False
+            If True, render plot in terminal
+        ax : tuple of 2 matplotlib.axes.Axes, optional
+            Tuple of 2 Axes (train_ax, test_ax) to plot on.
+            If None (default): create new figure with 2 subplots
+
+        Returns
+        -------
+        tuple or None
+            Returns (fig, [ax1, ax2]) when new figure is created, None otherwise
+        """
         train_data, test_data = self.get_train_test_split()
-        plot_dataset(
-            X=train_data['X'], 
+
+        return plot_dataset(
+            X=train_data['X'],
             y=train_data['y'],
-            X_test=test_data['X'], 
+            X_test=test_data['X'],
             y_test=test_data['y'],
             dataset_name=self.name,
             label_names=self.get_label_names(),
-            terminal_plot=terminal_plot
+            terminal_plot=terminal_plot,
+            ax=ax  # Pass through
         )
 
     def __str__(self):

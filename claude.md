@@ -77,3 +77,11 @@ Test structure:
 - `tests/test_embeddings.py` - Dimensionality reduction (PCA, UMAP)
 - `tests/test_main.py` - Registry and all dataset loaders
 - `tests/test_loaders.py` - Individual loader category tests
+
+
+## coding style
+always wise clear and consise code.
+
+
+## documentation
+always document features in the readme and docstrings. Use type hints for clarity.
