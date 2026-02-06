@@ -45,9 +45,9 @@ class TestGetDataset:
 
     def test_get_dataset_passes_kwargs(self):
         """get_dataset should pass kwargs to loader."""
-        loader = get_dataset('XOR', shuffle=False, split_size=0.7)
+        loader = get_dataset('XOR', shuffle=False, train_size=0.7)
         assert loader.shuffle == False
-        assert loader.split_size == 0.7
+        assert loader.train_size == 0.7
 
     def test_get_dataset_case_sensitive(self):
         """Dataset names should be case sensitive."""

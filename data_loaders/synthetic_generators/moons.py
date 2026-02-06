@@ -5,7 +5,7 @@ from data_loaders.abstract_loader import AbstractLoader
 class moons_generator(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 split_size=0.5,
+                 train_size=0.5,
                  num_samples=200,
                  moons_noise=0.2,
                  **kwargs):
@@ -13,7 +13,7 @@ class moons_generator(AbstractLoader):
         self.moons_noise = moons_noise
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
-                         split_size=split_size, 
+                         train_size=train_size,
                          dataset_name='Moons Synthetic',
                          **kwargs)
         

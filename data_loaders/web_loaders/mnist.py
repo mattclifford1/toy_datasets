@@ -10,8 +10,8 @@ from data_loaders.abstract_loader import AbstractLoader
 class mnist_loader(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 split_size=0.1,
-                 split_ratio=None,
+                 train_size=0.1,
+                 minority_reduce_scaler=None,
                  size=60000,  # 60000 is full dataset
                  minority_id=[0],
                  binary=True,
@@ -19,8 +19,8 @@ class mnist_loader(AbstractLoader):
                  equal_test=False,
                  **kwargs):
         super().__init__(shuffle=shuffle,
-                         split_size=split_size,
-                         split_ratio=split_ratio,
+                         train_size=train_size,
+                         minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='MNIST',
                          **kwargs)
         self.size = size

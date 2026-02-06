@@ -44,7 +44,7 @@ train, test = loader.get_train_test_split()
 loader = data_loaders.get_dataset(
     'Moons',
     scale=True,           # Normalize to [-1, 1]
-    split_size=0.8,       # 80% train, 20% test
+    train_size=0.8,       # 80% train, 20% test
     dim_reducer='PCA',    # Apply PCA
     reduce_to_dim=2       # Reduce to 2 dimensions
 )
@@ -153,7 +153,7 @@ loader = data_loaders.get_dataset(
     'Iris',
     shuffle=True,          # Shuffle data (default: True)
     set_seed=42,           # Random seed for reproducibility
-    split_size=0.5,        # Train set proportion (default: 0.5)
+    train_size=0.5,        # Train set proportion (default: 0.5)
     scale=True,            # Apply MinMax scaling
     percent_of_data=50,    # Use only 50% of data
     equal_test=True,       # Balance test set classes

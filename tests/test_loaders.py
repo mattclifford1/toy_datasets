@@ -224,8 +224,8 @@ class TestLoaderSplitRatio:
     """Tests for imbalanced class ratio functionality."""
 
     def test_split_ratio_creates_imbalance(self):
-        """split_ratio should create class imbalance in train."""
-        loader = get_dataset('Blobs', centers=2, n_samples=200, split_ratio=5)
+        """minority_reduce_scaler should create class imbalance in train."""
+        loader = get_dataset('Blobs', centers=2, n_samples=200, minority_reduce_scaler=5)
         train, test = loader.get_train_test_split()
 
         train_counts = dict(zip(*np.unique(train['y'], return_counts=True)))
@@ -263,16 +263,16 @@ class TestEdgeCases:
         assert 10 <= X.shape[0] <= 25
 
     def test_large_split_size(self):
-        """Large split_size (0.9) should work."""
-        loader = get_dataset('Iris', split_size=0.9)
+        """Large train_size (0.9) should work."""
+        loader = get_dataset('Iris', train_size=0.9)
         train, test = loader.get_train_test_split()
 
         # Most data should be in train
         assert len(train['y']) > len(test['y'])
 
     def test_small_split_size(self):
-        """Small split_size (0.1) should work."""
-        loader = get_dataset('Iris', split_size=0.1)
+        """Small train_size (0.1) should work."""
+        loader = get_dataset('Iris', train_size=0.1)
         train, test = loader.get_train_test_split()
 
         # Most data should be in test

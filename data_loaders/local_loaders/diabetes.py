@@ -14,13 +14,13 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 class diabetes_pima_indians_loader(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 split_size=0.5,
-                 split_ratio=10,
+                 train_size=0.5,
+                 minority_reduce_scaler=10,
                  **kwargs):
         # size=0.2, ratio=5   works nicely
         super().__init__(shuffle=shuffle,
-                         split_size=split_size, 
-                         split_ratio=split_ratio, 
+                         train_size=train_size,
+                         minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Diabetes Pima Indians',
                          **kwargs)
         

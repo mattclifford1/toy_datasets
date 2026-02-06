@@ -176,8 +176,8 @@ class TestProportionalSplit:
     """Tests for proportional_split function."""
 
     def test_proportional_split_sizes(self, sample_data):
-        """Split should respect size parameter."""
-        train, test = utils.proportional_split(sample_data.copy(), size=0.8)
+        """Split should respect train_size parameter."""
+        train, test = utils.proportional_split(sample_data.copy(), train_size=0.8)
 
         total = len(train['y']) + len(test['y'])
         assert total == 100
@@ -186,7 +186,7 @@ class TestProportionalSplit:
 
     def test_proportional_split_preserves_classes(self, sample_data):
         """Both splits should contain all classes."""
-        train, test = utils.proportional_split(sample_data.copy(), size=0.5)
+        train, test = utils.proportional_split(sample_data.copy(), train_size=0.5)
 
         train_classes = set(np.unique(train['y']))
         test_classes = set(np.unique(test['y']))
@@ -197,17 +197,17 @@ class TestProportionalSplit:
         assert 1 in test_classes
 
     def test_proportional_split_invalid_size(self, sample_data):
-        """Invalid size should raise ValueError."""
+        """Invalid train_size should raise ValueError."""
         with pytest.raises(ValueError):
-            utils.proportional_split(sample_data.copy(), size=0)
+            utils.proportional_split(sample_data.copy(), train_size=0)
 
         with pytest.raises(ValueError):
-            utils.proportional_split(sample_data.copy(), size=1.5)
+            utils.proportional_split(sample_data.copy(), train_size=1.5)
 
     def test_proportional_split_equal_test(self, imbalanced_data):
         """equal_test=True should balance test set classes."""
         train, test = utils.proportional_split(
-            imbalanced_data.copy(), size=0.5, equal_test=True
+            imbalanced_data.copy(), train_size=0.5, equal_test=True
         )
 
         test_classes, test_counts = np.unique(test['y'], return_counts=True)
@@ -215,15 +215,15 @@ class TestProportionalSplit:
         assert len(set(test_counts)) == 1
 
     def test_proportional_split_with_ratio(self):
-        """ratio parameter should adjust minority class in train."""
+        """minority_reduce_scaler parameter should adjust minority class in train."""
         data = {
             'X': np.random.randn(200, 4),
             'y': np.array([0]*100 + [1]*100)
         }
-        train, test = utils.proportional_split(data.copy(), size=0.5, ratio=5)
+        train, test = utils.proportional_split(data.copy(), train_size=0.5, minority_reduce_scaler=5)
 
         train_counts = dict(zip(*np.unique(train['y'], return_counts=True)))
-        # With ratio=5, class 1 should have ~1/5 of class 0
+        # With minority_reduce_scaler=5, class 1 should have ~1/5 of class 0
         assert train_counts[1] < train_counts[0]
 
 

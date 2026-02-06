@@ -5,7 +5,7 @@ from data_loaders.abstract_loader import AbstractLoader
 class blobs_generator(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 split_size=0.5,
+                 train_size=0.5,
                  num_samples=200,
                  blobs_features=2,
                  **kwargs):
@@ -13,7 +13,7 @@ class blobs_generator(AbstractLoader):
         self.blobs_features = blobs_features
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
-                         split_size=split_size, 
+                         train_size=train_size,
                          dataset_name='Blobs Synthetic',
                          **kwargs)
         

@@ -12,8 +12,8 @@ from data_loaders.embeddings import dim_reducer
 class AbstractLoader(ABC):
     def __init__(self, 
                  shuffle=True,
-                 split_size=0.5,
-                 split_ratio=None,  # train ratio
+                 train_size=0.5,
+                 minority_reduce_scaler=None,  # how much to reduce the minority class in the train set (0.5 means reduce to half, 0.1 means reduce to 10% of original size)
                  split_ratio_test=None,  # test ratio: not implemented yet
                  percent_of_data=None,
                  equal_test=False,
@@ -24,8 +24,8 @@ class AbstractLoader(ABC):
                  reduce_to_dim=2,
                  **kwargs):
         self.shuffle = shuffle
-        self.split_size = split_size
-        self.split_ratio = split_ratio
+        self.train_size = train_size
+        self.minority_reduce_scaler = minority_reduce_scaler
         self.split_ratio_test = split_ratio_test
         self.percent_of_data = percent_of_data
         self.equal_test = equal_test
@@ -47,8 +47,8 @@ class AbstractLoader(ABC):
     
 
     def get_train_test_split(self,
-                             split_size=None,
-                             split_ratio=None,
+                             train_size=None,
+                             minority_reduce_scaler=None,
                              equal_test=None,
                              seed=None):
         '''
@@ -57,10 +57,10 @@ class AbstractLoader(ABC):
             - data_test: dict containing 'X', 'y'
         '''
         # use provided or default
-        if split_size is None:
-            split_size = self.split_size
-        if split_ratio is None:
-            split_ratio = self.split_ratio
+        if train_size is None:
+            train_size = self.train_size
+        if minority_reduce_scaler is None:
+            minority_reduce_scaler = self.minority_reduce_scaler
         if equal_test is None:
             equal_test = self.equal_test
         if seed is None:
@@ -69,11 +69,11 @@ class AbstractLoader(ABC):
         # split into train, test
         train_data, test_data = utils.proportional_split( 
             self.get_data_dict(), 
-            size=self.split_size, 
-            ratio=self.split_ratio,
-            equal_test=self.equal_test,
-            ratio_test=self.split_ratio_test,  # not implemented yet
-            seed=self.set_seed
+            train_size=train_size, 
+            minority_reduce_scaler=minority_reduce_scaler,
+            equal_test=equal_test,
+            minority_reduce_scaler_test=self.split_ratio_test,  # not implemented yet
+            seed=seed
             )
         
         # reduce dims

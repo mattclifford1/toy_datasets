@@ -35,7 +35,7 @@ def train_test_split():
     print("=" * 60)
 
     # Load with custom split size
-    loader = data_loaders.get_dataset('Banknote Authentication', split_size=0.8)
+    loader = data_loaders.get_dataset('Banknote Authentication', train_size=0.8)
 
     # Get train/test split (preserves class proportions)
     train, test = loader.get_train_test_split()
@@ -240,7 +240,7 @@ def terminal_plotting_train_test():
 
     # Plot train/test split for Blobs
     print("Blobs train/test split:")
-    blobs = data_loaders.get_dataset('Blobs', n_samples=300, centers=3, split_size=0.7)
+    blobs = data_loaders.get_dataset('Blobs', n_samples=300, centers=3, train_size=0.7)
     blobs.plot_train_test_split(terminal_plot=True)
 
 

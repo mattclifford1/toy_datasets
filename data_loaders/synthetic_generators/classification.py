@@ -5,7 +5,7 @@ from data_loaders.abstract_loader import AbstractLoader
 class sklearn_normal_generator(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 split_size=0.5,
+                 train_size=0.5,
                  num_samples=200,
                  normal_features=20,
                  **kwargs):
@@ -13,7 +13,7 @@ class sklearn_normal_generator(AbstractLoader):
         self.normal_features = normal_features
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
-                         split_size=split_size, 
+                         train_size=train_size,
                          dataset_name='Sklearn Synthetic Classification (Normal)',
                          **kwargs)
         

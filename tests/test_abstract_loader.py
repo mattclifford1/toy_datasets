@@ -172,7 +172,7 @@ class TestAbstractLoaderTrainTestSplit:
         assert 'X' in test and 'y' in test
 
     def test_train_test_split_sizes(self, mock_loader):
-        """Split sizes should respect split_size parameter."""
+        """Split sizes should respect train_size parameter."""
         train, test = mock_loader.get_train_test_split()
 
         total = len(train['y']) + len(test['y'])
@@ -193,9 +193,9 @@ class TestAbstractLoaderTrainTestSplit:
         assert len(train_rows & test_rows) == 0
 
     def test_train_test_split_custom_size(self):
-        """Custom split_size should be respected."""
+        """Custom train_size should be respected."""
         from tests.conftest import MockLoader
-        loader = MockLoader(n_samples=100, split_size=0.8)
+        loader = MockLoader(n_samples=100, train_size=0.8)
 
         train, test = loader.get_train_test_split()
 

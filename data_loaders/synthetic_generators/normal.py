@@ -19,10 +19,10 @@ class normal_data_loader(AbstractLoader):
                  **kwargs):
         # work out the split size and ratio from the numbers
         self.total_instances = num_train + num_test
-        split_size = num_train / self.total_instances
+        train_size = num_train / self.total_instances
         super().__init__(shuffle=shuffle,
-                         split_size=split_size,
-                         split_ratio=train_ratio,
+                         train_size=train_size,
+                         minority_reduce_scaler=train_ratio,
                         #  equal_test=equal_test,
                          set_seed=set_seed,
                          dataset_name='Normal Synthetic',

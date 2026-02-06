@@ -68,23 +68,30 @@ def stratified_subsample(X, y, n_samples, random_state=42):
     return X_sub, y_sub
 
 
-def proportional_split(data, 
-                       size=0.8, 
-                       seed=True, 
-                       ratio=None, 
+def proportional_split(data,
+                       train_size=0.8,
+                       seed=True,
+                       minority_reduce_scaler=None,
                        equal_test=False,
-                       ratio_test=None
+                       minority_reduce_scaler_test=None
                        ):
     '''
     create a train, test split that preserves the class distributions
         data: data dict holder
-        size: size of the train set (0.5 means equal train, test size)
-        ratio: make imbalance ratio in the train set - assumes class 1 is minority
-        TODO: implement ratio for test set 
+        train_size: size of the train set (0.5 means equal train, test size)§
+        minority_reduce_scaler: if not None, scale down the minority class by this factor
+        TODO: implement ratio for test set
     '''
-    if size <= 0 or size > 1:
+    if train_size <= 0 or train_size > 1:
         raise ValueError(
-            f'size needs to be between 0 and 1 instead of :{size}')
+            f'train_size needs to be between 0 and 1 instead of :{train_size}')
+    if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler <= 0:
+        raise ValueError(
+            f'minority_reduce_scaler needs to be greater than 0 instead of :{minority_reduce_scaler}')
+    if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test <= 0:
+        raise ValueError(
+            f'minority_reduce_scaler_test needs to be greater than 0 instead of :{minority_reduce_scaler_test}')
+    
     set_seed(seed)
     # get current class proportions
     classes, counts = np.unique(data['y'], return_counts=True)
@@ -99,10 +106,10 @@ def proportional_split(data,
         np.random.shuffle(cls_inds)
         set_seed(seed)
         # now split the data inds into train/test
-        split_point = int(counts[i]*size)
+        split_point = int(counts[i]*train_size)
         if cls == 1: # minority class
-            if not isinstance(ratio, type(None)) and ratio != False:
-                split_point = max(int(len(train_inds[0])/ratio), 1)
+            if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler != False:
+                split_point = max(int(len(train_inds[0])/minority_reduce_scaler), 1)
         train_inds.append(list(cls_inds[:split_point]))
         test_inds.append(list(cls_inds[split_point:]))
     # concat all the inds from each class

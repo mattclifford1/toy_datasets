@@ -16,10 +16,10 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 class ionosphere_loader(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 split_size=0.7,
+                 train_size=0.7,
                  **kwargs):
         super().__init__(shuffle=shuffle,
-                         split_size=split_size, 
+                         train_size=train_size,
                          dataset_name='Ionosphere',
                          **kwargs)
         
