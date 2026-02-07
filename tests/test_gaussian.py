@@ -15,8 +15,8 @@ class TestGaussianBasics:
         X = loader.get_X()
         y = loader.get_y()
 
-        assert X.shape == (400, 2)
-        assert y.shape == (400,)
+        assert X.shape == (200, 2)
+        assert y.shape == (200,)
         assert set(np.unique(y)) == {0, 1}
 
     def test_num_samples_int(self):

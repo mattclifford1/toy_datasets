@@ -151,14 +151,22 @@ loader.plot_train_test_split(terminal_plot=True)
 ```python
 loader = data_loaders.get_dataset(
     'Iris',
-    shuffle=True,          # Shuffle data (default: True)
-    set_seed=42,           # Random seed for reproducibility
-    train_size=0.5,        # Train set proportion (default: 0.5)
-    scale=True,            # Apply MinMax scaling
-    percent_of_data=50,    # Use only 50% of data
-    equal_test=True,       # Balance test set classes
-    dim_reducer='PCA',     # 'PCA', 'UMAP', 'TSNE', 'kernelPCA'
-    reduce_to_dim=2,       # Target dimensions
+    shuffle=True,            # Shuffle data (default: True)
+    set_seed=42,             # Random seed for reproducibility
+    train_size=0.5,          # Train set proportion (default: 0.5)
+                             # The rest is used for the test set
+    minority_reduce_scaler=2,# Reduce minority class in train set to 1/2 
+                             # (default: None, no reduction)
+    minority_reduce_scaler_test=2,# Reduce minority class in test set to 1/2 
+                             # (default: None, no reduction)    
+    equal_test=False,        # Whether to make the test set 
+                             # perfectly balanced (overrides 
+                             # minority_reduce_scaler_test)                   
+    scale=True,              # Apply MinMax scaling
+    percent_of_data=50,      # Use only 50% of data
+    equal_test=True,         # Balance test set classes
+    dim_reducer='PCA',       # 'PCA', 'UMAP', 'TSNE', 'kernelPCA'
+    reduce_to_dim=2,         # Target dimensions
 )
 ```
 

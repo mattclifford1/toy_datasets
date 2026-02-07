@@ -8,23 +8,24 @@ from data_loaders.abstract_loader import AbstractLoader
 class XOR_generator(AbstractLoader):
     def __init__(self,
                  shuffle=True,
-                 num_samples=[200, 200],
+                 num_samples=200,
                  **kwargs):
-        if isinstance(num_samples, int):
-            self.num_samples = [num_samples//2, num_samples//2]
-        else:
-            self.num_samples = num_samples
+        self.num_samples = num_samples
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
                          dataset_name='XOR Synthetic',
                          **kwargs)
         
     def load_data(self):
-        data = self._get_XOR_single(num_samples=self.num_samples)
+        data = self._get_XOR_single()
         return data
 
 
-    def _get_XOR_single(self, num_samples=[100, 100]):
+    def _get_XOR_single(self):
+        if isinstance(self.num_samples, int):
+            num_samples = [self.num_samples//2, self.num_samples//2]
+        else:
+            num_samples = self.num_samples
         mu = 5
         cov = [[1, 0], [0, 1]]
         covs = [cov, cov]
@@ -60,6 +61,16 @@ class XOR_generator(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = XOR_generator()
-    loader.plot_dataset(terminal_plot=True)
-    # loader.plot_train_test_split(terminal_plot=True)
+    loader = XOR_generator(
+        num_samples=500, 
+        train_size=0.5, 
+        minority_reduce_scaler=10, 
+        equal_test=True,
+        minority_reduce_scaler_test=10, 
+        )
+    plot = False
+    if plot:
+        loader.plot_train_test_split(terminal_plot=True)
+        loader.plot_dataset(terminal_plot=True)
+    else:
+        loader.get_train_test_split()  # print out the stats of the train/test split

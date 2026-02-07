@@ -80,17 +80,17 @@ def proportional_split(data,
         data: data dict holder
         train_size: size of the train set (0.5 means equal train, test size)§
         minority_reduce_scaler: if not None, scale down the minority class by this factor
-        TODO: implement ratio for test set
     '''
+    print('minority_reduce_scaler:', minority_reduce_scaler)
     if train_size <= 0 or train_size > 1:
         raise ValueError(
             f'train_size needs to be between 0 and 1 instead of :{train_size}')
-    if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler <= 0:
+    if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler <= 1:
         raise ValueError(
-            f'minority_reduce_scaler needs to be greater than 0 instead of :{minority_reduce_scaler}')
-    if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test <= 0:
+            f'minority_reduce_scaler needs to be greater than 1 instead of :{minority_reduce_scaler}')
+    if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test <= 1:
         raise ValueError(
-            f'minority_reduce_scaler_test needs to be greater than 0 instead of :{minority_reduce_scaler_test}')
+            f'minority_reduce_scaler_test needs to be greater than 1 instead of :{minority_reduce_scaler_test}')
     
     set_seed(seed)
     # get current class proportions
@@ -110,8 +110,17 @@ def proportional_split(data,
         if cls == 1: # minority class
             if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler != False:
                 split_point = max(int(len(train_inds[0])/minority_reduce_scaler), 1)
-        train_inds.append(list(cls_inds[:split_point]))
-        test_inds.append(list(cls_inds[split_point:]))
+        train_inds.append(list(cls_inds[0:split_point]))
+
+        # reduce minority class in test set if needed
+        end_point = len(cls_inds)
+        if cls == 1 and not equal_test: # minority class
+            if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test != False:
+                len_test_minority = len(cls_inds[split_point:])
+                # dont take til the end
+                end_point = split_point + max(int(len_test_minority/minority_reduce_scaler_test), 1)
+        test_inds.append(list(cls_inds[split_point:end_point]))
+        
     # concat all the inds from each class
     train_inds = np.concatenate(train_inds)
     test_inds = np.concatenate(test_inds)
@@ -133,6 +142,7 @@ def proportional_split(data,
             inds_drop = inds[max_inst:]
             test_split['y'] = np.delete(test_split['y'], inds_drop)
             test_split['X'] = np.delete(test_split['X'], inds_drop, axis=0)
+    
     
     return data, test_split
 

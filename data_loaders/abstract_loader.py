@@ -11,22 +11,22 @@ from data_loaders.embeddings import dim_reducer
 
 class AbstractLoader(ABC):
     def __init__(self, 
-                 shuffle=True,
-                 train_size=0.5,
-                 minority_reduce_scaler=None,  # how much to reduce the minority class in the train set (0.5 means reduce to half, 0.1 means reduce to 10% of original size)
-                 split_ratio_test=None,  # test ratio: not implemented yet
-                 percent_of_data=None,
-                 equal_test=False,
-                 set_seed=True,
-                 dataset_name=None,
-                 scale=False,
-                 dim_reducer=None,
-                 reduce_to_dim=2,
+                 shuffle=True,   # whether to shuffle the data after loading (before splitting into train/test)
+                 train_size=0.5,  # proportion of data to use for training (between 0 and 1) the rest will be used for testing
+                 minority_reduce_scaler=None,  # how much to reduce the minority class in the train set (2 means reduce to half, 10 means reduce to 10% of original size)
+                 equal_test=False,  # whether to make the test set perfectly balanced (overrides minority_reduce_scaler_test)
+                 minority_reduce_scaler_test=None,  # how much to reduce the minority class in the test set (2 means reduce to half, 10 means reduce to 10% of original size)
+                 percent_of_data=None, # how much of the data to keep (for downsampling, 50 means keep 50% of the data)
+                 set_seed=True,   # whether to set the random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
+                 dataset_name=None,  # name of the dataset (for printing and plotting purposes)
+                 scale=False,    # whether to scale the data (using standard scaling) after splitting into train/test
+                 dim_reducer=None,  # dimensionality reduction method to apply to the data (e.g. 'PCA', 'tSNE', 'UMAP')
+                 reduce_to_dim=2,   # number of dimensions to reduce to if dim_reducer is not None
                  **kwargs):
         self.shuffle = shuffle
         self.train_size = train_size
         self.minority_reduce_scaler = minority_reduce_scaler
-        self.split_ratio_test = split_ratio_test
+        self.minority_reduce_scaler_test = minority_reduce_scaler_test
         self.percent_of_data = percent_of_data
         self.equal_test = equal_test
         self.already_loaded = False
@@ -49,6 +49,7 @@ class AbstractLoader(ABC):
     def get_train_test_split(self,
                              train_size=None,
                              minority_reduce_scaler=None,
+                             minority_reduce_scaler_test=None,
                              equal_test=None,
                              seed=None):
         '''
@@ -61,6 +62,8 @@ class AbstractLoader(ABC):
             train_size = self.train_size
         if minority_reduce_scaler is None:
             minority_reduce_scaler = self.minority_reduce_scaler
+        if minority_reduce_scaler_test is None:
+            minority_reduce_scaler_test = self.minority_reduce_scaler_test
         if equal_test is None:
             equal_test = self.equal_test
         if seed is None:
@@ -72,7 +75,7 @@ class AbstractLoader(ABC):
             train_size=train_size, 
             minority_reduce_scaler=minority_reduce_scaler,
             equal_test=equal_test,
-            minority_reduce_scaler_test=self.split_ratio_test,  # not implemented yet
+            minority_reduce_scaler_test=minority_reduce_scaler_test,
             seed=seed
             )
         

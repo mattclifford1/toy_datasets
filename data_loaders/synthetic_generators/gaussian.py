@@ -74,7 +74,7 @@ class gaussian_generator(AbstractLoader):
     def __init__(
         self,
         shuffle=True,
-        num_samples=None,
+        num_samples=200,
         n_features=2,
         means=None,
         class_separation=5.0,
@@ -95,14 +95,14 @@ class gaussian_generator(AbstractLoader):
         self.n_features = n_features
 
         # Handle num_samples
-        if num_samples is None:
-            self.num_samples = [200, 200]
-        elif isinstance(num_samples, int):
+        if isinstance(num_samples, int):
             self.num_samples = [num_samples // 2, num_samples // 2]
-        else:
+        elif isinstance(num_samples, (list, tuple)):
             if len(num_samples) != 2:
-                raise ValueError(f"num_samples must have 2 values, got {len(num_samples)}")
+                raise ValueError(f"num_samples must have 2 values or int, got {len(num_samples)}")
             self.num_samples = list(num_samples)
+        else:
+            raise ValueError(f"num_samples must be int or list of 2 ints, got {type(num_samples)}")
 
         # Generate or use provided means
         if means is not None:
