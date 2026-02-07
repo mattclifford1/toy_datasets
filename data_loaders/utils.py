@@ -85,10 +85,10 @@ def proportional_split(data,
     if train_size <= 0 or train_size > 1:
         raise ValueError(
             f'train_size needs to be between 0 and 1 instead of :{train_size}')
-    if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler <= 1:
+    if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler < 1:
         raise ValueError(
             f'minority_reduce_scaler needs to be greater than 1 instead of :{minority_reduce_scaler}')
-    if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test <= 1:
+    if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test < 1:
         raise ValueError(
             f'minority_reduce_scaler_test needs to be greater than 1 instead of :{minority_reduce_scaler_test}')
     
