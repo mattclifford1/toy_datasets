@@ -2,6 +2,7 @@
 '''
 Visualisation functions for each dataset
 '''
+import numpy as np
 import matplotlib.pyplot as plt
 
 from data_loaders.terminal_plots import terminal_show
@@ -103,9 +104,20 @@ def plot_dataset(X,
     # get 2d embedder fitted on train data
     embedder = dim_reducer(X, y, reducer=dim_reducer_method)
 
+    # transform all datasets first to determine global axis limits
+    embeddings = [embedder.transform(Xd) for Xd in Xs]
+
+    # find global min/max across all embeddings for consistent scaling
+    all_embeddings = embeddings[0] if len(embeddings) == 1 else np.vstack(embeddings)
+    x_min, x_max = all_embeddings[:, 0].min(), all_embeddings[:, 0].max()
+    y_min, y_max = all_embeddings[:, 1].min(), all_embeddings[:, 1].max()
+
+    # add padding (5% of range)
+    x_padding = (x_max - x_min) * 0.05
+    y_padding = (y_max - y_min) * 0.05
+
     # plot each dataset (X_train, X_test)
-    for ax, Xd, yd, title in zip(axes, Xs, ys, titles):
-        X_embed_2d = embedder.transform(Xd)
+    for ax, X_embed_2d, yd, title in zip(axes, embeddings, ys, titles):
         for cls in [0, 1]:
             if label_names is not None:
                 class_label = f"Class {cls}: {label_names[cls]}"
@@ -117,12 +129,16 @@ def plot_dataset(X,
                 color=colors[cls],
                 alpha=0.8,
                 s=12,
-                label=class_label 
+                label=class_label
             )
         ax.set_title(f"{title} in {embedder.reducer_name} space")
         ax.set_xlabel(embedder.feature_names[0])
         ax.set_ylabel(embedder.feature_names[1])
         ax.legend()
+
+        # set consistent axis limits across all subplots
+        ax.set_xlim(x_min - x_padding, x_max + x_padding)
+        ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
     if dataset_name is not None and created_fig:
         fig.suptitle(f"{dataset_name} dataset", fontsize=14)
