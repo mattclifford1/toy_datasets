@@ -29,20 +29,18 @@ import shutil
 import functools
 from typing import Literal, Optional
 
-import matplotlib.pyplot as plt
-
-try:
-    from PIL import Image
-except ImportError as e:
-    raise ImportError("terminal_plots requires pillow: pip install pillow") from e
-
 
 Mode = Literal["ascii", "iterm2", "text", "auto"]
 
 
 # --- Rasterize Matplotlib figure to a PIL image --------------------------------
 
-def _fig_to_pil(fig, *, dpi: int = 150) -> Image.Image:
+def _fig_to_pil(fig, *, dpi: int = 150):
+    try:
+        from PIL import Image
+    except ImportError as e:
+        raise ImportError("terminal_plots requires pillow: pip install pillow") from e
+
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight")
     buf.seek(0)
@@ -54,7 +52,7 @@ def _fig_to_pil(fig, *, dpi: int = 150) -> Image.Image:
 _ASCII_RAMP = " .:-=+*#%@"  # light -> dark
 
 
-def _pil_to_ascii(img: Image.Image, *, cols: int, rows: int) -> str:
+def _pil_to_ascii(img, *, cols: int, rows: int) -> str:
     g = img.convert("L").resize((cols, rows))
     arr = list(g.getdata())
     n = len(_ASCII_RAMP) - 1
@@ -324,6 +322,8 @@ class TerminalPlotter:
         self._patched_show = None
 
     def enable(self) -> "TerminalPlotter":
+        import matplotlib.pyplot as plt
+
         if self._original_show is None:
             self._original_show = plt.show
             @functools.wraps(self._original_show)
@@ -335,6 +335,8 @@ class TerminalPlotter:
         return self
 
     def disable(self) -> None:
+        import matplotlib.pyplot as plt
+
         if self._original_show is not None:
             plt.show = self._original_show
             self._original_show = None
@@ -348,6 +350,8 @@ class TerminalPlotter:
         return False
 
     def _terminal_show(self, *args, **kwargs) -> None:
+        import matplotlib.pyplot as plt
+
         fnums = plt.get_fignums()
         if not fnums:
             return
@@ -448,6 +452,8 @@ def enable_terminal_show(
 
 def terminal_show():
     """Shortcut to enable terminal plotting with default settings."""
+    import matplotlib.pyplot as plt
+
     plot_env = enable_terminal_show()
     plt.show()
     # reset terminal plot to previous state

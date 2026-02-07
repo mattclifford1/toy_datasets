@@ -1,8 +1,4 @@
 import functools
-
-from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
 import numpy as np
 
 
@@ -12,6 +8,8 @@ RANDOM_STATE = 42
 
 class normaliser:
     def __init__(self, train_X):
+        from sklearn import preprocessing
+
         self.scaler = preprocessing.MinMaxScaler(
             feature_range=(-1,1)).fit(train_X)
 
@@ -32,6 +30,8 @@ def set_seed(seed):
 
 
 def shuffle_data(data, seed=True):
+    from sklearn.utils import shuffle
+
     if seed == True:
         seed = RANDOM_STATE
     data['X'], data['y'] = shuffle(
@@ -59,6 +59,8 @@ def stratified_subsample(X, y, n_samples, random_state=42):
     '''
     Taken from mnists_path_dataset Repo https://github.com/mattclifford1/mnist_paths_dataset/blob/main/data_utils.py
     '''
+    from sklearn.model_selection import train_test_split
+
     X_sub, _, y_sub, _ = train_test_split(
         X, y,
         train_size=n_samples,

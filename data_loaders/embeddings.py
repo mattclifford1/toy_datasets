@@ -1,8 +1,3 @@
-from sklearn.decomposition import PCA, KernelPCA
-import umap
-from openTSNE import TSNE as OpenTSNE
-
-
 class dim_reducer:
     def __init__(self, 
                  X_train,  # use the train to fit
@@ -15,13 +10,17 @@ class dim_reducer:
             if reducer == 'TSNE':
                 self.reducer_model = TNSE_dim_reducer(X_train)
             elif reducer == 'PCA':
+                from sklearn.decomposition import PCA
                 self.reducer_model = PCA(n_components=num_dims, svd_solver='full').fit(X_train)
             elif reducer == 'kernelPCA':
+                from sklearn.decomposition import KernelPCA
                 self.reducer_model = KernelPCA(
                     n_components=num_dims, kernel='rbf', n_jobs=-1).fit(X_train)
             elif reducer == 'UMAP':
+                import umap
                 self.reducer_model = umap.UMAP(n_components=num_dims).fit(X_train)
             elif reducer == 'UMAP_supervised':
+                import umap
                 self.reducer_model = umap.UMAP(n_components=num_dims).fit(X_train, y=y_train)
             else:
                 raise ValueError(f"Unknown reducer type: {reducer}")
@@ -39,12 +38,14 @@ class dim_reducer:
 
 
 class TNSE_dim_reducer:
-    def __init__(self, 
+    def __init__(self,
                  X_train,  # use the train to fit
-                 perplexity=30, 
+                 perplexity=30,
                  random_state=42,
                  n_iter=1000,
                  n_jobs=-1):
+        from openTSNE import TSNE as OpenTSNE
+
         self.perplexity = perplexity
         self.random_state = random_state
         self.n_iter = n_iter

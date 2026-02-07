@@ -3,10 +3,6 @@
 Visualisation functions for each dataset
 '''
 import numpy as np
-import matplotlib.pyplot as plt
-
-from data_loaders.terminal_plots import terminal_show
-from data_loaders.embeddings import dim_reducer
 
 
 def plot_dataset(X,
@@ -56,6 +52,9 @@ def plot_dataset(X,
         If terminal_plot=True and ax is provided (incompatible options)
         If ax format doesn't match expected (single vs tuple)
     """
+    import matplotlib.pyplot as plt
+    from data_loaders.terminal_plots import terminal_show
+    from data_loaders.embeddings import dim_reducer
 
     # Validation: terminal_plot and ax are incompatible
     if terminal_plot and ax is not None:

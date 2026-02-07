@@ -2,71 +2,48 @@ from tqdm import tqdm
 import numpy as np
 from data_loaders import utils
 import data_loaders
-from data_loaders.external_loaders import MIMIC_III, MIMIC_IV
-from data_loaders.synthetic_generators import (
-    XOR,
-    moons,
-    blobs,
-    circles,
-    classification,
-    gaussian,
-)
-from data_loaders.local_loaders import (
-    abalone_gender, 
-    banknote, 
-    breast_cancer_W,
-    cervical_cancer, 
-    chronic_kidney_disease,
-    costcla,
-    diabetes, 
-    Habermans_breast_cancer, 
-    hepititus,
-    ionosphere, 
-    sonar_rocks, 
-    wheat_seeds, 
-)
-from data_loaders.web_loaders import heart_disease, mnist, wine, iris, breast_cancer
+import importlib
+
+
+def _create_lazy_loader(module_path, class_name):
+    """Create a factory function that imports the loader class on first use."""
+    def loader_factory(**kwargs):
+        module = importlib.import_module(module_path)
+        loader_class = getattr(module, class_name)
+        return loader_class(**kwargs)
+    return loader_factory
 
 
 AVAILABLE_DATASETS = {
-    # synthetic datasets
-    'XOR': XOR.XOR_generator,
-    'Moons': moons.moons_generator,
-    'Blobs': blobs.blobs_generator,
-    'Circles': circles.circles_generator,
-    'Sklearn Normal': classification.sklearn_normal_generator,
-    'Gaussian': gaussian.gaussian_generator,
-    # 'Madelon Separable': madelon.get_sep_datasets,
-    # 'Madelon Non-Separable': madelon.get_non_sep_datasets,
-    # 'Madelon High Dim Non-Separable': madelon.get_non_sep_data_high_dim,
+    # Synthetic datasets
+    'XOR': _create_lazy_loader('data_loaders.synthetic_generators.XOR', 'XOR_generator'),
+    'Moons': _create_lazy_loader('data_loaders.synthetic_generators.moons', 'moons_generator'),
+    'Blobs': _create_lazy_loader('data_loaders.synthetic_generators.blobs', 'blobs_generator'),
+    'Circles': _create_lazy_loader('data_loaders.synthetic_generators.circles', 'circles_generator'),
+    'Sklearn Normal': _create_lazy_loader('data_loaders.synthetic_generators.classification', 'sklearn_normal_generator'),
+    'Gaussian': _create_lazy_loader('data_loaders.synthetic_generators.gaussian', 'gaussian_generator'),
 
-    # toy datasets from sklearn
-    'Iris': iris.iris_loader,
-    'Wine': wine.wine_loader,
-    'Breast Cancer': breast_cancer.breast_cancer_loader,
+    # Toy datasets from sklearn
+    'Iris': _create_lazy_loader('data_loaders.web_loaders.iris', 'iris_loader'),
+    'Wine': _create_lazy_loader('data_loaders.web_loaders.wine', 'wine_loader'),
+    'Breast Cancer': _create_lazy_loader('data_loaders.web_loaders.breast_cancer', 'breast_cancer_loader'),
 
-    # "real" datasets
-    'Abalone Gender':               abalone_gender.abalone_gender_loader,
-    'Banknote Authentication':      banknote.banknote_loader,
-    'Breast Cancer Wisconsin':      breast_cancer_W.breast_cancer_W_loader,
-    # 'Cervical Cancer':              cervical_cancer.cervical_cancer_loader,
-    'Chronic Kidney Disease':       chronic_kidney_disease.chronic_kidney_disease_loader,
-    'Costcla Credit Scoring Kaggle 2011': costcla.costcla_CreditScoring_Kaggle2011_loader,
-    'Costcla Credit Scoring PAKDD 2009':  costcla.costcla_CreditScoring_PAKDD2009_loader,
-    'Costcla Direct Marketing':     costcla.costcla_DirectMarketing_loader,
-    'Diabetes Pima Indian':         diabetes.diabetes_pima_indians_loader,
-    'Habermans Breast Cancer':      Habermans_breast_cancer.habermans_breast_cancer_loader,
-    'Heart Disease':                heart_disease.heart_disease_loader,
-    'Hepatitis':                    hepititus.hepatitis_loader,
-    'Ionosphere':                   ionosphere.ionosphere_loader,
-    'MNIST': mnist.mnist_loader,
-    'Sonar Rocks vs Mines': sonar_rocks.sonar_rocks_loader,
-    'Wheat Seeds': wheat_seeds.wheat_seeds_loader,
-
-    # MIMIC datasets commented out for now as they require special data access downloaded separately
-    # 'MIMIC-III Mortality': MIMIC_III.MIMIC_III_mortality_loader,
-    # 'MIMIC-III Sepsis': MIMIC_III.MIMIC_III_sepsis_loader,
-    # 'MIMIC-IV Ready For Discharge': MIMIC_IV.MIMIC_IV_ready_for_discharge_loader,
+    # Real datasets
+    'Abalone Gender': _create_lazy_loader('data_loaders.local_loaders.abalone_gender', 'abalone_gender_loader'),
+    'Banknote Authentication': _create_lazy_loader('data_loaders.local_loaders.banknote', 'banknote_loader'),
+    'Breast Cancer Wisconsin': _create_lazy_loader('data_loaders.local_loaders.breast_cancer_W', 'breast_cancer_W_loader'),
+    'Chronic Kidney Disease': _create_lazy_loader('data_loaders.local_loaders.chronic_kidney_disease', 'chronic_kidney_disease_loader'),
+    'Costcla Credit Scoring Kaggle 2011': _create_lazy_loader('data_loaders.local_loaders.costcla', 'costcla_CreditScoring_Kaggle2011_loader'),
+    'Costcla Credit Scoring PAKDD 2009': _create_lazy_loader('data_loaders.local_loaders.costcla', 'costcla_CreditScoring_PAKDD2009_loader'),
+    'Costcla Direct Marketing': _create_lazy_loader('data_loaders.local_loaders.costcla', 'costcla_DirectMarketing_loader'),
+    'Diabetes Pima Indian': _create_lazy_loader('data_loaders.local_loaders.diabetes', 'diabetes_pima_indians_loader'),
+    'Habermans Breast Cancer': _create_lazy_loader('data_loaders.local_loaders.Habermans_breast_cancer', 'habermans_breast_cancer_loader'),
+    'Heart Disease': _create_lazy_loader('data_loaders.web_loaders.heart_disease', 'heart_disease_loader'),
+    'Hepatitis': _create_lazy_loader('data_loaders.local_loaders.hepititus', 'hepatitis_loader'),
+    'Ionosphere': _create_lazy_loader('data_loaders.local_loaders.ionosphere', 'ionosphere_loader'),
+    'MNIST': _create_lazy_loader('data_loaders.web_loaders.mnist', 'mnist_loader'),
+    'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.local_loaders.sonar_rocks', 'sonar_rocks_loader'),
+    'Wheat Seeds': _create_lazy_loader('data_loaders.local_loaders.wheat_seeds', 'wheat_seeds_loader'),
     }
 
 

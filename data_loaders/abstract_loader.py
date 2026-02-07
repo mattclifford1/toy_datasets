@@ -5,8 +5,6 @@ Generic class for data loaders to inherit from
 from abc import ABC, abstractmethod
 import numpy as np
 from data_loaders import utils
-from data_loaders.visualisation import plot_dataset
-from data_loaders.embeddings import dim_reducer
 
 
 class AbstractLoader(ABC):
@@ -81,6 +79,8 @@ class AbstractLoader(ABC):
         
         # reduce dims
         if self.dim_reducer is not None:
+            from data_loaders.embeddings import dim_reducer
+
             reducer = dim_reducer(
                 X_train=train_data['X'],
                 y_train=train_data['y'],
@@ -220,6 +220,8 @@ class AbstractLoader(ABC):
         tuple or None
             Returns (fig, ax) when new figure is created, None otherwise
         """
+        from data_loaders.visualisation import plot_dataset
+
         data = self.get_data_dict()
 
         return plot_dataset(
@@ -253,6 +255,8 @@ class AbstractLoader(ABC):
         tuple or None
             Returns (fig, [ax1, ax2]) when new figure is created, None otherwise
         """
+        from data_loaders.visualisation import plot_dataset
+
         train_data, test_data = self.get_train_test_split()
 
         return plot_dataset(
