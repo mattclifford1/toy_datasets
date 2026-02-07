@@ -77,9 +77,13 @@ def proportional_split(data,
                        ):
     '''
     create a train, test split that preserves the class distributions
-        data: data dict holder
-        train_size: size of the train set (0.5 means equal train, test size)§
+        data: data dict holder (not modified)
+        train_size: size of the train set (0.5 means equal train, test size)
         minority_reduce_scaler: if not None, scale down the minority class by this factor
+        equal_test: if True, balance test set classes
+        minority_reduce_scaler_test: if not None, scale down minority class in test set
+
+    returns: train_split, test_split (two new dicts)
     '''
     print('minority_reduce_scaler:', minority_reduce_scaler)
     if train_size <= 0 or train_size > 1:
@@ -125,14 +129,15 @@ def proportional_split(data,
     train_inds = np.concatenate(train_inds)
     test_inds = np.concatenate(test_inds)
     # now apply the split to all data arrays
+    train_split = {}
     test_split = {}
     instances = data['X'].shape[0]
     for key, val in data.items():
         # apply to all numpy arrays that are data rows
         if isinstance(val, np.ndarray) and data[key].shape[0] == instances:
             # extract and store the splits
-            test_split[key] = val[test_inds]  # important to do this one first!
-            data[key] = val[train_inds]       # as test data is now deleted
+            train_split[key] = val[train_inds]
+            test_split[key] = val[test_inds]
     if equal_test == True:
         classes, counts = np.unique(test_split['y'], return_counts=True)
         max_inst = min(counts)
@@ -142,9 +147,9 @@ def proportional_split(data,
             inds_drop = inds[max_inst:]
             test_split['y'] = np.delete(test_split['y'], inds_drop)
             test_split['X'] = np.delete(test_split['X'], inds_drop, axis=0)
-    
-    
-    return data, test_split
+
+
+    return train_split, test_split
 
 
 def proportional_downsample(data, percent_of_data=1, seed=True, **kwargs):
