@@ -85,7 +85,6 @@ def proportional_split(data,
 
     returns: train_split, test_split (two new dicts)
     '''
-    print('minority_reduce_scaler:', minority_reduce_scaler)
     if train_size <= 0 or train_size > 1:
         raise ValueError(
             f'train_size needs to be between 0 and 1 instead of :{train_size}')
