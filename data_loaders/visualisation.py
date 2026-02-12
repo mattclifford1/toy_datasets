@@ -118,10 +118,11 @@ def plot_dataset(X,
     # plot each dataset (X_train, X_test)
     for ax, X_embed_2d, yd, title in zip(axes, embeddings, ys, titles):
         for cls in [0, 1]:
+            n_points = int(np.sum(yd == cls))
             if label_names is not None:
-                class_label = f"Class {cls}: {label_names[cls]}"
+                class_label = f"Class {cls}: {label_names[cls]} (n={n_points})"
             else:
-                class_label = f"Class {cls}"
+                class_label = f"Class {cls} (n={n_points})"
             ax.scatter(
                 X_embed_2d[yd == cls, 0],
                 X_embed_2d[yd == cls, 1],
