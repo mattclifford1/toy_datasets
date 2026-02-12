@@ -79,10 +79,11 @@ def proportional_split(data,
                        ):
     '''
     create a train, test split that preserves the class distributions
+    Minority class is assumed to be class 1, majority class is assumed to be class 0
         data: data dict holder (not modified)
         train_size: size of the train set (0.5 means equal train, test size)
         minority_reduce_scaler: if not None, scale down the minority class by this factor
-        equal_test: if True, balance test set classes
+        equal_test: if True, balance test set classes (takes the minority class count and reduces majority class to match)
         minority_reduce_scaler_test: if not None, scale down minority class in test set
 
     returns: train_split, test_split (two new dicts)

@@ -49,7 +49,8 @@ class AbstractLoader(ABC):
                              minority_reduce_scaler=None,
                              minority_reduce_scaler_test=None,
                              equal_test=None,
-                             seed=None):
+                             seed=None,
+                             _print_info=False):
         '''
         returns:
             - data: dict containing 'X', 'y'
@@ -98,15 +99,16 @@ class AbstractLoader(ABC):
             test_data['X'] = normaliser(test_data['X'])
 
         # print info
-        print(f"\nDataset: {self.name} - Train/Test split")
-        print(f"    - Train instances: {len(train_data['y'])}")
-        label, counts = np.unique(train_data['y'], return_counts=True)
-        for labels in zip(label, counts):
-            print(f"      - Class {labels[0]}: {labels[1]} instances")
-        print(f"    - Test instances: {len(test_data['y'])}")
-        label, counts = np.unique(test_data['y'], return_counts=True)
-        for labels in zip(label, counts):
-            print(f"      - Class {labels[0]}: {labels[1]} instances")
+        if _print_info:
+            print(f"\nDataset: {self.name} - Train/Test split")
+            print(f"    - Train instances: {len(train_data['y'])}")
+            label, counts = np.unique(train_data['y'], return_counts=True)
+            for labels in zip(label, counts):
+                print(f"      - Class {labels[0]}: {labels[1]} instances")
+            print(f"    - Test instances: {len(test_data['y'])}")
+            label, counts = np.unique(test_data['y'], return_counts=True)
+            for labels in zip(label, counts):
+                print(f"      - Class {labels[0]}: {labels[1]} instances")
 
         return train_data, test_data
 
