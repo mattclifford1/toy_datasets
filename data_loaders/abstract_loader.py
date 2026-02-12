@@ -14,6 +14,8 @@ class AbstractLoader(ABC):
                  minority_reduce_scaler=None,  # how much to reduce the minority class in the train set (2 means reduce to half, 10 means reduce to 10% of original size)
                  equal_test=False,  # whether to make the test set perfectly balanced (overrides minority_reduce_scaler_test)
                  minority_reduce_scaler_test=None,  # how much to reduce the minority class in the test set (2 means reduce to half, 10 means reduce to 10% of original size)
+                 train_post_process=None, # function to apply to the train data after splitting (takes in X_train, y_train and returns modified X_train, y_train)
+                 test_post_process=None, # function to apply to the test data after splitting (takes in X_test, y_test and returns modified X_test, y_test)
                  percent_of_data=None, # how much of the data to keep (for downsampling, 50 means keep 50% of the data)
                  set_seed=True,   # whether to set the random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
                  dataset_name=None,  # name of the dataset (for printing and plotting purposes)
@@ -25,6 +27,8 @@ class AbstractLoader(ABC):
         self.train_size = train_size
         self.minority_reduce_scaler = minority_reduce_scaler
         self.minority_reduce_scaler_test = minority_reduce_scaler_test
+        self.train_post_process = train_post_process
+        self.test_post_process = test_post_process
         self.percent_of_data = percent_of_data
         self.equal_test = equal_test
         self.already_loaded = False
@@ -49,6 +53,8 @@ class AbstractLoader(ABC):
                              minority_reduce_scaler=None,
                              equal_test=None,
                              minority_reduce_scaler_test=None,
+                             train_post_process=None,
+                             test_post_process=None,
                              seed=None,
                              _print_info=False):
         '''
@@ -58,6 +64,8 @@ class AbstractLoader(ABC):
             minority_reduce_scaler: if not None, scale down the minority class by this factor
             equal_test: if True, balance test set classes first (reduces majority to match minority count)
             minority_reduce_scaler_test: if not None, scale down minority class in test set (applied after equal_test if both set)
+            train_post_process: function to apply to the train data after splitting (takes in X_train, y_train and returns modified X_train, y_train)
+            test_post_process: function to apply to the test data after splitting (takes in X_test, y_test and returns modified X_test, y_test)
             seed: random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
             _print_info: whether to print the class distributions in the train and test sets after splitting
         returns:
@@ -73,6 +81,11 @@ class AbstractLoader(ABC):
             minority_reduce_scaler_test = self.minority_reduce_scaler_test
         if equal_test is None:
             equal_test = self.equal_test
+        if train_post_process is None:
+            train_post_process = self.train_post_process
+        if test_post_process is None: 
+            test_post_process = self.test_post_process
+        
         if seed is None:
             seed = self.set_seed
 
@@ -117,6 +130,12 @@ class AbstractLoader(ABC):
             label, counts = np.unique(test_data['y'], return_counts=True)
             for labels in zip(label, counts):
                 print(f"      - Class {labels[0]}: {labels[1]} instances")
+
+        # post process if needed
+        if train_post_process is not None:
+            train_data['X'], train_data['y'] = train_post_process(train_data['X'], train_data['y']) 
+        if test_post_process is not None:
+            test_data['X'], test_data['y'] = test_post_process(test_data['X'], test_data['y'])
 
         return train_data, test_data
 
@@ -213,6 +232,7 @@ class AbstractLoader(ABC):
 
 
     def plot_dataset(self,
+                     data_override=None,
                      terminal_plot=False,
                      ax=None):
         """
@@ -220,6 +240,7 @@ class AbstractLoader(ABC):
 
         Parameters
         ----------
+        data_override: dict containing 'X', 'y' to plot instead of the dataset's own data (useful for plotting modified versions of the data, e.g. after dimensionality reduction)
         terminal_plot : bool, default=False
             If True, render plot in terminal
         ax : matplotlib.axes.Axes, optional
@@ -231,8 +252,10 @@ class AbstractLoader(ABC):
             Returns (fig, ax) when new figure is created, None otherwise
         """
         from data_loaders.visualisation import plot_dataset
-
-        data = self.get_data_dict()
+        if data_override is not None:
+            data = data_override
+        else:
+            data = self.get_data_dict()
 
         return plot_dataset(
             X=data['X'],
@@ -247,6 +270,8 @@ class AbstractLoader(ABC):
 
 
     def plot_train_test_split(self,
+                              train_data_override=None,
+                              test_data_override=None,
                               terminal_plot=False,
                               ax=None):
         """
@@ -254,6 +279,8 @@ class AbstractLoader(ABC):
 
         Parameters
         ----------
+        train_data_override: dict containing 'X', 'y' to plot instead of the dataset's own train split (useful for plotting modified versions of the train data, e.g. after dimensionality reduction)
+        test_data_override: dict containing 'X', 'y' to plot instead of the dataset's own test split (useful for plotting modified versions of the test data, e.g. after dimensionality reduction)
         terminal_plot : bool, default=False
             If True, render plot in terminal
         ax : tuple of 2 matplotlib.axes.Axes, optional
@@ -267,7 +294,16 @@ class AbstractLoader(ABC):
         """
         from data_loaders.visualisation import plot_dataset
 
-        train_data, test_data = self.get_train_test_split()
+        if train_data_override is None or test_data_override is None:
+            train_data_original, test_data_original = self.get_train_test_split()
+        
+        if train_data_override is not None:
+            train_data = train_data_override 
+        else: train_data = train_data_original 
+        if test_data_override is not None: 
+            test_data = test_data_override 
+        else: 
+            test_data = test_data_original
 
         return plot_dataset(
             X=train_data['X'],
