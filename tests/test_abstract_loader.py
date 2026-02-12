@@ -254,6 +254,158 @@ class TestAbstractLoaderDimReducer:
         assert test['X'].shape[1] == 10
 
 
+class TestAbstractLoaderPostProcess:
+    """Tests for train_post_process and test_post_process functionality."""
+
+    def test_train_post_process_modifies_train_data(self):
+        """train_post_process should modify the training data."""
+        from tests.conftest import MockLoader
+
+        def double_features(X, y):
+            return X * 2, y
+
+        loader = MockLoader(n_samples=50, train_post_process=double_features)
+        loader_no_pp = MockLoader(n_samples=50)
+
+        train, _ = loader.get_train_test_split()
+        train_orig, _ = loader_no_pp.get_train_test_split()
+
+        np.testing.assert_array_almost_equal(train['X'], train_orig['X'] * 2)
+
+    def test_test_post_process_modifies_test_data(self):
+        """test_post_process should modify the test data."""
+        from tests.conftest import MockLoader
+
+        def double_features(X, y):
+            return X * 2, y
+
+        loader = MockLoader(n_samples=50, test_post_process=double_features)
+        loader_no_pp = MockLoader(n_samples=50)
+
+        _, test = loader.get_train_test_split()
+        _, test_orig = loader_no_pp.get_train_test_split()
+
+        np.testing.assert_array_almost_equal(test['X'], test_orig['X'] * 2)
+
+    def test_train_post_process_does_not_affect_test(self):
+        """train_post_process should not modify test data."""
+        from tests.conftest import MockLoader
+
+        def zero_out(X, y):
+            return np.zeros_like(X), y
+
+        loader = MockLoader(n_samples=50, train_post_process=zero_out)
+        train, test = loader.get_train_test_split()
+
+        assert np.all(train['X'] == 0)
+        assert not np.all(test['X'] == 0)
+
+    def test_test_post_process_does_not_affect_train(self):
+        """test_post_process should not modify train data."""
+        from tests.conftest import MockLoader
+
+        def zero_out(X, y):
+            return np.zeros_like(X), y
+
+        loader = MockLoader(n_samples=50, test_post_process=zero_out)
+        train, test = loader.get_train_test_split()
+
+        assert not np.all(train['X'] == 0)
+        assert np.all(test['X'] == 0)
+
+    def test_both_post_processes_applied(self):
+        """Both train and test post-processes should be applied independently."""
+        from tests.conftest import MockLoader
+
+        def add_one(X, y):
+            return X + 1, y
+
+        def multiply_three(X, y):
+            return X * 3, y
+
+        loader = MockLoader(n_samples=50, train_post_process=add_one, test_post_process=multiply_three)
+        loader_orig = MockLoader(n_samples=50)
+
+        train, test = loader.get_train_test_split()
+        train_orig, test_orig = loader_orig.get_train_test_split()
+
+        np.testing.assert_array_almost_equal(train['X'], train_orig['X'] + 1)
+        np.testing.assert_array_almost_equal(test['X'], test_orig['X'] * 3)
+
+    def test_post_process_can_filter_samples(self):
+        """Post-process should support filtering (changing number of samples)."""
+        from tests.conftest import MockLoader
+
+        def keep_class_0(X, y):
+            mask = y == 0
+            return X[mask], y[mask]
+
+        loader = MockLoader(n_samples=100, train_post_process=keep_class_0)
+        train, _ = loader.get_train_test_split()
+
+        assert np.all(train['y'] == 0)
+
+    def test_post_process_can_modify_labels(self):
+        """Post-process should support modifying labels."""
+        from tests.conftest import MockLoader
+
+        def flip_labels(X, y):
+            return X, 1 - y
+
+        loader = MockLoader(n_samples=50, train_post_process=flip_labels)
+        loader_orig = MockLoader(n_samples=50)
+
+        train, _ = loader.get_train_test_split()
+        train_orig, _ = loader_orig.get_train_test_split()
+
+        np.testing.assert_array_equal(train['y'], 1 - train_orig['y'])
+
+    def test_post_process_override_in_get_train_test_split(self):
+        """Post-process passed to get_train_test_split should override constructor."""
+        from tests.conftest import MockLoader
+
+        def add_one(X, y):
+            return X + 1, y
+
+        def add_ten(X, y):
+            return X + 10, y
+
+        loader = MockLoader(n_samples=50, train_post_process=add_one)
+        loader_orig = MockLoader(n_samples=50)
+
+        # Override the constructor post-process
+        train, _ = loader.get_train_test_split(train_post_process=add_ten)
+        train_orig, _ = loader_orig.get_train_test_split()
+
+        np.testing.assert_array_almost_equal(train['X'], train_orig['X'] + 10)
+
+    def test_no_post_process_by_default(self):
+        """No post-processing should occur when post-process is None (default)."""
+        from tests.conftest import MockLoader
+
+        loader1 = MockLoader(n_samples=50)
+        loader2 = MockLoader(n_samples=50)
+
+        train1, test1 = loader1.get_train_test_split()
+        train2, test2 = loader2.get_train_test_split()
+
+        np.testing.assert_array_equal(train1['X'], train2['X'])
+        np.testing.assert_array_equal(test1['X'], test2['X'])
+
+    def test_post_process_applied_after_scaling(self):
+        """Post-process should be applied after scaling."""
+        from tests.conftest import MockLoader
+
+        def add_hundred(X, y):
+            return X + 100, y
+
+        loader = MockLoader(n_samples=50, scale=True, train_post_process=add_hundred)
+        train, _ = loader.get_train_test_split()
+
+        # Scaled data is in [-1, 1], adding 100 puts it in [99, 101]
+        assert train['X'].min() >= 98
+
+
 class TestAbstractLoaderInfo:
     """Tests for AbstractLoader info/display methods."""
 
