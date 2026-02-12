@@ -226,6 +226,73 @@ class TestProportionalSplit:
         # With minority_reduce_scaler=5, class 1 should have ~1/5 of class 0
         assert train_counts[1] < train_counts[0]
 
+    def test_minority_reduce_scaler_test_reduces_minority(self):
+        """minority_reduce_scaler_test should reduce minority class in test set."""
+        data = {
+            'X': np.random.randn(150, 4),
+            'y': np.array([0]*100 + [1]*50)
+        }
+        _, test = utils.proportional_split(
+            data.copy(), train_size=0.5, minority_reduce_scaler_test=2
+        )
+        test_counts = dict(zip(*np.unique(test['y'], return_counts=True)))
+        # Without equal_test, majority stays at ~50, minority halved to ~12-13
+        assert test_counts[1] < test_counts[0]
+
+    def test_minority_reduce_scaler_test_alone(self):
+        """minority_reduce_scaler_test without equal_test: majority unchanged, minority halved."""
+        data = {
+            'X': np.random.randn(150, 4),
+            'y': np.array([0]*100 + [1]*50)
+        }
+        _, test_plain = utils.proportional_split(data.copy(), train_size=0.5)
+        _, test_reduced = utils.proportional_split(
+            data.copy(), train_size=0.5, minority_reduce_scaler_test=2
+        )
+        plain_counts = dict(zip(*np.unique(test_plain['y'], return_counts=True)))
+        reduced_counts = dict(zip(*np.unique(test_reduced['y'], return_counts=True)))
+
+        # Majority class should be unchanged
+        assert plain_counts[0] == reduced_counts[0]
+        # Minority class should be roughly halved
+        assert reduced_counts[1] == max(int(plain_counts[1] / 2), 1)
+
+    def test_equal_test_then_minority_reduce_scaler_test(self):
+        """equal_test then minority_reduce_scaler_test: 100:50 → 50:50 → 50:25."""
+        data = {
+            'X': np.random.randn(150, 4),
+            'y': np.array([0]*100 + [1]*50)
+        }
+        _, test = utils.proportional_split(
+            data.copy(), train_size=0.5, equal_test=True, minority_reduce_scaler_test=2
+        )
+        test_counts = dict(zip(*np.unique(test['y'], return_counts=True)))
+
+        # After equal_test: majority reduced to match minority (~25 each)
+        # After minority_reduce_scaler_test=2: minority halved (~12-13)
+        assert test_counts[1] < test_counts[0]
+
+    def test_equal_test_then_minority_reduce_not_equal_to_equal_test_only(self):
+        """Combining equal_test + minority_reduce_scaler_test differs from equal_test alone."""
+        data = {
+            'X': np.random.randn(150, 4),
+            'y': np.array([0]*100 + [1]*50)
+        }
+        _, test_equal_only = utils.proportional_split(
+            data.copy(), train_size=0.5, equal_test=True
+        )
+        _, test_combined = utils.proportional_split(
+            data.copy(), train_size=0.5, equal_test=True, minority_reduce_scaler_test=2
+        )
+        equal_counts = dict(zip(*np.unique(test_equal_only['y'], return_counts=True)))
+        combined_counts = dict(zip(*np.unique(test_combined['y'], return_counts=True)))
+
+        # equal_test alone: both classes equal
+        assert equal_counts[0] == equal_counts[1]
+        # combined: minority is further reduced
+        assert combined_counts[1] < combined_counts[0]
+        assert combined_counts[1] < equal_counts[1]
+
 
 class TestProportionalDownsample:
     """Tests for proportional_downsample function."""

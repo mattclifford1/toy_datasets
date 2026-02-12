@@ -47,11 +47,19 @@ class AbstractLoader(ABC):
     def get_train_test_split(self,
                              train_size=None,
                              minority_reduce_scaler=None,
-                             minority_reduce_scaler_test=None,
                              equal_test=None,
+                             minority_reduce_scaler_test=None,
                              seed=None,
                              _print_info=False):
         '''
+        create a train, test split that preserves the class distributions
+        Minority class is assumed to be class 1, majority class is assumed to be class
+            train_size: size of the train set (0.5 means equal train, test size)
+            minority_reduce_scaler: if not None, scale down the minority class by this factor
+            equal_test: if True, balance test set classes first (reduces majority to match minority count)
+            minority_reduce_scaler_test: if not None, scale down minority class in test set (applied after equal_test if both set)
+            seed: random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
+            _print_info: whether to print the class distributions in the train and test sets after splitting
         returns:
             - data: dict containing 'X', 'y'
             - data_test: dict containing 'X', 'y'

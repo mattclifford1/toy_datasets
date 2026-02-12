@@ -83,8 +83,8 @@ def proportional_split(data,
         data: data dict holder (not modified)
         train_size: size of the train set (0.5 means equal train, test size)
         minority_reduce_scaler: if not None, scale down the minority class by this factor
-        equal_test: if True, balance test set classes (takes the minority class count and reduces majority class to match)
-        minority_reduce_scaler_test: if not None, scale down minority class in test set
+        equal_test: if True, balance test set classes first (reduces majority to match minority count)
+        minority_reduce_scaler_test: if not None, scale down minority class in test set (applied after equal_test if both set)
 
     returns: train_split, test_split (two new dicts)
     '''
@@ -118,14 +118,7 @@ def proportional_split(data,
                 split_point = max(int(len(train_inds[0])/minority_reduce_scaler), 1)
         train_inds.append(list(cls_inds[0:split_point]))
 
-        # reduce minority class in test set if needed
-        end_point = len(cls_inds)
-        if cls == 1 and not equal_test: # minority class
-            if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test != False:
-                len_test_minority = len(cls_inds[split_point:])
-                # dont take til the end
-                end_point = split_point + max(int(len_test_minority/minority_reduce_scaler_test), 1)
-        test_inds.append(list(cls_inds[split_point:end_point]))
+        test_inds.append(list(cls_inds[split_point:]))
         
     # concat all the inds from each class
     train_inds = np.concatenate(train_inds)
@@ -140,16 +133,26 @@ def proportional_split(data,
             # extract and store the splits
             train_split[key] = val[train_inds]
             test_split[key] = val[test_inds]
+    # Step 1: equal_test — balance test classes first
     if equal_test == True:
         classes, counts = np.unique(test_split['y'], return_counts=True)
         max_inst = min(counts)
         for cls in classes:
             inds = np.arange(len(test_split['y']))
-            inds = inds[test_split['y']==cls]
+            inds = inds[test_split['y'] == cls]
             inds_drop = inds[max_inst:]
             test_split['y'] = np.delete(test_split['y'], inds_drop)
             test_split['X'] = np.delete(test_split['X'], inds_drop, axis=0)
 
+    # Step 2: minority_reduce_scaler_test — reduce minority class further (applies after equal_test if both set)
+    if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test != False:
+        minority_cls = 1
+        inds = np.arange(len(test_split['y']))
+        minority_inds = inds[test_split['y'] == minority_cls]
+        n_keep = max(int(len(minority_inds) / minority_reduce_scaler_test), 1)
+        inds_drop = minority_inds[n_keep:]
+        test_split['y'] = np.delete(test_split['y'], inds_drop)
+        test_split['X'] = np.delete(test_split['X'], inds_drop, axis=0)
 
     return train_split, test_split
 
