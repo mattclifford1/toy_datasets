@@ -2,13 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any
-
 import importlib
 
-import numpy as np
-from tqdm import tqdm
-
-from data_loaders import utils
 import data_loaders
 
 
@@ -71,7 +66,10 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     }
 
 
-def get_dataset(dataset_name: str, **kwargs: Any) -> data_loaders.AbstractLoader:
+def get_dataset(
+        dataset_name: str, 
+        **kwargs: Any
+        ) -> data_loaders.AbstractLoader:
     """Load and return a dataset loader by name.
 
     Parameters
@@ -101,90 +99,15 @@ def get_dataset(dataset_name: str, **kwargs: Any) -> data_loaders.AbstractLoader
 
 
 
-### OLD WAY OF DOING IT HERE ----> MAKE THIS INTO NEW METHOD ASAP
-# @utils.make_data_dim_reducer
-def get_dataset_old(
-        dataset: str = 'Breast Cancer',
-        _print: bool = True,
-        scale: bool = False,
-        **kwargs: Any,
-) -> dict[str, Any]:
-    # check input correct dataset name
-    if dataset not in AVAILABLE_DATASETS.keys():
-        raise ValueError(f'dataset needs to be one of:{AVAILABLE_DATASETS.keys()}')
-
-    # load dataset
-    data_set = AVAILABLE_DATASETS[dataset](**kwargs)
-    if not isinstance(data_set, dict):
-        # convert to dict format needed
-        train_data, test_data = data_set
-        data_set = {'data': train_data, 'data_test': test_data}
-
-    # scale
-    scaler = utils.Normaliser(data_set['data'])
-    if scale == True:
-        data_set['data'] = scaler(data_set['data'])
-        data_set['data_test'] = scaler(data_set['data_test'])
-
-    train0 = len(data_set['data']['y'])-sum(data_set['data']['y'])
-    train1 = sum(data_set['data']['y'])
-
-    test0 = len(data_set['data_test']['y'])-sum(data_set['data_test']['y'])
-    test1 = sum(data_set['data_test']['y'])
-
-    # print some info about dataset
-    if _print == True:
-        print(f"Dataset: {dataset}")
-        print(f"    - Number of features: {data_set['data']['X'].shape[1]}")
-        print(f"    - Total instances: {test0+train0+test1+train1}")
-        print(f"      - Classes total: {test0+train0}:{test1+train1}")
-        print(f"      -         train: {train0}:{train1}")
-        print(f"      -         test:  {test0}:{test1}")
-
-    return data_set
-
-
-
-def test_available_datasets(_print: bool = False) -> None:
-    """Validate that every registered dataset loads successfully.
-
-    Iterates over all entries in ``AVAILABLE_DATASETS``, loads X and y, and
-    checks that both are numpy arrays with consistent shapes and at least 10
-    instances.
-
-    Parameters
-    ----------
-    _print : bool, default=False
-        If True, print the dataset name and summary info for each dataset.
-
-    Raises
-    ------
-    ValueError
-        If any dataset fails a validation check.
-    """
-    infos: list[str] = []
-    for dataset_name in tqdm(AVAILABLE_DATASETS.keys(), desc="Testing loading datasets"):
-        if _print:
-            print(dataset_name)
-        dataset = data_loaders.get_dataset(dataset_name)
-        X = dataset.get_X()
-        y = dataset.get_y()
-        if not isinstance(X, np.ndarray):
-            raise ValueError(f"Dataset {dataset_name} X is not a numpy array")
-        if not isinstance(y, np.ndarray):
-            raise ValueError(f"Dataset {dataset_name} y is not a numpy array")
-        if X.shape[0] != y.shape[0]:
-            raise ValueError(f"Dataset {dataset_name} X and y have different number of instances: {X.shape[0]} vs {y.shape[0]}")
-        if y.shape[0] < 10:
-            raise ValueError(f"Dataset {dataset_name} has less than 10 instances: {X.shape[0]}")
-        infos.append(dataset.get_info(long=False))
-
-    if _print:
-        print("\n\n".join(infos))
-
-
 if __name__ == '__main__':
-    print(f"Testing available datasets:")
+    print(f"Available datasets:")
     for dataset_name in AVAILABLE_DATASETS.keys():
         print(f"    - {dataset_name}")
-    test_available_datasets(_print=False)
+
+    print("\nExample usage:")
+    dataset_name = 'Iris'
+    print(f"Loading '{dataset_name}' dataset...")
+    loader = get_dataset(dataset_name)
+    X = loader.get_X()
+    y = loader.get_y()
+    print(f"Loaded '{dataset_name}' with {X.shape[0]} instances and {X.shape[1]} features.")
