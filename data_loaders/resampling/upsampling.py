@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 
 from data_loaders.utils import set_seed
-from data_loaders.resampling_base import AbstractResampler
+from data_loaders.resampling.resampling_base import AbstractResampler
 
 
 

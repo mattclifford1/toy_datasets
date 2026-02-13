@@ -3,9 +3,9 @@ Tests for data_loaders/utils.py
 """
 import pytest
 import numpy as np
-from data_loaders import downsampling
-from data_loaders.downsampling import StratifiedSubsampler
-from data_loaders.upsampling import AbstractResampler
+from data_loaders.resampling import downsampling
+from data_loaders.resampling.downsampling import StratifiedSubsampler
+from data_loaders.resampling.resampling_base import AbstractResampler
 
 
 class TestStratifiedSubsampler:

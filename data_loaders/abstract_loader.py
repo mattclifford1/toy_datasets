@@ -10,7 +10,8 @@ from typing import Any
 
 import numpy as np
 
-from data_loaders import utils, downsampling
+from data_loaders import utils
+from data_loaders.resampling import downsampling
 
 DataDict = dict[str, Any]
 

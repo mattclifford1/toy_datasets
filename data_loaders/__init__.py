@@ -3,12 +3,13 @@ from __future__ import annotations
 from data_loaders.main import AVAILABLE_DATASETS, get_dataset
 from data_loaders.abstract_loader import AbstractLoader
 from data_loaders.utils import Normaliser, proportional_split
-from data_loaders.downsampling import proportional_downsample, StratifiedSubsampler
-from data_loaders.upsampling import (
+from data_loaders.resampling import (
     AbstractResampler,
     proportional_upsample,
     RandomDuplicateUpsampler,
     SMOTEUpsampler,
+    proportional_downsample,
+    StratifiedSubsampler,
 )
 from data_loaders.embeddings import DimReducer
 
