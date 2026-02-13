@@ -3,10 +3,13 @@
 loader for chronic kidney disease dataset: https://archive.ics.uci.edu/dataset/336/chronic+kidney+disease
 This dataset can be used to predict the chronic kidney disease and it can be collected from the hospital nearly 2 months of period.
 '''
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
@@ -14,15 +17,15 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 class chronic_kidney_disease_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.7,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.7,
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Chronic Kidney Disease',
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'chronic_kidney_disease', 'data.csv'))

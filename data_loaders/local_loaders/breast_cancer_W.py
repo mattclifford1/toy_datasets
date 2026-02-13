@@ -1,32 +1,35 @@
 # author: Matt Clifford <matt.clifford@bristol.ac.uk>
 '''
 loader for Wisconsins breast cancer: https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic
-Features are computed from a digitized image of a fine needle aspirate (FNA) of a breast mass.  
+Features are computed from a digitized image of a fine needle aspirate (FNA) of a breast mass.
 They describe characteristics of the cell nuclei present in the image
 A few of the images can be found at http://www.cs.wisc.edu/~street/images/
 '''
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
 import numpy as np
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class breast_cancer_W_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.45,
-                 minority_reduce_scaler=10,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.45,
+                 minority_reduce_scaler: int = 10,
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Wisconsin Breast Cancer',
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'breast_cancer_Wisconsin', 'data.csv'))

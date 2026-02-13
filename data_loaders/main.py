@@ -1,20 +1,27 @@
-from tqdm import tqdm
-import numpy as np
-from data_loaders import utils
-import data_loaders
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
 import importlib
 
+import numpy as np
+from tqdm import tqdm
 
-def _create_lazy_loader(module_path, class_name):
+from data_loaders import utils
+import data_loaders
+
+
+def _create_lazy_loader(module_path: str, class_name: str) -> Callable[..., Any]:
     """Create a factory function that imports the loader class on first use."""
-    def loader_factory(**kwargs):
+    def loader_factory(**kwargs: Any) -> Any:
         module = importlib.import_module(module_path)
         loader_class = getattr(module, class_name)
         return loader_class(**kwargs)
     return loader_factory
 
 
-AVAILABLE_DATASETS = {
+AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     # Synthetic datasets
     'XOR': _create_lazy_loader('data_loaders.synthetic_generators.XOR', 'XOR_generator'),
     'Moons': _create_lazy_loader('data_loaders.synthetic_generators.moons', 'moons_generator'),
@@ -47,7 +54,7 @@ AVAILABLE_DATASETS = {
     }
 
 
-def get_dataset(dataset_name, **kwargs):
+def get_dataset(dataset_name: str, **kwargs: Any) -> data_loaders.AbstractLoader:
     if dataset_name not in AVAILABLE_DATASETS.keys():
         raise ValueError(f"Dataset {dataset_name} not available. Choose from: {list(AVAILABLE_DATASETS.keys())}")
     loader_class = AVAILABLE_DATASETS[dataset_name]
@@ -59,7 +66,12 @@ def get_dataset(dataset_name, **kwargs):
 
 ### OLD WAY OF DOING IT HERE ----> MAKE THIS INTO NEW METHOD ASAP
 # @utils.make_data_dim_reducer
-def get_dataset_old(dataset='Breast Cancer', _print=True, scale=False, **kwargs):
+def get_dataset_old(
+        dataset: str = 'Breast Cancer',
+        _print: bool = True,
+        scale: bool = False,
+        **kwargs: Any,
+) -> dict[str, Any]:
     # check input correct dataset name
     if dataset not in AVAILABLE_DATASETS.keys():
         raise ValueError(f'dataset needs to be one of:{AVAILABLE_DATASETS.keys()}')
@@ -91,13 +103,13 @@ def get_dataset_old(dataset='Breast Cancer', _print=True, scale=False, **kwargs)
         print(f"      - Classes total: {test0+train0}:{test1+train1}")
         print(f"      -         train: {train0}:{train1}")
         print(f"      -         test:  {test0}:{test1}")
-    
+
     return data_set
 
 
 
-def test_available_datasets(_print=False):
-    infos = []
+def test_available_datasets(_print: bool = False) -> None:
+    infos: list[str] = []
     for dataset_name in tqdm(AVAILABLE_DATASETS.keys(), desc="Testing loading datasets"):
         if _print:
             print(dataset_name)
@@ -113,7 +125,7 @@ def test_available_datasets(_print=False):
         if y.shape[0] < 10:
             raise ValueError(f"Dataset {dataset_name} has less than 10 instances: {X.shape[0]}")
         infos.append(dataset.get_info(long=False))
-    
+
     if _print:
         print("\n\n".join(infos))
 

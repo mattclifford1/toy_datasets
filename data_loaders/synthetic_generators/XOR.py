@@ -1,27 +1,31 @@
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
 import sklearn.utils
 from data_loaders import utils
 from data_loaders.utils import set_seed
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class XOR_generator(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 num_samples=200,
-                 **kwargs):
+                 shuffle: bool = True,
+                 num_samples: int | list[int] = 200,
+                 **kwargs: Any) -> None:
         self.num_samples = num_samples
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
                          dataset_name='XOR Synthetic',
                          **kwargs)
-        
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         data = self._get_XOR_single()
         return data
 
 
-    def _get_XOR_single(self):
+    def _get_XOR_single(self) -> DataDict:
         if isinstance(self.num_samples, int):
             num_samples = [self.num_samples//2, self.num_samples//2]
         else:
@@ -42,11 +46,14 @@ class XOR_generator(AbstractLoader):
         return {'X': X, 'y': y}
 
 
-    def _get_two_normal_classes(self, means=[[0, 0], [10, 10]], 
-                        covs=[[[1, 0], [0, 1]],
-                            [[1, 1], [1, 1]]], 
-                        num_samples=[3, 2],
-                        seed=None):
+    def _get_two_normal_classes(
+            self,
+            means: list[list[float]] = [[0, 0], [10, 10]],
+            covs: list[list[list[float]]] = [[[1, 0], [0, 1]],
+                        [[1, 1], [1, 1]]],
+            num_samples: list[int] = [3, 2],
+            seed: bool | int | None = None,
+    ) -> DataDict:
         labels = [0, 1]
         X = []
         y = []
@@ -62,11 +69,11 @@ class XOR_generator(AbstractLoader):
 
 if __name__ == "__main__":
     loader = XOR_generator(
-        num_samples=500, 
-        train_size=0.5, 
-        minority_reduce_scaler=10, 
+        num_samples=500,
+        train_size=0.5,
+        minority_reduce_scaler=10,
         equal_test=True,
-        minority_reduce_scaler_test=10, 
+        minority_reduce_scaler_test=10,
         )
     plot = False
     if plot:

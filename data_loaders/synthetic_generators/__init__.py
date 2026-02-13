@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .sklearn_synthetic_utils import _generic_sklearn_loader
 from .XOR import XOR_generator
 from .moons import moons_generator

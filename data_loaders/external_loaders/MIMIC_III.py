@@ -1,6 +1,6 @@
 '''
-loader for MIMIC-IV: ready to discharge from ICU prediction 
-    - 1 is negative outcome (death or readdmission) 
+loader for MIMIC-IV: ready to discharge from ICU prediction
+    - 1 is negative outcome (death or readdmission)
     - 0 successful discharge
 N.B. MIMIC dataset is not provided due to lisencing - you will need to download and process yourself (or email Matt for help)
 
@@ -9,7 +9,7 @@ and the github repo https://github.com/UHBristolDataScience/smartt-algortihm/tre
 processing https://github.com/UHBristolDataScience/towards-decision-support-icu-discharge
 
 
-Resampled data we exclude IMPUTED: 
+Resampled data we exclude IMPUTED:
     row 2 to 784 (outcome 0): original NRFD
     row 785 to 6606 (outcome 0): resampled NRFD (again should be in blocks of monotonically increasing ICUSTAY_ID, of which you could take one block).
     row 6607 to 13244 (outcome 1): RFD
@@ -17,12 +17,15 @@ Resampled data we exclude IMPUTED:
 Resampled data we exclude COMPLETECASE:
     row 2 to 2508: RFD
     row 2509 to 2837: original NRFD
-    row 2838 onwards: resampled NRFD 
+    row 2838 onwards: resampled NRFD
 
 '''
 # author: Matt Clifford <matt.clifford@bristol.ac.uk>
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
 import numpy as np
 from data_loaders import utils
@@ -30,15 +33,19 @@ from data_loaders import utils
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_mortality(seed=True, complete=False, **kwargs):
-    data = {}
+def get_mortality(
+        seed: bool | int = True,
+        complete: bool = False,
+        **kwargs: Any,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    data: dict[str, Any] = {}
     if complete == False:
         file = 'fm_MIMIC_IMPUTED_extended.csv'
     else:
         file = 'fm_MIMIC_COMPLETECASE_extended.csv'
     df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', '..',
                      'data', 'MIMIC-III', file))
-    
+
     # remove resampled data we dont care about for the true dataset
     if complete == False:
         df.drop(df.index[0:2], inplace=True)
@@ -71,20 +78,23 @@ def get_mortality(seed=True, complete=False, **kwargs):
     data = utils.shuffle_data(data, seed=seed)  # type: ignore
     # split into train, test
     train_data, test_data = utils.proportional_split(  # type: ignore
-        data, 
-        size=0.5, 
-        # size=0.7, 
+        data,
+        size=0.5,
+        # size=0.7,
         seed=seed)
     return train_data, test_data
 
 
-def get_sepsis(seed=True, **kwargs):
+def get_sepsis(
+        seed: bool | int = True,
+        **kwargs: Any,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     # https://www.kaggle.com/datasets/missan/mimic-challenge-2019?select=CleanDataSet.csv
-    
-    data = {}
+
+    data: dict[str, Any] = {}
     df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', '..',
                      'data', 'MIMIC-III', 'mimic_challenge_2019_sepsis.csv'))
-    
+
 
     # not a feature
     df.pop('ID')

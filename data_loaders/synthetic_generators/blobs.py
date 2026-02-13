@@ -1,14 +1,18 @@
+from __future__ import annotations
+
+from typing import Any
+
 import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 class blobs_generator(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.5,
-                 num_samples=200,
-                 blobs_features=2,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
+                 num_samples: int = 200,
+                 blobs_features: int = 2,
+                 **kwargs: Any) -> None:
         self.num_samples = num_samples
         self.blobs_features = blobs_features
          # work out the split size and ratio from the numbers
@@ -16,8 +20,8 @@ class blobs_generator(AbstractLoader):
                          train_size=train_size,
                          dataset_name='Blobs Synthetic',
                          **kwargs)
-        
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         '''
         https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs
         returns:
@@ -27,7 +31,7 @@ class blobs_generator(AbstractLoader):
                                         samples=self.num_samples,
                                         test=False,
                                         n_features=self.blobs_features)
-        return data    
+        return data
 
 
 if __name__ == "__main__":

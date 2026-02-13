@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .iris import iris_loader
 from .wine import wine_loader
 from .breast_cancer import breast_cancer_loader

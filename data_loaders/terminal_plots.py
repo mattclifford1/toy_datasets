@@ -27,7 +27,7 @@ import io
 import os
 import shutil
 import functools
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 
 Mode = Literal["ascii", "iterm2", "text", "auto"]
@@ -35,7 +35,7 @@ Mode = Literal["ascii", "iterm2", "text", "auto"]
 
 # --- Rasterize Matplotlib figure to a PIL image --------------------------------
 
-def _fig_to_pil(fig, *, dpi: int = 150):
+def _fig_to_pil(fig: Any, *, dpi: int = 150) -> Any:
     try:
         from PIL import Image
     except ImportError as e:
@@ -52,7 +52,7 @@ def _fig_to_pil(fig, *, dpi: int = 150):
 _ASCII_RAMP = " .:-=+*#%@"  # light -> dark
 
 
-def _pil_to_ascii(img, *, cols: int, rows: int) -> str:
+def _pil_to_ascii(img: Any, *, cols: int, rows: int) -> str:
     g = img.convert("L").resize((cols, rows))
     arr = list(g.getdata())
     n = len(_ASCII_RAMP) - 1
@@ -81,7 +81,7 @@ def _format_tick(value: float) -> str:
     return f"{value:.2g}"
 
 
-def _get_suptitle(fig) -> str:
+def _get_suptitle(fig: Any) -> str:
     suptitle = getattr(fig, "_suptitle", None)
     if suptitle is None:
         return ""
@@ -89,7 +89,7 @@ def _get_suptitle(fig) -> str:
     return text.strip()
 
 
-def _render_axes_text(ax, *, cols: int, rows: int, figure_title: str = "") -> str:
+def _render_axes_text(ax: Any, *, cols: int, rows: int, figure_title: str = "") -> str:
     title = ax.get_title()
     xlabel = ax.get_xlabel()
     ylabel = ax.get_ylabel()
@@ -318,8 +318,8 @@ class TerminalPlotter:
         self.close = close
         self.dpi = dpi
         self.margin_cols = margin_cols
-        self._original_show = None
-        self._patched_show = None
+        self._original_show: Any = None
+        self._patched_show: Any = None
 
     def enable(self) -> "TerminalPlotter":
         import matplotlib.pyplot as plt
@@ -345,11 +345,11 @@ class TerminalPlotter:
     def __enter__(self) -> "TerminalPlotter":
         return self.enable()
 
-    def __exit__(self, exc_type, exc, tb) -> bool:
+    def __exit__(self, exc_type: type[BaseException] | None, exc: BaseException | None, tb: Any) -> bool:
         self.disable()
         return False
 
-    def _terminal_show(self, *args, **kwargs) -> None:
+    def _terminal_show(self, *args: Any, **kwargs: Any) -> None:
         import matplotlib.pyplot as plt
 
         fnums = plt.get_fignums()
@@ -450,7 +450,7 @@ def enable_terminal_show(
         margin_cols=margin_cols,
     ).enable()
 
-def terminal_show():
+def terminal_show() -> None:
     """Shortcut to enable terminal plotting with default settings."""
     import matplotlib.pyplot as plt
 

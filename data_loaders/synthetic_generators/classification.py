@@ -1,14 +1,18 @@
+from __future__ import annotations
+
+from typing import Any
+
 import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 class sklearn_normal_generator(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.5,
-                 num_samples=200,
-                 normal_features=20,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
+                 num_samples: int = 200,
+                 normal_features: int = 20,
+                 **kwargs: Any) -> None:
         self.num_samples = num_samples
         self.normal_features = normal_features
          # work out the split size and ratio from the numbers
@@ -16,8 +20,8 @@ class sklearn_normal_generator(AbstractLoader):
                          train_size=train_size,
                          dataset_name='Sklearn Synthetic Classification (Normal)',
                          **kwargs)
-        
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         '''
         ** read docs to add more params here
         https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification        returns:
@@ -27,7 +31,7 @@ class sklearn_normal_generator(AbstractLoader):
                                         samples=self.num_samples,
                                         test=False,
                                         n_features=self.normal_features)
-        return data    
+        return data
 
 
 if __name__ == "__main__":

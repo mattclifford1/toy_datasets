@@ -1,36 +1,40 @@
+from __future__ import annotations
+
 import os
+from typing import Any
+
 import numpy as np
 from tqdm import tqdm
 from torchvision import transforms
 from torchvision import datasets
 from torch.utils import data as torch_data
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class mnist_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.1,
-                 minority_reduce_scaler=None,
-                 size=60000,  # 60000 is full dataset
-                 minority_id=[0],
-                 binary=True,
-                 classes_remove=[],
-                 equal_test=False,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.1,
+                 minority_reduce_scaler: int | None = None,
+                 size: int = 60000,  # 60000 is full dataset
+                 minority_id: list[int] | None = None,
+                 binary: bool = True,
+                 classes_remove: list[int] | None = None,
+                 equal_test: bool = False,
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='MNIST',
                          **kwargs)
         self.size = size
-        self.minority_id = minority_id
+        self.minority_id = minority_id if minority_id is not None else [0]
         self.binary = binary
-        self.classes_remove = classes_remove
+        self.classes_remove = classes_remove if classes_remove is not None else []
         self.equal_test = equal_test
-    
 
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         this_dir = os.path.dirname(os.path.abspath(__file__))
         download_dir = os.path.join(this_dir, '..', 'datasets')
         train_loader = torch_data.DataLoader(

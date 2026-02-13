@@ -3,10 +3,13 @@
 Get datasets from the costcla package
     - credit scoring and direct marketing
 '''
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
@@ -14,11 +17,11 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 class costcla_CreditScoring_Kaggle2011_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.7,
-                 minority_reduce_scaler=10,
-                 percent_of_data=5,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.7,
+                 minority_reduce_scaler: int = 10,
+                 percent_of_data: float = 5,
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
@@ -27,17 +30,17 @@ class costcla_CreditScoring_Kaggle2011_loader(AbstractLoader):
                          percent_of_data=percent_of_data,
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         return _get_costcla_dataset('CreditScoring_Kaggle2011_costcla')
 
 
 class costcla_CreditScoring_PAKDD2009_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.7,
-                 minority_reduce_scaler=10,
-                 percent_of_data=5,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.7,
+                 minority_reduce_scaler: int = 10,
+                 percent_of_data: float = 5,
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
@@ -46,17 +49,17 @@ class costcla_CreditScoring_PAKDD2009_loader(AbstractLoader):
                          percent_of_data=percent_of_data,
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         return _get_costcla_dataset('CreditScoring_PAKDD2009_costcla')
-    
+
 
 class costcla_DirectMarketing_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.7,
-                 minority_reduce_scaler=10,
-                 percent_of_data=5,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.7,
+                 minority_reduce_scaler: int = 10,
+                 percent_of_data: float = 5,
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
@@ -65,11 +68,11 @@ class costcla_DirectMarketing_loader(AbstractLoader):
                          percent_of_data=percent_of_data,
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         return _get_costcla_dataset('DirectMarketing_costcla')
 
 
-def _get_costcla_dataset(dataset="CreditScoring_Kaggle2011_costcla", normalise=False):
+def _get_costcla_dataset(dataset: str = "CreditScoring_Kaggle2011_costcla", normalise: bool = False) -> DataDict:
     '''
     load the costcla csv dataset files
     available datasets:

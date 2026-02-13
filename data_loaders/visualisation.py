@@ -2,18 +2,24 @@
 '''
 Visualisation functions for each dataset
 '''
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
 
 
-def plot_dataset(X,
-                 y,
-                 X_test=None,
-                 y_test=None,
-                 dataset_name=None,
-                 label_names=None,
-                 terminal_plot=False,
-                 dim_reducer_method='TSNE',
-                 ax=None):
+def plot_dataset(
+        X: np.ndarray,
+        y: np.ndarray,
+        X_test: np.ndarray | None = None,
+        y_test: np.ndarray | None = None,
+        dataset_name: str | None = None,
+        label_names: list[str | int] | None = None,
+        terminal_plot: bool = False,
+        dim_reducer_method: str = 'TSNE',
+        ax: Any = None,
+) -> tuple[Any, Any] | None:
     """
     Plot dataset in 2D using dimensionality reduction.
 
@@ -157,17 +163,17 @@ def plot_dataset(X,
     else:
         # Don't call show() - caller controls display
         return None
-    
-    
+
+
 if __name__ == "__main__":
     import data_loaders
     dataset_name = 'Abalone Gender'
     dataset = data_loaders.get_dataset(dataset_name)
     train, test = dataset.get_train_test_split()
     plot_dataset(
-        train['X'], 
+        train['X'],
         train['y'],
-        X_test=test['X'], 
+        X_test=test['X'],
         y_test=test['y'],
         dataset_name='Abalone Gender',
         terminal_plot=True,

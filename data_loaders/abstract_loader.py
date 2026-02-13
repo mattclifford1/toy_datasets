@@ -2,27 +2,35 @@
 '''
 Generic class for data loaders to inherit from
 '''
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
+
 from data_loaders import utils
+
+DataDict = dict[str, Any]
 
 
 class AbstractLoader(ABC):
-    def __init__(self, 
-                 shuffle=True,   # whether to shuffle the data after loading (before splitting into train/test)
-                 train_size=0.5,  # proportion of data to use for training (between 0 and 1) the rest will be used for testing
-                 minority_reduce_scaler=None,  # how much to reduce the minority class in the train set (2 means reduce to half, 10 means reduce to 10% of original size)
-                 equal_test=False,  # whether to make the test set perfectly balanced (overrides minority_reduce_scaler_test)
-                 minority_reduce_scaler_test=None,  # how much to reduce the minority class in the test set (2 means reduce to half, 10 means reduce to 10% of original size)
-                 train_post_process=None, # function to apply to the train data after splitting (takes in X_train, y_train and returns modified X_train, y_train)
-                 test_post_process=None, # function to apply to the test data after splitting (takes in X_test, y_test and returns modified X_test, y_test)
-                 percent_of_data=None, # how much of the data to keep (for downsampling, 50 means keep 50% of the data)
-                 set_seed=True,   # whether to set the random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
-                 dataset_name=None,  # name of the dataset (for printing and plotting purposes)
-                 scale=False,    # whether to scale the data (using standard scaling) after splitting into train/test
-                 dim_reducer=None,  # dimensionality reduction method to apply to the data (e.g. 'PCA', 'tSNE', 'UMAP')
-                 reduce_to_dim=2,   # number of dimensions to reduce to if dim_reducer is not None
-                 **kwargs):
+    def __init__(self,
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
+                 minority_reduce_scaler: int | None = None,
+                 equal_test: bool = False,
+                 minority_reduce_scaler_test: int | None = None,
+                 train_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
+                 test_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
+                 percent_of_data: float | None = None,
+                 set_seed: bool | int = True,
+                 dataset_name: str | None = None,
+                 scale: bool = False,
+                 dim_reducer: str | None = None,
+                 reduce_to_dim: int = 2,
+                 **kwargs: Any) -> None:
         self.shuffle = shuffle
         self.train_size = train_size
         self.minority_reduce_scaler = minority_reduce_scaler
@@ -38,25 +46,27 @@ class AbstractLoader(ABC):
         self.dim_reducer = dim_reducer
         self.reduce_to_dim = reduce_to_dim
 
-    
+
     @abstractmethod
-    def load_data(self):
+    def load_data(self) -> DataDict:
         '''
         returns:
             - data: dict containing 'X', 'y'
         '''
         raise NotImplementedError("This is an abstract class")
-    
 
-    def get_train_test_split(self,
-                             train_size=None,
-                             minority_reduce_scaler=None,
-                             equal_test=None,
-                             minority_reduce_scaler_test=None,
-                             train_post_process=None,
-                             test_post_process=None,
-                             seed=None,
-                             _print_info=False):
+
+    def get_train_test_split(
+            self,
+            train_size: float | None = None,
+            minority_reduce_scaler: int | None = None,
+            equal_test: bool | None = None,
+            minority_reduce_scaler_test: int | None = None,
+            train_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
+            test_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
+            seed: bool | int | None = None,
+            _print_info: bool = False,
+    ) -> tuple[DataDict, DataDict]:
         '''
         create a train, test split that preserves the class distributions
         Minority class is assumed to be class 1, majority class is assumed to be class
@@ -83,22 +93,22 @@ class AbstractLoader(ABC):
             equal_test = self.equal_test
         if train_post_process is None:
             train_post_process = self.train_post_process
-        if test_post_process is None: 
+        if test_post_process is None:
             test_post_process = self.test_post_process
-        
+
         if seed is None:
             seed = self.set_seed
 
         # split into train, test
-        train_data, test_data = utils.proportional_split( 
-            self.get_data_dict(), 
-            train_size=train_size, 
+        train_data, test_data = utils.proportional_split(
+            self.get_data_dict(),
+            train_size=train_size,
             minority_reduce_scaler=minority_reduce_scaler,
             equal_test=equal_test,
             minority_reduce_scaler_test=minority_reduce_scaler_test,
             seed=seed
             )
-        
+
         # reduce dims
         if self.dim_reducer is not None:
             from data_loaders.embeddings import dim_reducer
@@ -111,7 +121,7 @@ class AbstractLoader(ABC):
             )
             train_data['X'] = reducer.transform(train_data['X'])
             test_data['X'] = reducer.transform(test_data['X'])
-        
+
         # scale if needed
         if self.scale:
             # only fit the scaler on the train data
@@ -133,14 +143,14 @@ class AbstractLoader(ABC):
 
         # post process if needed
         if train_post_process is not None:
-            train_data['X'], train_data['y'] = train_post_process(train_data['X'], train_data['y']) 
+            train_data['X'], train_data['y'] = train_post_process(train_data['X'], train_data['y'])
         if test_post_process is not None:
             test_data['X'], test_data['y'] = test_post_process(test_data['X'], test_data['y'])
 
         return train_data, test_data
 
 
-    def get_data_dict(self):
+    def get_data_dict(self) -> DataDict:
         '''
         call the data loader and shuffle if needed
         returns:
@@ -159,51 +169,51 @@ class AbstractLoader(ABC):
                 self.data = utils.shuffle_data(
                     self.data,
                     seed=self.set_seed
-                    ) 
+                    )
             # downsample if needed
             if self.percent_of_data is not None:
                 self.data = utils.proportional_downsample(
-                    self.data, 
+                    self.data,
                     percent_of_data=self.percent_of_data,
                     seed=self.set_seed
                     )
-                
-        return self.data
-    
 
-    def get_X(self):
+        return self.data
+
+
+    def get_X(self) -> np.ndarray:
         data = self.get_data_dict()
         return data['X']
-    
 
-    def get_y(self):
+
+    def get_y(self) -> np.ndarray:
         data = self.get_data_dict()
         return data['y']
-    
 
-    def get_description(self):
+
+    def get_description(self) -> str:
         data = self.get_data_dict()
         return data.get('description', 'No description available')
-    
-    
-    def get_feature_names(self):
+
+
+    def get_feature_names(self) -> list[str] | str:
         data = self.get_data_dict()
         return data.get('feature_names', 'No feature names available')
-    
 
-    def get_label_names(self):
+
+    def get_label_names(self) -> list[str | int]:
         data = self.get_data_dict()
         return data.get('label_names', [0, 1, 2, 3])
-    
-    
+
+
     @property
-    def name(self):
+    def name(self) -> str:
         if hasattr(self, 'dataset_name'):
             if self.dataset_name is not None:
                 return self.dataset_name
         return 'No dataset name available'
-    
-    def get_info(self, long=True):
+
+    def get_info(self, long: bool = True) -> str:
         msg = f"Data Loader for {self.name}"
         if long == True:
             msg += f"\n\n Description:\n{self.get_description()}"
@@ -231,10 +241,12 @@ class AbstractLoader(ABC):
         return msg
 
 
-    def plot_dataset(self,
-                     data_override=None,
-                     terminal_plot=False,
-                     ax=None):
+    def plot_dataset(
+            self,
+            data_override: DataDict | None = None,
+            terminal_plot: bool = False,
+            ax: Any = None,
+    ) -> tuple[Any, Any] | None:
         """
         Plot the dataset.
 
@@ -269,11 +281,13 @@ class AbstractLoader(ABC):
         )
 
 
-    def plot_train_test_split(self,
-                              train_data_override=None,
-                              test_data_override=None,
-                              terminal_plot=False,
-                              ax=None):
+    def plot_train_test_split(
+            self,
+            train_data_override: DataDict | None = None,
+            test_data_override: DataDict | None = None,
+            terminal_plot: bool = False,
+            ax: Any = None,
+    ) -> tuple[Any, Any] | None:
         """
         Create train/test split and plot both datasets.
 
@@ -296,13 +310,13 @@ class AbstractLoader(ABC):
 
         if train_data_override is None or test_data_override is None:
             train_data_original, test_data_original = self.get_train_test_split()
-        
+
         if train_data_override is not None:
-            train_data = train_data_override 
-        else: train_data = train_data_original 
-        if test_data_override is not None: 
-            test_data = test_data_override 
-        else: 
+            train_data = train_data_override
+        else: train_data = train_data_original
+        if test_data_override is not None:
+            test_data = test_data_override
+        else:
             test_data = test_data_original
 
         return plot_dataset(
@@ -316,18 +330,17 @@ class AbstractLoader(ABC):
             ax=ax  # Pass through
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.get_info()
-    
+
 
 class example_dataset(AbstractLoader):
-    def __init__(self,
-                 **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(shuffle=True,
                          dataset_name='Example Dataloader',
                          **kwargs)
-    
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         '''
         some example data loading function
         '''

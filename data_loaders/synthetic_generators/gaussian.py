@@ -2,9 +2,13 @@
 '''
 Generate Gaussian data with flexible covariance and mean configurations.
 '''
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
 from data_loaders.utils import set_seed
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class gaussian_generator(AbstractLoader):
@@ -73,19 +77,19 @@ class gaussian_generator(AbstractLoader):
 
     def __init__(
         self,
-        shuffle=True,
-        num_samples=200,
-        n_features=2,
-        means=None,
-        class_separation=5.0,
-        covs=None,
-        cov_type='spherical',
-        cov_scale=1.0,
-        cov_correlation=0.5,
-        random_cov_range=(0.5, 2.0),
-        name='Gaussian Synthetic',
-        **kwargs
-    ):
+        shuffle: bool = True,
+        num_samples: int | list[int] = 200,
+        n_features: int = 2,
+        means: list[list[float]] | None = None,
+        class_separation: float = 5.0,
+        covs: list[list[list[float]]] | None = None,
+        cov_type: str = 'spherical',
+        cov_scale: float | list[float] = 1.0,
+        cov_correlation: float = 0.5,
+        random_cov_range: tuple[float, float] = (0.5, 2.0),
+        name: str = 'Gaussian Synthetic',
+        **kwargs: Any,
+    ) -> None:
         # Infer n_features from means if provided
         if means is not None:
             if len(means) != 2:
@@ -133,14 +137,21 @@ class gaussian_generator(AbstractLoader):
             **kwargs
         )
 
-    def _generate_means(self, n_features, separation):
+    def _generate_means(self, n_features: int, separation: float) -> list[np.ndarray]:
         """Generate class means at origin and diagonal offset."""
         return [
             np.zeros(n_features),
             np.ones(n_features) * separation
         ]
 
-    def _generate_covs(self, n_features, cov_type, scale, correlation, random_range):
+    def _generate_covs(
+            self,
+            n_features: int,
+            cov_type: str,
+            scale: float | list[float],
+            correlation: float,
+            random_range: tuple[float, float],
+    ) -> list[np.ndarray]:
         """Generate covariance matrices based on type."""
         # Handle per-class scales
         if isinstance(scale, (int, float)):
@@ -156,8 +167,15 @@ class gaussian_generator(AbstractLoader):
             covs.append(cov)
         return covs
 
-    def _make_cov_matrix(self, n_features, cov_type, scale, correlation,
-                         random_range, seed=None):
+    def _make_cov_matrix(
+            self,
+            n_features: int,
+            cov_type: str,
+            scale: float,
+            correlation: float,
+            random_range: tuple[float, float],
+            seed: int | None = None,
+    ) -> np.ndarray:
         """Create a single covariance matrix of the specified type."""
         if cov_type == 'spherical':
             # Identity scaled - same variance in all directions
@@ -195,7 +213,7 @@ class gaussian_generator(AbstractLoader):
                 f"Choose from: 'spherical', 'diagonal', 'symmetric', 'random'"
             )
 
-    def load_data(self):
+    def load_data(self) -> DataDict:
         """Generate the Gaussian data."""
         X_list = []
         y_list = []
@@ -220,7 +238,7 @@ class gaussian_generator(AbstractLoader):
         }
         return data
 
-    def _make_description(self):
+    def _make_description(self) -> str:
         """Generate a description of the dataset configuration."""
         total = sum(self.num_samples)
         desc = f"Gaussian synthetic dataset for binary classification.\n\n"

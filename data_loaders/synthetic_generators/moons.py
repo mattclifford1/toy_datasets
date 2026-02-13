@@ -1,14 +1,18 @@
+from __future__ import annotations
+
+from typing import Any
+
 import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 class moons_generator(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.5,
-                 num_samples=200,
-                 moons_noise=0.2,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
+                 num_samples: int = 200,
+                 moons_noise: float = 0.2,
+                 **kwargs: Any) -> None:
         self.num_samples = num_samples
         self.moons_noise = moons_noise
          # work out the split size and ratio from the numbers
@@ -16,8 +20,8 @@ class moons_generator(AbstractLoader):
                          train_size=train_size,
                          dataset_name='Moons Synthetic',
                          **kwargs)
-        
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         '''
         sample from the half moons data distribution
         returns:
@@ -27,7 +31,7 @@ class moons_generator(AbstractLoader):
                                         samples=self.num_samples,
                                         test=False,
                                         noise=self.moons_noise)
-        return data    
+        return data
 
 
 if __name__ == "__main__":

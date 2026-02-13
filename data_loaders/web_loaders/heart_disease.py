@@ -2,25 +2,28 @@
 '''
 https://archive.ics.uci.edu/dataset/45/heart+disease
 '''
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 from ucimlrepo import fetch_ucirepo
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class heart_disease_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.5,
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
                 #  minority_reduce_scaler=10,
-                 **kwargs):
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                         #  minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Heart Disease',
                          **kwargs)
-        
-    def load_data(self):
+
+    def load_data(self) -> DataDict:
         data = {}
 
         # fetch dataset

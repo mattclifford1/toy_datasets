@@ -1,5 +1,5 @@
 '''
-loader for MIMIC-IV: ready to discharge from ICU prediction 
+loader for MIMIC-IV: ready to discharge from ICU prediction
     Key outcome data is the RFD variable:
         0 = Not ready for discharge (ie currently in ICU)    -  1616473   instances
         1 = Successfully discharged (ie went home)           -     7634   instances
@@ -8,11 +8,14 @@ loader for MIMIC-IV: ready to discharge from ICU prediction
 N.B. MIMIC dataset is not provided due to lisencing - you will need to download and process yourself (or email Matt for help)
 
 # code from https://github.com/jeffnclark/TraCE/blob/main/helpers/funcs_icu_study.py
-# paper https://proceedings.mlr.press/v233/clark24a/clark24a.pdf 
+# paper https://proceedings.mlr.press/v233/clark24a/clark24a.pdf
 '''
 # author: Matt Clifford <matt.clifford@bristol.ac.uk>
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
 import numpy as np
 from data_loaders import utils
@@ -20,7 +23,10 @@ from data_loaders import utils
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_ready_for_discharge(seed=True, **kwargs):
+def get_ready_for_discharge(
+        seed: bool | int = True,
+        **kwargs: Any,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     desired_variables = ['stay_id',
                          'biocarbonate',
                          'bloodOxygen',
@@ -50,7 +56,7 @@ def get_ready_for_discharge(seed=True, **kwargs):
     df = df[df.RFD != 2]
 
 
-    data = {}
+    data: dict[str, Any] = {}
     data['y'] = df.pop('RFD').to_numpy()#[:6638+954]   # number from paper above
 
 
@@ -65,10 +71,13 @@ def get_ready_for_discharge(seed=True, **kwargs):
     return train_data, test_data
 
 
-def nan_post_processing_data(df_data, columns):
+def nan_post_processing_data(
+        df_data: pd.DataFrame,
+        columns: list[str],
+) -> pd.DataFrame:
     '''
     Function for post processing the dataframe with all the proceessed values (eg removing nans)
-    input: 
+    input:
     df_data -  dataframe which contain the values of all the processed files
     columns -  column of interest to perform data processing on
     returns:
@@ -103,7 +112,10 @@ def nan_post_processing_data(df_data, columns):
     return df_data
 
 
-def change_categorical(df, categorical_features):
+def change_categorical(
+        df: pd.DataFrame,
+        categorical_features: list[str],
+) -> pd.DataFrame:
     '''
     function: Used to change data variables to categorical type (for the case of passing to DiCE)
     '''
@@ -112,7 +124,10 @@ def change_categorical(df, categorical_features):
     return df
 
 
-def initial_icu_processing(filepath, features):
+def initial_icu_processing(
+        filepath: str,
+        features: list[str],
+) -> pd.DataFrame:
     '''
     Function used to perform initial preprocessing of the data, this includes:
     choosing the correct columns of interest,
@@ -123,7 +138,7 @@ def initial_icu_processing(filepath, features):
         filepath - path of the csv file which cotains the data
         features - which features you want to extract and use
 
-    return:desired_df_data -  dataframe after processing the data 
+    return:desired_df_data -  dataframe after processing the data
     '''
     df_data = pd.read_csv(filepath,
                           header=0)

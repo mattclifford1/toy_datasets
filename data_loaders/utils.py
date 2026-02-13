@@ -1,26 +1,28 @@
-import functools
-import numpy as np
+from __future__ import annotations
 
+from typing import Any
+
+import numpy as np
 
 
 RANDOM_STATE = 42
 
 
 class normaliser:
-    def __init__(self, train_X):
+    def __init__(self, train_X: np.ndarray) -> None:
         from sklearn import preprocessing
 
         self.scaler = preprocessing.MinMaxScaler(
             feature_range=(-1,1)).fit(train_X)
 
-    def __call__(self, X):
+    def __call__(self, X: np.ndarray) -> np.ndarray:
         return self.scaler.transform(X)
-    
-    def transform_instance(self, X):
+
+    def transform_instance(self, X: np.ndarray) -> np.ndarray:
         return self.scaler.transform([X])[0]
 
 
-def set_seed(seed):
+def set_seed(seed: bool | int) -> None:
     if seed == True:
         np.random.seed(seed=RANDOM_STATE)
     elif isinstance(seed, int):
@@ -29,7 +31,7 @@ def set_seed(seed):
         np.random.seed(seed=None)
 
 
-def shuffle_data(data, seed=True):
+def shuffle_data(data: dict[str, Any], seed: bool | int = True) -> dict[str, Any]:
     from sklearn.utils import shuffle
 
     if seed == True:
@@ -39,7 +41,7 @@ def shuffle_data(data, seed=True):
     return data
 
 
-def shuffle_dataset(data, seed=True):
+def shuffle_dataset(data: dict[str, Any], seed: bool | int = True) -> dict[str, Any]:
     '''
     shuffle numpy arrays (data) in data dict
     '''
@@ -55,7 +57,12 @@ def shuffle_dataset(data, seed=True):
     return data
 
 
-def stratified_subsample(X, y, n_samples, random_state=42):
+def stratified_subsample(
+        X: np.ndarray,
+        y: np.ndarray,
+        n_samples: int,
+        random_state: int = 42,
+) -> tuple[np.ndarray, np.ndarray]:
     '''
     Taken from mnists_path_dataset Repo https://github.com/mattclifford1/mnist_paths_dataset/blob/main/data_utils.py
     '''
@@ -70,13 +77,14 @@ def stratified_subsample(X, y, n_samples, random_state=42):
     return X_sub, y_sub
 
 
-def proportional_split(data,
-                       train_size=0.8,
-                       seed=True,
-                       minority_reduce_scaler=None,
-                       equal_test=False,
-                       minority_reduce_scaler_test=None
-                       ):
+def proportional_split(
+        data: dict[str, Any],
+        train_size: float = 0.8,
+        seed: bool | int = True,
+        minority_reduce_scaler: int | None = None,
+        equal_test: bool = False,
+        minority_reduce_scaler_test: int | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     '''
     create a train, test split that preserves the class distributions
     Minority class is assumed to be class 1, majority class is assumed to be class 0
@@ -97,13 +105,13 @@ def proportional_split(data,
     if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test < 1:
         raise ValueError(
             f'minority_reduce_scaler_test needs to be greater than 1 instead of :{minority_reduce_scaler_test}')
-    
+
     set_seed(seed)
     # get current class proportions
     classes, counts = np.unique(data['y'], return_counts=True)
     classes = sorted(classes)
-    test_inds = []
-    train_inds = []
+    test_inds: list[list[int]] = []
+    train_inds: list[list[int]] = []
     for i, cls in enumerate(classes):
         # get all the inds of current class
         cls_inds = np.where(data['y'] == cls)[0]
@@ -119,20 +127,20 @@ def proportional_split(data,
         train_inds.append(list(cls_inds[0:split_point]))
 
         test_inds.append(list(cls_inds[split_point:]))
-        
+
     # concat all the inds from each class
-    train_inds = np.concatenate(train_inds)
-    test_inds = np.concatenate(test_inds)
+    train_inds_arr = np.concatenate(train_inds)
+    test_inds_arr = np.concatenate(test_inds)
     # now apply the split to all data arrays
-    train_split = {}
-    test_split = {}
+    train_split: dict[str, Any] = {}
+    test_split: dict[str, Any] = {}
     instances = data['X'].shape[0]
     for key, val in data.items():
         # apply to all numpy arrays that are data rows
         if isinstance(val, np.ndarray) and data[key].shape[0] == instances:
             # extract and store the splits
-            train_split[key] = val[train_inds]
-            test_split[key] = val[test_inds]
+            train_split[key] = val[train_inds_arr]
+            test_split[key] = val[test_inds_arr]
     # Step 1: equal_test — balance test classes first
     if equal_test == True:
         classes, counts = np.unique(test_split['y'], return_counts=True)
@@ -157,7 +165,12 @@ def proportional_split(data,
     return train_split, test_split
 
 
-def proportional_downsample(data, percent_of_data=1, seed=True, **kwargs):
+def proportional_downsample(
+        data: dict[str, Any],
+        percent_of_data: float = 1,
+        seed: bool | int = True,
+        **kwargs: Any,
+) -> dict[str, Any]:
     '''
     downsample data whilst keep the represenetaed class proportion distribution
     the same
@@ -185,27 +198,12 @@ def proportional_downsample(data, percent_of_data=1, seed=True, **kwargs):
         sub_sample_of_inds = cls_inds[:new_data_counts[i]]
         new_inds.append(list(sub_sample_of_inds))
     # concat all the inds from each class
-    new_inds = np.concatenate(new_inds)
+    new_inds_arr = np.concatenate(new_inds)
     # now only take new_inds from all data arrays
     instances = data['X'].shape[0]
     for key, val in data.items():
         # apply to all numpy arrays that are data rows
         if isinstance(val, np.ndarray) and data[key].shape[0] == instances:
             # apply the shuffle
-            data[key] = val[new_inds]
+            data[key] = val[new_inds_arr]
     return data
-
-
-# def make_data_dim_reducer(data_getter):
-#     @functools.wraps(data_getter)
-#     def _wrapper(*args, **kwargs):
-#         data_dict = data_getter(*args, **kwargs)
-#         if data_dict['data']['X'].shape[1] > 2:
-#             dim_reducer = get_dim_reducer(data_dict['data'])
-#         else:
-#             dim_reducer = None
-#         data_dict['dim_reducer'] = dim_reducer
-#         return data_dict
-#     return _wrapper
-
-

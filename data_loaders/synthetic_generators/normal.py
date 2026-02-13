@@ -1,22 +1,26 @@
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
 from data_loaders.utils import set_seed
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class normal_data_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 num_train=1000,
-                 num_test=2000,
-                 train_ratio=10,
+                 shuffle: bool = True,
+                 num_train: int = 1000,
+                 num_test: int = 2000,
+                 train_ratio: int = 10,
                 #  test_ratio=1,
-                 set_seed=True,
-                 m1=[-1, -1],
-                 m2=[1, 1],
-                 cov1=[[1, 0], [0, 1]],
-                 cov2=[[1, 0], [0, 1]],
-                 scale=False,
-                 **kwargs):
+                 set_seed: bool | int = True,
+                 m1: list[float] = [-1, -1],
+                 m2: list[float] = [1, 1],
+                 cov1: list[list[float]] = [[1, 0], [0, 1]],
+                 cov2: list[list[float]] = [[1, 0], [0, 1]],
+                 scale: bool = False,
+                 **kwargs: Any) -> None:
         # work out the split size and ratio from the numbers
         self.total_instances = num_train + num_test
         train_size = num_train / self.total_instances
@@ -41,7 +45,7 @@ class normal_data_loader(AbstractLoader):
         self.N2 += num_test // 2
 
 
-    def load_data(self):
+    def load_data(self) -> DataDict:
         labels = [0, 1]
         X = []
         y = []
@@ -55,8 +59,8 @@ class normal_data_loader(AbstractLoader):
         X = np.vstack(X)
         y = np.hstack(y)
         data = {
-            'X': X, 
-            'y': y, 
+            'X': X,
+            'y': y,
             'description': 'Synthetic normal distributed data',
             'mean1': self.m1,
             'mean2': self.m2,

@@ -2,10 +2,13 @@
 '''
 loader for hepititus: https://archive.ics.uci.edu/dataset/46/hepatitis
 '''
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
@@ -13,17 +16,17 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 class hepatitis_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.5,
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
                 #  minority_reduce_scaler=5,
-                 **kwargs):
+                 **kwargs: Any) -> None:
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                         #  minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Hepatitis',
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'hepititus', 'data.csv'))

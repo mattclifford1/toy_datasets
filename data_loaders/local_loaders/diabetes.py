@@ -2,10 +2,13 @@
 '''
 loader for the Pima Indians Diabetes Database: https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database?resource=download
 '''
+from __future__ import annotations
 
 import os
+from typing import Any
+
 import pandas as pd
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
@@ -13,10 +16,10 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 class diabetes_pima_indians_loader(AbstractLoader):
     def __init__(self,
-                 shuffle=True,
-                 train_size=0.5,
-                 minority_reduce_scaler=10,
-                 **kwargs):
+                 shuffle: bool = True,
+                 train_size: float = 0.5,
+                 minority_reduce_scaler: int = 10,
+                 **kwargs: Any) -> None:
         # size=0.2, ratio=5   works nicely
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
@@ -24,7 +27,7 @@ class diabetes_pima_indians_loader(AbstractLoader):
                          dataset_name='Diabetes Pima Indians',
                          **kwargs)
         
-    def load_data(self):
+    def load_data(self) -> DataDict:
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'diabetes_pima_indians', 'data.csv'))

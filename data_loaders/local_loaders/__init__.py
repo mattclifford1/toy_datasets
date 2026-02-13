@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .abalone_gender import abalone_gender_loader
 from .banknote import banknote_loader
 from .breast_cancer_W import breast_cancer_W_loader

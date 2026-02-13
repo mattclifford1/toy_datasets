@@ -2,22 +2,33 @@
 '''
 Generate synthetic data from sklearn datasets
 '''
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
 
 import sklearn.datasets
 import sklearn.utils
 
 
-def get_synthetic_sep_data_moons(N1=10000,
-                           N2=10000,
-                           scale=True,
-                           test_nums=(10000, 10000)):
+def get_synthetic_sep_data_moons(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: tuple[int, int] = (10000, 10000),
+) -> dict[str, Any]:
 
     data = get_moons((N1, N2))
     data_test = get_moons(test_nums)
     return {'data': data, 'data_test': data_test}
 
 
-def _generic_loader(load_func, samples=[100, 100], test=False, **kwargs):
+def _generic_loader(
+        load_func: Callable[..., Any],
+        samples: list[int] = [100, 100],
+        test: bool = False,
+        **kwargs: Any,
+) -> dict[str, Any]:
     '''
     sample from the a sklearn synthetic dataset
     returns:
@@ -37,7 +48,12 @@ def _generic_loader(load_func, samples=[100, 100], test=False, **kwargs):
     return data
 
 
-def get_moons(samples=[100, 100], test=False, moons_noise=0, **kwargs):
+def get_moons(
+        samples: list[int] | tuple[int, int] = [100, 100],
+        test: bool = False,
+        moons_noise: float = 0,
+        **kwargs: Any,
+) -> dict[str, Any]:
     '''
     sample from the half moons data distribution
     returns:
@@ -50,7 +66,12 @@ def get_moons(samples=[100, 100], test=False, moons_noise=0, **kwargs):
     return data
 
 
-def get_normal(samples=[100, 100], test=False, normal_dims=20, **kwargs):
+def get_normal(
+        samples: list[int] = [100, 100],
+        test: bool = False,
+        normal_dims: int = 20,
+        **kwargs: Any,
+) -> dict[str, Any]:
     '''
     sample from the circles data distribution
     ** read docs to add more params here
@@ -66,7 +87,12 @@ def get_normal(samples=[100, 100], test=False, normal_dims=20, **kwargs):
     return data
 
 
-def get_circles(samples=[100, 100], test=False, circles_noise=0.2, **kwargs):
+def get_circles(
+        samples: list[int] = [100, 100],
+        test: bool = False,
+        circles_noise: float = 0.2,
+        **kwargs: Any,
+) -> dict[str, Any]:
     '''
     sample from the circles data distribution
     returns:
@@ -80,7 +106,12 @@ def get_circles(samples=[100, 100], test=False, circles_noise=0.2, **kwargs):
     return data
 
 
-def get_blobs(samples=[100, 100], test=False, blobs_features=2, **kwargs):
+def get_blobs(
+        samples: list[int] = [100, 100],
+        test: bool = False,
+        blobs_features: int = 2,
+        **kwargs: Any,
+) -> dict[str, Any]:
     '''
     sample from the circles data distribution
     https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs

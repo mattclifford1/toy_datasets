@@ -1,7 +1,11 @@
 '''
 Generate data from https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#:~:text=Generate%20a%20random%20n%2Dclass,of%20clusters%20to%20each%20class.
-I. Guyon, “Design of experiments for the NIPS 2003 variable selection benchmark”, 2003.
+I. Guyon, "Design of experiments for the NIPS 2003 variable selection benchmark", 2003.
 '''
+from __future__ import annotations
+
+from typing import Any
+
 from sklearn.datasets import make_classification
 from sklearn.utils import shuffle
 import numpy as np
@@ -10,60 +14,72 @@ from data_loaders import utils
 
 
 @utils.make_data_dim_reducer
-def get_non_sep_data_high_dim(N1=10000,
-                              N2=10000,
-                              scale=True,
-                              test_nums=[10000, 10000]):
+def get_non_sep_data_high_dim(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: list[int] = [10000, 10000],
+) -> dict[str, Any]:
     data, data_test = get_non_separable(
         N1=N1, N2=N2, scale=scale, test_nums=test_nums, dims=100, gen_num=3)
 
     return {'data': data, 'data_test': data_test}
 
 
-def get_non_sep_datasets(N1=10000,
-                     N2=10000,
-                     scale=True,
-                     test_nums=[10000, 10000]):
+def get_non_sep_datasets(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: list[int] = [10000, 10000],
+) -> dict[str, Any]:
     data, data_test = get_non_separable(
         N1=N1, N2=N2, scale=scale, test_nums=test_nums)
 
     return {'data': data, 'data_test': data_test}
 
 
-def get_sep_datasets(N1=10000,
-                 N2=10000,
-                 scale=True,
-                 test_nums=[10000, 10000]):
+def get_sep_datasets(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: list[int] = [10000, 10000],
+) -> dict[str, Any]:
     data, data_test = get_separable(
         N1=N1, N2=N2, scale=scale, test_nums=test_nums)
 
     return {'data': data, 'data_test': data_test}
 
 
-def get_separable(N1=10000,
-                  N2=10000,
-                  scale=True,
-                  test_nums=[10000, 10000]):
-    
+def get_separable(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: list[int] = [10000, 10000],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+
     return _get_data(N1=N1, N2=N2, scale=scale, test_nums=test_nums, gen_num=5)
 
 
-def get_non_separable(N1=10000,
-                  N2=10000,
-                  scale=True,
-                  test_nums=[10000, 10000],
-                  dims=2,
-                  gen_num=9):
-    
+def get_non_separable(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: list[int] = [10000, 10000],
+        dims: int = 2,
+        gen_num: int = 9,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+
     return _get_data(N1=N1, N2=N2, scale=scale, test_nums=test_nums, gen_num=gen_num, dims=dims)
 
 
-def _get_data(N1=10000,
-              N2=10000,
-              scale=True,
-              test_nums=[10000, 10000],
-              gen_num=0,
-              dims=2):
+def _get_data(
+        N1: int = 10000,
+        N2: int = 10000,
+        scale: bool = True,
+        test_nums: list[int] = [10000, 10000],
+        gen_num: int = 0,
+        dims: int = 2,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     class1_num = N1 + test_nums[0]
     class2_num = N2 + test_nums[1]
 

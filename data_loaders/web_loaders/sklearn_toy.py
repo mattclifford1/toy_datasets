@@ -2,13 +2,16 @@
 Generate toy data from the breast cancer dataset
 '''
 # author: Matt Clifford <matt.clifford@bristol.ac.uk>
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 from sklearn.datasets import load_breast_cancer, load_iris, load_wine
 from data_loaders import utils
 
 
-def get_breast_cancer(seed=True, **kwargs):
+def get_breast_cancer(seed: bool | int = True, **kwargs: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     '''
     breast cancer dataset
     returns:
@@ -36,7 +39,7 @@ def get_breast_cancer(seed=True, **kwargs):
         seed=seed)
     return train_data, test_data
 
-def get_wine(**kwargs):
+def get_wine(**kwargs: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     '''
     wine dataset (0 vs 1,2)
     returns:
@@ -56,7 +59,7 @@ def get_wine(**kwargs):
     train_data, test_data = utils.proportional_split(data, size=0.8)
     return train_data, test_data
 
-def get_iris(**kwargs):
+def get_iris(**kwargs: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     '''
     iris dataset (0,2 vs 1)
     returns:
