@@ -23,7 +23,7 @@ Config in `pyproject.toml` with `distribution = false` (application mode, not li
 - `data_loaders/loaders/local_loaders/` - Breast cancer variants, diabetes, banknote, wheat seeds (from local CSV files in `data/`)
 - `data_loaders/loaders/external_loaders/` - MIMIC-III/IV medical datasets (require special access)
 - `data_loaders/utils/` - Normalization (`normalisation.py`), shuffling/seeding (`shuffling.py`), train/test splitting (`splitting.py`)
-- `data_loaders/embeddings.py` - PCA, UMAP, t-SNE dimensionality reduction
+- `data_loaders/embeddings/` - Dimensionality reduction subpackage: `base.py` (ABC), `pca.py`, `tsne.py`, `umap.py`, `dim_reducer.py` (string-dispatch orchestrator)
 - `data_loaders/plotting/` - Dataset visualisation (`visualisation.py`) and terminal rendering (`terminal_plots.py`)
 
 ## Key Patterns
