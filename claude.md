@@ -84,4 +84,4 @@ always wise clear and consise code.
 
 
 ## documentation
-always document features in the readme and docstrings. Use type hints for clarity.
+always document features in the readme and docstrings. Use type hints for clarity in the input arguments.

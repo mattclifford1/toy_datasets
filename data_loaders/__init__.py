@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from data_loaders.main import AVAILABLE_DATASETS, get_dataset
 from data_loaders.abstract_loader import AbstractLoader
-from data_loaders.utils import normaliser, proportional_split, proportional_downsample
+from data_loaders.utils import normaliser, proportional_split
+from data_loaders.downsampling import proportional_downsample
 from data_loaders.embeddings import dim_reducer
 
 __all__ = [

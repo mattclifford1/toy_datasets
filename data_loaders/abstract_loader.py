@@ -10,7 +10,7 @@ from typing import Any
 
 import numpy as np
 
-from data_loaders import utils
+from data_loaders import utils, downsampling
 
 DataDict = dict[str, Any]
 
@@ -216,7 +216,7 @@ class AbstractLoader(ABC):
                     )
             # downsample if needed
             if self.percent_of_data is not None:
-                self.data = utils.proportional_downsample(
+                self.data = downsampling.proportional_downsample(
                     self.data,
                     percent_of_data=self.percent_of_data,
                     seed=self.set_seed

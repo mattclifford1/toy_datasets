@@ -28,7 +28,7 @@ def get_breast_cancer(seed: bool | int = True, **kwargs: Any) -> tuple[dict[str,
     # shuffle the dataset
     data = utils.shuffle_data(data, seed=seed)
     # reduce the size of the dataset
-    # data = utils.proportional_downsample(data, **kwargs)
+    # data = downsampling.proportional_downsample(data, **kwargs)
     # split into train, test
     train_data, test_data = utils.proportional_split(
         data, 
@@ -54,7 +54,7 @@ def get_wine(**kwargs: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     # shuffle the dataset
     data = utils.shuffle_data(data)
     # reduce the size of the dataset
-    # data = utils.proportional_downsample(data, **kwargs)
+    # data = downsampling.proportional_downsample(data, **kwargs)
     # split into train, test
     train_data, test_data = utils.proportional_split(data, size=0.8)
     return train_data, test_data
@@ -79,7 +79,7 @@ def get_iris(**kwargs: Any) -> tuple[dict[str, Any], dict[str, Any]]:
                              'Petal length',
                              'Petal width']
     # reduce the size of the dataset
-    # data = utils.proportional_downsample(data, **kwargs)
+    # data = downsampling.proportional_downsample(data, **kwargs)
     # split into train, test
     train_data, test_data = utils.proportional_split(data, size=0.8)
     return train_data, test_data
