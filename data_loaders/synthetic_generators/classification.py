@@ -7,6 +7,26 @@ from data_loaders.synthetic_generators import _generic_sklearn_loader
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 class sklearn_normal_generator(AbstractLoader):
+    """Generate a synthetic classification dataset via sklearn's make_classification.
+
+    Wraps :func:`sklearn.datasets.make_classification` to produce a
+    higher-dimensional normally-distributed binary classification dataset with
+    redundant and informative features.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    num_samples : int, default=200
+        Total number of samples to generate.
+    normal_features : int, default=20
+        Total number of features (informative + redundant) per sample.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,

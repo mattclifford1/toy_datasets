@@ -16,6 +16,50 @@ DataDict = dict[str, Any]
 
 
 class AbstractLoader(ABC):
+    """Base class for all dataset loaders.
+
+    Subclasses must implement :meth:`load_data`, which returns a dict with at
+    least ``'X'`` and ``'y'`` keys.  All splitting, shuffling, scaling, and
+    dimensionality-reduction logic lives here so individual loaders stay lean.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    minority_reduce_scaler : int or None, default=None
+        If set, reduce the minority class (class 1) in the *train* set by this
+        factor relative to the majority class.
+    equal_test : bool, default=False
+        If True, balance the test set by downsampling the majority class to
+        match the minority count before any ``minority_reduce_scaler_test``.
+    minority_reduce_scaler_test : int or None, default=None
+        If set, further reduce the minority class in the *test* set by this
+        factor (applied after ``equal_test`` if both are set).
+    train_post_process : callable or None, default=None
+        Function ``(X, y) -> (X, y)`` applied to train data after splitting.
+    test_post_process : callable or None, default=None
+        Function ``(X, y) -> (X, y)`` applied to test data after splitting.
+    percent_of_data : float or None, default=None
+        If set, downsample the full dataset to this percentage (0–100) while
+        preserving class proportions.
+    set_seed : bool or int, default=True
+        Random seed for shuffling and splitting. True uses 42, False disables.
+    dataset_name : str or None, default=None
+        Human-readable name used in plot titles and info output.
+    scale : bool, default=False
+        If True, apply MinMax normalisation (fitted on train) to both splits.
+    dim_reducer : str or None, default=None
+        Dimensionality reduction method applied before returning splits.
+        Supported values: ``'PCA'``, ``'kernelPCA'``, ``'TSNE'``, ``'UMAP'``,
+        ``'UMAP_supervised'``.
+    reduce_to_dim : int, default=2
+        Target number of dimensions when ``dim_reducer`` is set.
+    **kwargs
+        Additional keyword arguments (ignored, allows flexible subclass init).
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,
@@ -182,38 +226,95 @@ class AbstractLoader(ABC):
 
 
     def get_X(self) -> np.ndarray:
+        """Return the full feature matrix.
+
+        Returns
+        -------
+        np.ndarray
+            Feature matrix of shape ``(n_samples, n_features)``.
+        """
         data = self.get_data_dict()
         return data['X']
 
 
     def get_y(self) -> np.ndarray:
+        """Return the full label array.
+
+        Returns
+        -------
+        np.ndarray
+            Integer label array of shape ``(n_samples,)``.
+        """
         data = self.get_data_dict()
         return data['y']
 
 
     def get_description(self) -> str:
+        """Return a human-readable description of the dataset.
+
+        Returns
+        -------
+        str
+            Dataset description, or ``'No description available'`` if none.
+        """
         data = self.get_data_dict()
         return data.get('description', 'No description available')
 
 
     def get_feature_names(self) -> list[str] | str:
+        """Return the names of each feature column.
+
+        Returns
+        -------
+        list[str] or str
+            List of feature name strings, or ``'No feature names available'``
+            if the loader does not provide them.
+        """
         data = self.get_data_dict()
         return data.get('feature_names', 'No feature names available')
 
 
     def get_label_names(self) -> list[str | int]:
+        """Return the human-readable names for each class label.
+
+        Returns
+        -------
+        list[str or int]
+            List of label names indexed by class integer, or ``[0, 1, 2, 3]``
+            as a fallback if the loader does not provide them.
+        """
         data = self.get_data_dict()
         return data.get('label_names', [0, 1, 2, 3])
 
 
     @property
     def name(self) -> str:
+        """Human-readable dataset name set at construction time.
+
+        Returns
+        -------
+        str
+            Dataset name, or ``'No dataset name available'`` if not set.
+        """
         if hasattr(self, 'dataset_name'):
             if self.dataset_name is not None:
                 return self.dataset_name
         return 'No dataset name available'
 
     def get_info(self, long: bool = True) -> str:
+        """Return a formatted summary string for the dataset.
+
+        Parameters
+        ----------
+        long : bool, default=True
+            If True, include the full description text.
+
+        Returns
+        -------
+        str
+            Multi-line summary including feature names, label names, instance
+            counts per class, and optionally the full description.
+        """
         msg = f"Data Loader for {self.name}"
         if long == True:
             msg += f"\n\n Description:\n{self.get_description()}"
@@ -335,15 +436,26 @@ class AbstractLoader(ABC):
 
 
 class example_dataset(AbstractLoader):
+    """Minimal example loader demonstrating how to subclass AbstractLoader.
+
+    Generates a small hard-coded 3-feature, 2-class dataset for testing and
+    documentation purposes.
+    """
+
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(shuffle=True,
                          dataset_name='Example Dataloader',
                          **kwargs)
 
     def load_data(self) -> DataDict:
-        '''
-        some example data loading function
-        '''
+        """Return a small hard-coded example dataset.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'``, ``'y'``, ``'description'``,
+            ``'feature_names'``, and ``'label_names'``.
+        """
         X_sample = np.array([[1, 2, 4],
                              [2, 3, 5],
                              [3, 4, 6],

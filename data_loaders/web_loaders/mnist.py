@@ -12,6 +12,38 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class mnist_loader(AbstractLoader):
+    """Load the MNIST handwritten-digit dataset.
+
+    Images (28×28 pixels) are flattened to 784-dimensional vectors.
+    In the default binary mode, a specified minority digit (default: 9) is
+    labelled 1 and all other digits are labelled 0.
+
+    Dataset stats: up to 60 000 training samples, 784 features per sample.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.1
+        Fraction of data used for training in train/test splits.
+    minority_reduce_scaler : int or None, default=None
+        If set, reduce the minority class in the train set by this factor.
+    size : int, default=60000
+        Number of samples to load from the training split (max 60 000).
+    minority_id : list[int] or None, default=None
+        Digit label(s) to treat as the minority class (class 1) in binary
+        mode.  Defaults to ``[0]`` (digit 9).
+    binary : bool, default=True
+        If True, convert to binary classification (minority digit vs. rest).
+        If False, keep all 10 digit classes.
+    classes_remove : list[int] or None, default=None
+        Digit classes to remove entirely before creating the split.
+    equal_test : bool, default=False
+        If True, balance the test set classes.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.1,
@@ -35,6 +67,14 @@ class mnist_loader(AbstractLoader):
 
 
     def load_data(self) -> DataDict:
+        """Download (if needed) and load MNIST training images.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'`` (shape ``(size, 784)``), ``'y'``,
+            ``'description'``, and ``'label_names'``.
+        """
         this_dir = os.path.dirname(os.path.abspath(__file__))
         download_dir = os.path.join(this_dir, '..', 'datasets')
         train_loader = torch_data.DataLoader(

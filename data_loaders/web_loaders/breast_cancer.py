@@ -14,6 +14,24 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class breast_cancer_loader(AbstractLoader):
+    """Load the Breast Cancer Wisconsin (Diagnostic) dataset.
+
+    Labels are swapped from the sklearn convention so that the minority class
+    (Malignant, 212 samples) is class 0 and the majority class (Benign,
+    357 samples) is class 1.
+
+    Dataset stats: 569 samples, 30 features (computed from digitised images).
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,

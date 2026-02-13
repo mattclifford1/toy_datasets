@@ -13,7 +13,24 @@ import data_loaders
 
 
 def _create_lazy_loader(module_path: str, class_name: str) -> Callable[..., Any]:
-    """Create a factory function that imports the loader class on first use."""
+    """Create a factory function that imports a loader class on first use.
+
+    Defers the import of heavy dependencies (e.g. torch, ucimlrepo) until the
+    dataset is actually requested.
+
+    Parameters
+    ----------
+    module_path : str
+        Dotted module path, e.g. ``'data_loaders.web_loaders.iris'``.
+    class_name : str
+        Name of the loader class inside that module.
+
+    Returns
+    -------
+    Callable
+        A zero-argument-free factory that accepts ``**kwargs`` and returns an
+        initialised loader instance.
+    """
     def loader_factory(**kwargs: Any) -> Any:
         module = importlib.import_module(module_path)
         loader_class = getattr(module, class_name)
@@ -55,6 +72,26 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
 
 
 def get_dataset(dataset_name: str, **kwargs: Any) -> data_loaders.AbstractLoader:
+    """Load and return a dataset loader by name.
+
+    Parameters
+    ----------
+    dataset_name : str
+        Name of the dataset. Must be a key in ``AVAILABLE_DATASETS``.
+    **kwargs
+        Additional keyword arguments forwarded to the loader's constructor
+        (e.g. ``train_size``, ``minority_reduce_scaler``, ``scale``).
+
+    Returns
+    -------
+    AbstractLoader
+        An initialised loader instance for the requested dataset.
+
+    Raises
+    ------
+    ValueError
+        If ``dataset_name`` is not found in ``AVAILABLE_DATASETS``.
+    """
     if dataset_name not in AVAILABLE_DATASETS.keys():
         raise ValueError(f"Dataset {dataset_name} not available. Choose from: {list(AVAILABLE_DATASETS.keys())}")
     loader_class = AVAILABLE_DATASETS[dataset_name]
@@ -109,6 +146,22 @@ def get_dataset_old(
 
 
 def test_available_datasets(_print: bool = False) -> None:
+    """Validate that every registered dataset loads successfully.
+
+    Iterates over all entries in ``AVAILABLE_DATASETS``, loads X and y, and
+    checks that both are numpy arrays with consistent shapes and at least 10
+    instances.
+
+    Parameters
+    ----------
+    _print : bool, default=False
+        If True, print the dataset name and summary info for each dataset.
+
+    Raises
+    ------
+    ValueError
+        If any dataset fails a validation check.
+    """
     infos: list[str] = []
     for dataset_name in tqdm(AVAILABLE_DATASETS.keys(), desc="Testing loading datasets"):
         if _print:

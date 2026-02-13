@@ -16,6 +16,26 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class chronic_kidney_disease_loader(AbstractLoader):
+    """Load the UCI Chronic Kidney Disease dataset.
+
+    Binary classification: predict the presence (class 0) or absence (class 1)
+    of chronic kidney disease.  Extensive preprocessing is applied: categorical
+    and high-missingness columns are dropped, binary text columns are encoded
+    as integers, and remaining missing values are filled with column means.
+
+    Dataset stats: ~400 samples, ~19 features (after preprocessing).
+    Source: https://archive.ics.uci.edu/dataset/336/chronic+kidney+disease
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.7
+        Fraction of data used for training in train/test splits.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.7,
@@ -26,6 +46,14 @@ class chronic_kidney_disease_loader(AbstractLoader):
                          **kwargs)
         
     def load_data(self) -> DataDict:
+        """Load and preprocess the Chronic Kidney Disease CSV data.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'``, ``'y'``, ``'feature_names'``,
+            ``'label_names'``, and ``'description'``.
+        """
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'chronic_kidney_disease', 'data.csv'))

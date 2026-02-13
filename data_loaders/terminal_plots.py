@@ -36,6 +36,20 @@ Mode = Literal["ascii", "iterm2", "text", "auto"]
 # --- Rasterize Matplotlib figure to a PIL image --------------------------------
 
 def _fig_to_pil(fig: Any, *, dpi: int = 150) -> Any:
+    """Render a Matplotlib figure to a PIL Image.
+
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        Figure to rasterise.
+    dpi : int, default=150
+        Output resolution in dots per inch.
+
+    Returns
+    -------
+    PIL.Image.Image
+        Rasterised figure as a PIL image.
+    """
     try:
         from PIL import Image
     except ImportError as e:
@@ -53,6 +67,22 @@ _ASCII_RAMP = " .:-=+*#%@"  # light -> dark
 
 
 def _pil_to_ascii(img: Any, *, cols: int, rows: int) -> str:
+    """Convert a PIL image to a fixed-size ASCII-art string.
+
+    Parameters
+    ----------
+    img : PIL.Image.Image
+        Source image.
+    cols : int
+        Width of the ASCII output in characters.
+    rows : int
+        Height of the ASCII output in lines.
+
+    Returns
+    -------
+    str
+        Multi-line ASCII representation of the image.
+    """
     g = img.convert("L").resize((cols, rows))
     arr = list(g.getdata())
     n = len(_ASCII_RAMP) - 1
@@ -66,6 +96,22 @@ def _pil_to_ascii(img: Any, *, cols: int, rows: int) -> str:
 # --- Text plot renderer (scatter + axes labels) --------------------------------
 
 def _linspace(start: float, end: float, count: int) -> list[float]:
+    """Return ``count`` evenly-spaced values between ``start`` and ``end``.
+
+    Parameters
+    ----------
+    start : float
+        First value in the sequence.
+    end : float
+        Last value in the sequence.
+    count : int
+        Number of values to produce.
+
+    Returns
+    -------
+    list[float]
+        Evenly-spaced values from ``start`` to ``end`` inclusive.
+    """
     if count <= 1:
         return [start]
     step = (end - start) / (count - 1)
@@ -73,6 +119,19 @@ def _linspace(start: float, end: float, count: int) -> list[float]:
 
 
 def _format_tick(value: float) -> str:
+    """Format a numeric tick value as a concise string.
+
+    Parameters
+    ----------
+    value : float
+        Axis tick value to format.
+
+    Returns
+    -------
+    str
+        Formatted string using scientific notation for very large/small values
+        and ``g`` format otherwise.
+    """
     if value == 0:
         return "0"
     abs_value = abs(value)
@@ -82,6 +141,18 @@ def _format_tick(value: float) -> str:
 
 
 def _get_suptitle(fig: Any) -> str:
+    """Extract the suptitle text from a Matplotlib figure.
+
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        Figure to inspect.
+
+    Returns
+    -------
+    str
+        Suptitle text, or an empty string if no suptitle is set.
+    """
     suptitle = getattr(fig, "_suptitle", None)
     if suptitle is None:
         return ""
@@ -90,6 +161,27 @@ def _get_suptitle(fig: Any) -> str:
 
 
 def _render_axes_text(ax: Any, *, cols: int, rows: int, figure_title: str = "") -> str:
+    """Render a Matplotlib Axes as a text-based plot string.
+
+    Draws scatter points, lines, and bar-chart rectangles using ASCII
+    characters on a character grid, with labelled axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes object to render.
+    cols : int
+        Total width of the output in characters.
+    rows : int
+        Total height of the output in lines.
+    figure_title : str, default=''
+        Optional figure-level suptitle to prepend above the plot.
+
+    Returns
+    -------
+    str
+        Multi-line text representation of the axes.
+    """
     title = ax.get_title()
     xlabel = ax.get_xlabel()
     ylabel = ax.get_ylabel()
@@ -278,6 +370,14 @@ def _render_axes_text(ax: Any, *, cols: int, rows: int, figure_title: str = "") 
 # --- iTerm2 inline image (best overall if supported) ---------------------------
 
 def _is_iterm2() -> bool:
+    """Return True if the current terminal appears to be iTerm2.
+
+    Returns
+    -------
+    bool
+        True if the ``TERM_PROGRAM`` environment variable is ``'iTerm.app'``
+        or the ``ITERM_SESSION_ID`` variable is set.
+    """
     return os.environ.get("TERM_PROGRAM") == "iTerm.app" or "ITERM_SESSION_ID" in os.environ
 
 
@@ -298,7 +398,32 @@ def _print_iterm2_inline_png(png_bytes: bytes, *, width_cols: Optional[int] = No
 # --- Public API ----------------------------------------------------------------
 
 class TerminalPlotter:
-    """Enable/disable a terminal renderer for matplotlib via a show() monkey-patch."""
+    """Enable/disable a terminal renderer for matplotlib via a show() monkey-patch.
+
+    Replaces ``plt.show()`` with a terminal-aware version that renders figures
+    as ASCII art, text scatter plots, or inline PNG (iTerm2 only).
+
+    Parameters
+    ----------
+    mode : {'auto', 'text', 'ascii', 'iterm2'}, default='auto'
+        Rendering mode. ``'auto'`` uses ``'iterm2'`` when available, otherwise
+        ``'text'``.
+    width : int or None, default=None
+        Output width in characters.  Defaults to terminal width minus
+        ``margin_cols``.
+    height : int or None, default=None
+        Output height in lines.  Defaults to terminal height minus 2.
+    clear : bool, default=True
+        If True, clear the terminal before rendering each figure.
+    close : bool, default=True
+        If True, close the Matplotlib figure after rendering.
+    dpi : int, default=150
+        Resolution used when rasterising to PNG (``'ascii'`` / ``'iterm2'``
+        modes only).
+    margin_cols : int, default=2
+        Number of columns to subtract from the terminal width when
+        auto-sizing, to prevent line wrapping.
+    """
 
     def __init__(
         self,
@@ -322,6 +447,13 @@ class TerminalPlotter:
         self._patched_show: Any = None
 
     def enable(self) -> "TerminalPlotter":
+        """Monkey-patch ``plt.show()`` to render in the terminal.
+
+        Returns
+        -------
+        TerminalPlotter
+            Returns ``self`` for use as a context manager or chained calls.
+        """
         import matplotlib.pyplot as plt
 
         if self._original_show is None:
@@ -335,6 +467,7 @@ class TerminalPlotter:
         return self
 
     def disable(self) -> None:
+        """Restore the original ``plt.show()`` function."""
         import matplotlib.pyplot as plt
 
         if self._original_show is not None:
@@ -350,6 +483,12 @@ class TerminalPlotter:
         return False
 
     def _terminal_show(self, *args: Any, **kwargs: Any) -> None:
+        """Render all open Matplotlib figures in the terminal.
+
+        Called automatically in place of ``plt.show()`` while the plotter is
+        enabled.  Iterates over all open figure numbers and renders each one
+        according to the configured ``mode``.
+        """
         import matplotlib.pyplot as plt
 
         fnums = plt.get_fignums()
@@ -436,9 +575,32 @@ def enable_terminal_show(
     dpi: int = 150,
     margin_cols: int = 2,
 ) -> TerminalPlotter:
-    """Monkey-patch `matplotlib.pyplot.show()` to render figures in the terminal.
+    """Monkey-patch ``plt.show()`` to render figures in the terminal.
 
-    Returns a TerminalPlotter instance so you can call .disable() later.
+    Convenience factory that creates and enables a :class:`TerminalPlotter`.
+    Call ``.disable()`` on the returned object to restore normal behaviour.
+
+    Parameters
+    ----------
+    mode : {'auto', 'text', 'ascii', 'iterm2'}, default='auto'
+        Rendering mode passed to :class:`TerminalPlotter`.
+    width : int or None, default=None
+        Output width in characters.
+    height : int or None, default=None
+        Output height in lines.
+    clear : bool, default=True
+        Clear the terminal before each figure.
+    close : bool, default=True
+        Close the figure after rendering.
+    dpi : int, default=150
+        Rasterisation resolution (PNG-based modes only).
+    margin_cols : int, default=2
+        Columns to reserve as right-margin padding.
+
+    Returns
+    -------
+    TerminalPlotter
+        An enabled plotter instance.
     """
     return TerminalPlotter(
         mode=mode,

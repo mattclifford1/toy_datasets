@@ -9,6 +9,14 @@ RANDOM_STATE = 42
 
 
 class normaliser:
+    """MinMax scaler fitted on training data, scaling features to [-1, 1].
+
+    Parameters
+    ----------
+    train_X : np.ndarray
+        Training feature matrix used to fit the scaler.
+    """
+
     def __init__(self, train_X: np.ndarray) -> None:
         from sklearn import preprocessing
 
@@ -16,13 +24,45 @@ class normaliser:
             feature_range=(-1,1)).fit(train_X)
 
     def __call__(self, X: np.ndarray) -> np.ndarray:
+        """Transform a feature matrix using the fitted scaler.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            Feature matrix to transform.
+
+        Returns
+        -------
+        np.ndarray
+            Scaled feature matrix with values in [-1, 1].
+        """
         return self.scaler.transform(X)
 
     def transform_instance(self, X: np.ndarray) -> np.ndarray:
+        """Transform a single feature vector using the fitted scaler.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            1D feature vector to transform.
+
+        Returns
+        -------
+        np.ndarray
+            Scaled 1D feature vector with values in [-1, 1].
+        """
         return self.scaler.transform([X])[0]
 
 
 def set_seed(seed: bool | int) -> None:
+    """Set the NumPy random seed.
+
+    Parameters
+    ----------
+    seed : bool or int
+        If True, use the default random state (42). If False, use None
+        (non-deterministic). If an int, use that value as the seed.
+    """
     if seed == True:
         np.random.seed(seed=RANDOM_STATE)
     elif isinstance(seed, int):
@@ -32,6 +72,21 @@ def set_seed(seed: bool | int) -> None:
 
 
 def shuffle_data(data: dict[str, Any], seed: bool | int = True) -> dict[str, Any]:
+    """Shuffle X and y arrays together in a data dict using sklearn.
+
+    Parameters
+    ----------
+    data : dict
+        Data dict with at least 'X' and 'y' numpy arrays.
+    seed : bool or int, default=True
+        Random seed. True uses the default state (42), False is
+        non-deterministic, int uses that value.
+
+    Returns
+    -------
+    dict
+        Data dict with 'X' and 'y' shuffled in unison.
+    """
     from sklearn.utils import shuffle
 
     if seed == True:
@@ -42,9 +97,23 @@ def shuffle_data(data: dict[str, Any], seed: bool | int = True) -> dict[str, Any
 
 
 def shuffle_dataset(data: dict[str, Any], seed: bool | int = True) -> dict[str, Any]:
-    '''
-    shuffle numpy arrays (data) in data dict
-    '''
+    """Shuffle all numpy row arrays in a data dict in unison.
+
+    All numpy arrays whose first dimension matches the number of instances
+    are shuffled with the same permutation.
+
+    Parameters
+    ----------
+    data : dict
+        Data dict containing numpy arrays to shuffle (must include 'X').
+    seed : bool or int, default=True
+        Random seed passed to ``set_seed``.
+
+    Returns
+    -------
+    dict
+        Data dict with all matching numpy arrays shuffled in unison.
+    """
     instances = data['X'].shape[0]
     # get random order
     set_seed(seed)
@@ -63,9 +132,24 @@ def stratified_subsample(
         n_samples: int,
         random_state: int = 42,
 ) -> tuple[np.ndarray, np.ndarray]:
-    '''
-    Taken from mnists_path_dataset Repo https://github.com/mattclifford1/mnist_paths_dataset/blob/main/data_utils.py
-    '''
+    """Subsample data while preserving class proportions.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Feature matrix.
+    y : np.ndarray
+        Label array.
+    n_samples : int
+        Number of samples to keep.
+    random_state : int, default=42
+        Random seed for reproducibility.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Subsampled (X, y) arrays with ``n_samples`` rows.
+    """
     from sklearn.model_selection import train_test_split
 
     X_sub, _, y_sub, _ = train_test_split(

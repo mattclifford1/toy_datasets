@@ -18,6 +18,25 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class wheat_seeds_loader(AbstractLoader):
+    """Load the UCI Wheat Seeds dataset as a binary classification problem.
+
+    The original 3-class dataset (Kama=1, Rosa=2, Canadian=3) is converted to
+    binary by combining Rosa and Canadian into class 0 and keeping Kama as
+    class 1.
+
+    Dataset stats: 210 samples, 7 geometric features of wheat kernels.
+    Source: https://archive.ics.uci.edu/ml/datasets/seeds
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.7
+        Fraction of data used for training in train/test splits.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.7,
@@ -28,15 +47,18 @@ class wheat_seeds_loader(AbstractLoader):
                          **kwargs)
         
     def load_data(self) -> DataDict:
-        '''
-        options to:
-            - we remove class 3 and make it a binary problem
-            - combine 2 classes into one
-        original classes:
-            1. Kama
-            2. Rosa
-            3. Canadian
-        '''
+        """Load and preprocess the Wheat Seeds CSV data into a binary problem.
+
+        The 3-class dataset (Kama, Rosa, Canadian) is collapsed to 2 classes
+        by combining Rosa (2) and Canadian (3) into class 0, keeping Kama (1)
+        as class 1.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'``, ``'y'``, ``'feature_names'``,
+            ``'label_names'``, and ``'description'``.
+        """
         drop_class_3 = False
         combine_classes = True
         if (drop_class_3 and combine_classes):

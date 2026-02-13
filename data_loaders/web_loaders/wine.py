@@ -14,6 +14,24 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class wine_loader(AbstractLoader):
+    """Load the Wine dataset as a binary classification problem.
+
+    The original 3-class Wine dataset (178 samples, 13 chemical features) is
+    converted to binary by keeping class 0 as-is and merging classes 1 and 2
+    into a single class 1.
+
+    Dataset stats: 178 samples, 13 features.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,

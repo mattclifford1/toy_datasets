@@ -18,6 +18,27 @@ CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class habermans_breast_cancer_loader(AbstractLoader):
+    """Load Haberman's Survival dataset.
+
+    Binary classification predicting whether a breast-cancer surgery patient
+    survived 5 or more years (class 0) or died within 5 years (class 1).
+    Study conducted 1958–1970 at the University of Chicago Billings Hospital.
+
+    Dataset stats: 306 samples, 3 features (age, year of surgery, positive nodes).
+    Source: https://archive.ics.uci.edu/dataset/43/haberman+s+survival
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.7
+        Fraction of data used for training in train/test splits.
+    minority_reduce_scaler : int or None, default=None
+        If set, reduce the minority class in the train set by this factor.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.7,
@@ -30,6 +51,14 @@ class habermans_breast_cancer_loader(AbstractLoader):
                          **kwargs)
         
     def load_data(self) -> DataDict:
+        """Load the Haberman's Survival CSV data.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'``, ``'y'``, ``'feature_names'``,
+            ``'label_names'``, and ``'description'``.
+        """
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..',
                         'datasets', 'Habermans_breast_cancer', 'data.csv'))

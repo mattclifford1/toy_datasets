@@ -7,6 +7,25 @@ from data_loaders.synthetic_generators import _generic_sklearn_loader
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 class moons_generator(AbstractLoader):
+    """Generate a synthetic two-moons (half-moons) classification dataset.
+
+    Wraps :func:`sklearn.datasets.make_moons` to produce two interleaving
+    half-circle clusters that are not linearly separable.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    num_samples : int, default=200
+        Total number of samples to generate.
+    moons_noise : float, default=0.2
+        Standard deviation of Gaussian noise added to the samples.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,

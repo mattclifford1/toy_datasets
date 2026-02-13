@@ -18,11 +18,24 @@ def _generic_sklearn_loader(
         test: bool = False,
         **kwargs: Any,
 ) -> dict[str, Any]:
-    '''
-    sample from the a sklearn synthetic dataset
-    returns:
-        - data: dict containing 'X', 'y'
-    '''
+    """Sample from a sklearn synthetic dataset generator.
+
+    Parameters
+    ----------
+    load_func : callable
+        A sklearn generator such as ``sklearn.datasets.make_moons``.
+    samples : int, default=200
+        Number of samples to generate.
+    test : bool, default=False
+        If True, offset the random seed by 1 so train and test sets differ.
+    **kwargs
+        Extra keyword arguments forwarded directly to ``load_func``.
+
+    Returns
+    -------
+    dict
+        Data dict with keys ``'X'`` and ``'y'``.
+    """
     seed = 42
     if test == True and load_func != sklearn.datasets.make_blobs:
         seed += 1

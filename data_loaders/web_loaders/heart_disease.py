@@ -12,6 +12,26 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class heart_disease_loader(AbstractLoader):
+    """Load the UCI Heart Disease dataset as a binary classification problem.
+
+    Fetches the dataset from the UCI ML repository (id=45).  Columns ``'ca'``
+    and ``'thal'`` are dropped due to high missingness.  Samples with
+    intermediate severity labels (1, 2) are removed; remaining labels 2, 3, 4
+    are merged into class 1 (heart disease present), while 0 stays as class 0
+    (no heart disease).
+
+    Dataset stats: ~297 samples (after filtering), 11 features.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,
@@ -24,6 +44,14 @@ class heart_disease_loader(AbstractLoader):
                          **kwargs)
 
     def load_data(self) -> DataDict:
+        """Fetch and preprocess the Heart Disease dataset.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'``, ``'y'``, ``'feature_names'``,
+            ``'description'``, and ``'label_names'``.
+        """
         data = {}
 
         # fetch dataset

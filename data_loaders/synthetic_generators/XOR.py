@@ -10,6 +10,23 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class XOR_generator(AbstractLoader):
+    """Generate a synthetic XOR classification dataset.
+
+    Class 0 and class 1 points are drawn from two pairs of Gaussian clusters
+    arranged in the four XOR quadrants so that the classes are not linearly
+    separable.
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    num_samples : int or list[int], default=200
+        Total number of samples (split equally between classes) or a
+        per-class list ``[n_class0, n_class1]``.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  num_samples: int | list[int] = 200,
@@ -21,11 +38,25 @@ class XOR_generator(AbstractLoader):
                          **kwargs)
 
     def load_data(self) -> DataDict:
+        """Generate the XOR dataset.
+
+        Returns
+        -------
+        DataDict
+            Dict with keys ``'X'`` (shape ``(n_samples, 2)``) and ``'y'``.
+        """
         data = self._get_XOR_single()
         return data
 
 
     def _get_XOR_single(self) -> DataDict:
+        """Build the XOR layout from two pairs of Gaussian clusters.
+
+        Returns
+        -------
+        DataDict
+            Dict with ``'X'`` and ``'y'`` for the full XOR dataset.
+        """
         if isinstance(self.num_samples, int):
             num_samples = [self.num_samples//2, self.num_samples//2]
         else:
@@ -54,6 +85,24 @@ class XOR_generator(AbstractLoader):
             num_samples: list[int] = [3, 2],
             seed: bool | int | None = None,
     ) -> DataDict:
+        """Sample two multivariate Gaussian classes.
+
+        Parameters
+        ----------
+        means : list of list[float]
+            Mean vector for each class ``[mean0, mean1]``.
+        covs : list of list[list[float]]
+            Covariance matrix for each class ``[cov0, cov1]``.
+        num_samples : list[int]
+            Number of samples per class ``[n0, n1]``.
+        seed : bool, int, or None
+            Random seed passed to :func:`set_seed`.
+
+        Returns
+        -------
+        DataDict
+            Dict with ``'X'`` and ``'y'`` arrays.
+        """
         labels = [0, 1]
         X = []
         y = []

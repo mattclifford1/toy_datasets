@@ -19,10 +19,18 @@ __all__ = [
 
 
 def get_available_dataset_list() -> list[str]:
+    """Return a list of all registered dataset names.
+
+    Returns
+    -------
+    list[str]
+        Names of all datasets in ``AVAILABLE_DATASETS``.
+    """
     return list(AVAILABLE_DATASETS.keys())
 
 
 def print_available_datasets() -> None:
+    """Print all registered dataset names to stdout."""
     print('Available datasets:')
     for key in AVAILABLE_DATASETS.keys():
         print(f' - {key}')

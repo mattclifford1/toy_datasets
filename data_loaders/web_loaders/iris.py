@@ -14,6 +14,24 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class iris_loader(AbstractLoader):
+    """Load the Iris dataset as a binary classification problem.
+
+    The original 3-class Iris dataset is converted to binary by merging
+    *Setosa* (class 0) and *Virginica* (class 2) into a single class 0,
+    leaving *Versicolor* as class 1.
+
+    Dataset stats: 150 samples, 4 features (sepal/petal length and width).
+
+    Parameters
+    ----------
+    shuffle : bool, default=True
+        Shuffle the dataset after loading.
+    train_size : float, default=0.5
+        Fraction of data used for training in train/test splits.
+    **kwargs
+        Additional keyword arguments forwarded to :class:`AbstractLoader`.
+    """
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,
