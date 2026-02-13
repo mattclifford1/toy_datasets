@@ -5,8 +5,7 @@ from data_loaders.loaders.abstract_loader import AbstractLoader
 from data_loaders.utils import Normaliser, proportional_split
 from data_loaders.resampling import (
     AbstractResampler,
-    proportional_upsample,
-    RandomDuplicateUpsampler,
+    RandomDuplicateMinorityUpsampler,
     SMOTEUpsampler,
     proportional_downsample,
     StratifiedSubsampler,
@@ -22,8 +21,7 @@ __all__ = [
     'proportional_downsample',
     'StratifiedSubsampler',
     'AbstractResampler',
-    'proportional_upsample',
-    'RandomDuplicateUpsampler',
+    'RandomDuplicateMinorityUpsampler',
     'SMOTEUpsampler',
     'DimReducer',
     'get_available_dataset_list',

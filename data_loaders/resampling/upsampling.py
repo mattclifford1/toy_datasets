@@ -8,13 +8,10 @@ from data_loaders.utils import set_seed
 from data_loaders.resampling.resampling_base import AbstractResampler
 
 
-
-
-
-class RandomDuplicateUpsampler(AbstractResampler):
+class RandomDuplicateMinorityUpsampler(AbstractResampler):
     """Upsample minority classes by duplicating samples at random.
 
-    All classes are upsampled to match the majority class count.
+    Minority class is upsampled by a given factor or 'equal' to match majority class count.
 
     Parameters
     ----------
@@ -28,13 +25,18 @@ class RandomDuplicateUpsampler(AbstractResampler):
     def __init__(
         self,
         random_state: int | bool = True,
-        sampling_strategy: str = 'auto',
+        factor: float | str = 'equal',
     ) -> None:
         self.random_state = random_state
-        self.sampling_strategy = sampling_strategy
+        self.factor = factor
+        # check factor validity
+        if isinstance(self.factor, (int, float)) and self.factor < 1:
+            raise ValueError(f"Factor must be > 1 for upsampling. Got {self.factor}.")
+        elif self.factor != 'equal' and not isinstance(self.factor, (int, float)):
+            raise ValueError(f"Invalid factor: {self.factor}, either 'equal' or float > 1 expected.")
 
     def __repr__(self) -> str:
-        return 'RandomDuplicate'
+        return f'RandomDuplicate(factor={self.factor}, seed={self.random_state})'
 
     def __call__(
         self, X: np.ndarray, y: np.ndarray
@@ -55,19 +57,23 @@ class RandomDuplicateUpsampler(AbstractResampler):
         """
         set_seed(self.random_state)
         classes, counts = np.unique(y, return_counts=True)
-        target = int(counts.max())
+        if self.factor == 'equal':
+            target_minority = int(counts.max())
+        else:
+            target_minority = int(counts.min() * self.factor)
+        
 
         X_parts = [X]
         y_parts = [y]
 
-        for cls, count in zip(classes, counts):
-            n_extra = target - count
-            if n_extra <= 0:
-                continue
-            cls_inds = np.where(y == cls)[0]
-            extra_inds = np.random.choice(cls_inds, size=n_extra, replace=True)
-            X_parts.append(X[extra_inds])
-            y_parts.append(y[extra_inds])
+        # upsample the minority classes by random duplication to the target count
+        minority_cls = classes[counts == counts.min()][0]
+        minority_count = counts.min()
+        n_extra = target_minority - minority_count
+        cls_inds = np.where(y == minority_cls)[0]
+        extra_inds = np.random.choice(cls_inds, size=n_extra, replace=True)
+        X_parts.append(X[extra_inds])
+        y_parts.append(y[extra_inds])
 
         return np.concatenate(X_parts), np.concatenate(y_parts)
 
@@ -130,90 +136,3 @@ class SMOTEUpsampler(AbstractResampler):
         smote = SMOTE(random_state=seed, k_neighbors=self.k_neighbors)
         return smote.fit_resample(X, y)
 
-
-def proportional_upsample(
-    data: dict[str, Any],
-    strategy: str = 'random',
-    seed: bool | int = True,
-    **kwargs: Any,
-) -> dict[str, Any]:
-    """Upsample data so all classes have equal representation.
-
-    Mirrors the API of :func:`proportional_downsample`. All numpy arrays in
-    *data* whose first dimension matches ``X``'s row count are resampled with
-    the same indices.
-
-    Parameters
-    ----------
-    data : dict[str, Any]
-        Data dict with at least ``'X'`` and ``'y'`` keys.
-    strategy : str, default='random'
-        Upsampling strategy: ``'random'`` (duplicate rows) or ``'smote'``
-        (synthetic samples).
-    seed : bool | int, default=True
-        Random seed passed to the chosen upsampler.
-    **kwargs : Any
-        Extra keyword arguments forwarded to the upsampler constructor.
-
-    Returns
-    -------
-    dict[str, Any]
-        Data dict with balanced ``'X'``, ``'y'``, and any co-indexed arrays.
-
-    Raises
-    ------
-    ValueError
-        If *strategy* is not ``'random'`` or ``'smote'``.
-    """
-    if strategy == 'random':
-        upsampler: AbstractResampler = RandomDuplicateUpsampler(
-            random_state=seed, **kwargs
-        )
-    elif strategy == 'smote':
-        upsampler = SMOTEUpsampler(random_state=seed, **kwargs)
-    else:
-        raise ValueError(
-            f"Unknown strategy '{strategy}'. Choose 'random' or 'smote'."
-        )
-
-    X_orig = data['X']
-    y_orig = data['y']
-    n_orig = X_orig.shape[0]
-
-    X_new, y_new = upsampler(X_orig, y_orig)
-
-    # Build index map: for each new row, which original row does it come from?
-    # Original rows are kept as-is (indices 0..n_orig-1 map to themselves).
-    # Extra rows appended per class map back to the source row in X_orig.
-    # We recover this by comparing X_new rows to X_orig rows.
-    # Simpler: replay the same selection and track indices explicitly.
-    # Re-derive the extra indices deterministically for consistent co-indexing.
-    set_seed(seed)
-    classes, counts = np.unique(y_orig, return_counts=True)
-    target = int(counts.max())
-
-    extra_src_inds: list[np.ndarray] = []
-    for cls, count in zip(classes, counts):
-        n_extra = target - count
-        if n_extra <= 0:
-            continue
-        cls_inds = np.where(y_orig == cls)[0]
-        extra_inds = np.random.choice(cls_inds, size=n_extra, replace=True)
-        extra_src_inds.append(extra_inds)
-
-    all_src_inds = np.concatenate(
-        [np.arange(n_orig)]
-        + (extra_src_inds if extra_src_inds else [np.array([], dtype=int)])
-    )
-
-    new_data = dict(data)
-    new_data['X'] = X_new
-    new_data['y'] = y_new
-
-    for key, val in data.items():
-        if key in ('X', 'y'):
-            continue
-        if isinstance(val, np.ndarray) and val.shape[0] == n_orig:
-            new_data[key] = val[all_src_inds]
-
-    return new_data

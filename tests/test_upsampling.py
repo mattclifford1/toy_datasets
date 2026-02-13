@@ -6,19 +6,18 @@ import numpy as np
 
 from data_loaders.resampling import upsampling
 from data_loaders.resampling.upsampling import (
-    RandomDuplicateUpsampler,
+    RandomDuplicateMinorityUpsampler,
     SMOTEUpsampler,
-    proportional_upsample,
 )
 
 
-class TestRandomDuplicateUpsampler:
-    """Tests for RandomDuplicateUpsampler."""
+class TestRandomDuplicateMinorityUpsampler:
+    """Tests for RandomDuplicateMinorityUpsampler."""
 
     def test_balances_classes(self, imbalanced_data):
         """Imbalanced input should produce equal class counts after resampling."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
-        up = RandomDuplicateUpsampler(random_state=42)
+        up = RandomDuplicateMinorityUpsampler(random_state=42)
         X_res, y_res = up(X, y)
 
         _, counts = np.unique(y_res, return_counts=True)
@@ -29,7 +28,7 @@ class TestRandomDuplicateUpsampler:
         X, y = imbalanced_data['X'], imbalanced_data['y']
         majority_count = int(np.bincount(y).max())
 
-        up = RandomDuplicateUpsampler(random_state=42)
+        up = RandomDuplicateMinorityUpsampler(random_state=42)
         _, y_res = up(X, y)
 
         _, counts = np.unique(y_res, return_counts=True)
@@ -38,8 +37,8 @@ class TestRandomDuplicateUpsampler:
     def test_reproducible(self, imbalanced_data):
         """Same random_state should produce identical results."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
-        up1 = RandomDuplicateUpsampler(random_state=7)
-        up2 = RandomDuplicateUpsampler(random_state=7)
+        up1 = RandomDuplicateMinorityUpsampler(random_state=7)
+        up2 = RandomDuplicateMinorityUpsampler(random_state=7)
 
         X1, y1 = up1(X, y)
         X2, y2 = up2(X, y)
@@ -50,15 +49,36 @@ class TestRandomDuplicateUpsampler:
     def test_returns_correct_types(self, imbalanced_data):
         """__call__ should return numpy arrays."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
-        up = RandomDuplicateUpsampler(random_state=42)
+        up = RandomDuplicateMinorityUpsampler(random_state=42)
         X_res, y_res = up(X, y)
 
         assert isinstance(X_res, np.ndarray)
         assert isinstance(y_res, np.ndarray)
 
     def test_repr(self):
-        """__repr__ should return 'RandomDuplicate'."""
-        assert repr(RandomDuplicateUpsampler()) == 'RandomDuplicate'
+        """__repr__ should include factor and seed info."""
+        up = RandomDuplicateMinorityUpsampler(factor='equal', random_state=True)
+        assert repr(up) == 'RandomDuplicate(factor=equal, seed=True)'
+
+    def test_factor_float(self, imbalanced_data):
+        """Float factor should upsample minority class by that multiplier."""
+        X, y = imbalanced_data['X'], imbalanced_data['y']
+        minority_count = int(np.bincount(y).min())
+        factor = 2.0
+        up = RandomDuplicateMinorityUpsampler(random_state=42, factor=factor)
+        _, y_res = up(X, y)
+        _, counts = np.unique(y_res, return_counts=True)
+        assert counts.min() == int(minority_count * factor)
+
+    def test_invalid_factor_below_one_raises(self):
+        """Factor below 1 should raise ValueError."""
+        with pytest.raises(ValueError):
+            RandomDuplicateMinorityUpsampler(factor=0.5)
+
+    def test_invalid_factor_string_raises(self):
+        """Invalid string factor should raise ValueError."""
+        with pytest.raises(ValueError):
+            RandomDuplicateMinorityUpsampler(factor='invalid')
 
 
 @pytest.mark.slow
@@ -98,43 +118,3 @@ class TestSMOTEUpsampler:
         """__repr__ should return 'SMOTE'."""
         assert repr(SMOTEUpsampler()) == 'SMOTE'
 
-
-class TestProportionalUpsample:
-    """Tests for proportional_upsample convenience function."""
-
-    def test_proportional_upsample_random_balances(self, imbalanced_data):
-        """strategy='random' should produce balanced classes in data dict."""
-        result = proportional_upsample(imbalanced_data.copy(), strategy='random', seed=42)
-
-        _, counts = np.unique(result['y'], return_counts=True)
-        assert counts.min() == counts.max()
-
-    @pytest.mark.slow
-    def test_proportional_upsample_smote_balances(self, imbalanced_data):
-        """strategy='smote' should produce balanced classes in data dict."""
-        result = proportional_upsample(imbalanced_data.copy(), strategy='smote', seed=42)
-
-        _, counts = np.unique(result['y'], return_counts=True)
-        assert counts.min() == counts.max()
-
-    def test_invalid_strategy_raises(self, imbalanced_data):
-        """Unknown strategy should raise ValueError."""
-        with pytest.raises(ValueError, match="Unknown strategy"):
-            proportional_upsample(imbalanced_data.copy(), strategy='bogus')
-
-    def test_other_arrays_resampled(self, imbalanced_data):
-        """Extra arrays with the same row count should also be resampled."""
-        data = dict(imbalanced_data)
-        data['weights'] = np.ones(data['X'].shape[0])
-
-        result = proportional_upsample(data.copy(), strategy='random', seed=42)
-
-        assert result['weights'].shape[0] == result['X'].shape[0]
-
-    def test_reproducible_with_seed(self, imbalanced_data):
-        """Same seed should yield identical results."""
-        r1 = proportional_upsample(imbalanced_data.copy(), strategy='random', seed=99)
-        r2 = proportional_upsample(imbalanced_data.copy(), strategy='random', seed=99)
-
-        np.testing.assert_array_equal(r1['X'], r2['X'])
-        np.testing.assert_array_equal(r1['y'], r2['y'])
