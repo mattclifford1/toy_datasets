@@ -188,10 +188,11 @@ toy_datasets/
 │   ├── utils.py             # Normalization, splitting utilities
 │   ├── embeddings.py        # PCA, UMAP, t-SNE
 │   ├── terminal_plots.py    # Terminal rendering
-│   ├── synthetic_generators/  # XOR, Moons, Blobs, etc.
-│   ├── web_loaders/           # Iris, Wine, MNIST, etc.
-│   ├── local_loaders/         # CSV-based datasets
-│   └── external_loaders/      # MIMIC (requires access)
+│   ├── loaders/
+│   │   ├── synthetic_generators/  # XOR, Moons, Blobs, etc.
+│   │   ├── web_loaders/           # Iris, Wine, MNIST, etc.
+│   │   ├── local_loaders/         # CSV-based datasets
+│   │   └── external_loaders/      # MIMIC (requires access)
 ├── data/                    # Local CSV datasets
 ├── tests/                   # pytest test suite
 └── pyproject.toml           # PDM configuration

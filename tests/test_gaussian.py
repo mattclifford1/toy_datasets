@@ -3,7 +3,7 @@ Tests for data_loaders/synthetic_generators/gaussian.py
 """
 import pytest
 import numpy as np
-from data_loaders.synthetic_generators.gaussian import GaussianGenerator
+from data_loaders.loaders.synthetic_generators.gaussian import GaussianGenerator
 
 
 class TestGaussianBasics:

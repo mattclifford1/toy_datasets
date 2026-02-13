@@ -18,10 +18,10 @@ Config in `pyproject.toml` with `distribution = false` (application mode, not li
 
 - `data_loaders/main.py` - Central registry (`AVAILABLE_DATASETS`) and `get_dataset(name)` entry point
 - `data_loaders/abstract_loader.py` - Base `AbstractLoader` class all loaders inherit from
-- `data_loaders/synthetic_generators/` - XOR, Moons, Blobs, Circles, Gaussian, Madelon
-- `data_loaders/web_loaders/` - Iris, Wine, MNIST, Heart Disease, Breast Cancer (from sklearn/online)
-- `data_loaders/local_loaders/` - Breast cancer variants, diabetes, banknote, wheat seeds (from local CSV files in `data/`)
-- `data_loaders/external_loaders/` - MIMIC-III/IV medical datasets (require special access)
+- `data_loaders/loaders/synthetic_generators/` - XOR, Moons, Blobs, Circles, Gaussian, Madelon
+- `data_loaders/loaders/web_loaders/` - Iris, Wine, MNIST, Heart Disease, Breast Cancer (from sklearn/online)
+- `data_loaders/loaders/local_loaders/` - Breast cancer variants, diabetes, banknote, wheat seeds (from local CSV files in `data/`)
+- `data_loaders/loaders/external_loaders/` - MIMIC-III/IV medical datasets (require special access)
 - `data_loaders/utils.py` - Normalization, shuffling, train/test splitting, downsampling
 - `data_loaders/embeddings.py` - PCA, UMAP, t-SNE dimensionality reduction
 - `data_loaders/terminal_plots.py` - Terminal-based matplotlib rendering
@@ -46,9 +46,9 @@ Each `__init__.py` defines `__all__` to explicitly export the public API.
 - `get_available_dataset_list()`, `print_available_datasets()` - Helpers
 
 **Submodules:**
-- `data_loaders.synthetic_generators` - All generator classes
-- `data_loaders.web_loaders` - All web-based loader classes
-- `data_loaders.local_loaders` - All CSV-based loader classes
+- `data_loaders.loaders.synthetic_generators` - All generator classes
+- `data_loaders.loaders.web_loaders` - All web-based loader classes
+- `data_loaders.loaders.local_loaders` - All CSV-based loader classes
 
 ## Available Datasets (~25)
 
