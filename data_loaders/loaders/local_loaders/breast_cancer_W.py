@@ -12,7 +12,7 @@ from typing import Any
 
 import pandas as pd
 import numpy as np
-from data_loaders.abstract_loader import AbstractLoader, DataDict
+from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 

@@ -8,7 +8,7 @@ from tqdm import tqdm
 from torchvision import transforms
 from torchvision import datasets
 from torch.utils import data as torch_data
-from data_loaders.abstract_loader import AbstractLoader, DataDict
+from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class MnistLoader(AbstractLoader):

@@ -6,7 +6,7 @@ import numpy as np
 import sklearn.utils
 from data_loaders import utils
 from data_loaders.utils import set_seed
-from data_loaders.abstract_loader import AbstractLoader, DataDict
+from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class XORGenerator(AbstractLoader):

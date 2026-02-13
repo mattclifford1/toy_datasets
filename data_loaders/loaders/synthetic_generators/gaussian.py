@@ -8,7 +8,7 @@ from typing import Any
 
 import numpy as np
 from data_loaders.utils import set_seed
-from data_loaders.abstract_loader import AbstractLoader, DataDict
+from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
 class GaussianGenerator(AbstractLoader):

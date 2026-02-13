@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 from sklearn.datasets import load_wine
 from data_loaders import utils
-from data_loaders.abstract_loader import AbstractLoader, DataDict
+from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
 

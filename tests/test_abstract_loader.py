@@ -3,7 +3,7 @@ Tests for data_loaders/abstract_loader.py
 """
 import pytest
 import numpy as np
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.loaders.abstract_loader import AbstractLoader
 
 
 class InvalidLoader(AbstractLoader):

@@ -4,7 +4,7 @@ from typing import Any
 
 import sklearn.datasets
 from data_loaders.loaders.synthetic_generators import _generic_sklearn_loader
-from data_loaders.abstract_loader import AbstractLoader, DataDict
+from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 class MoonsGenerator(AbstractLoader):
     """Generate a synthetic two-moons (half-moons) classification dataset.

@@ -3,7 +3,7 @@ Shared pytest fixtures for toy_datasets tests.
 """
 import pytest
 import numpy as np
-from data_loaders.abstract_loader import AbstractLoader
+from data_loaders.loaders.abstract_loader import AbstractLoader
 
 
 class MockLoader(AbstractLoader):
