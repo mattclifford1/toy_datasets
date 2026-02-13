@@ -17,7 +17,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class habermans_breast_cancer_loader(AbstractLoader):
+class HabermansBreastCancerLoader(AbstractLoader):
     """Load Haberman's Survival dataset.
 
     Binary classification predicting whether a breast-cancer surgery patient
@@ -75,7 +75,7 @@ class habermans_breast_cancer_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = habermans_breast_cancer_loader()
+    loader = HabermansBreastCancerLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     loader.plot_train_test_split()

@@ -15,7 +15,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class chronic_kidney_disease_loader(AbstractLoader):
+class ChronicKidneyDiseaseLoader(AbstractLoader):
     """Load the UCI Chronic Kidney Disease dataset.
 
     Binary classification: predict the presence (class 0) or absence (class 1)
@@ -172,7 +172,7 @@ class chronic_kidney_disease_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = chronic_kidney_disease_loader()
+    loader = ChronicKidneyDiseaseLoader()
     print(loader.get_info(long=True))
     loader.plot_dataset()
     # loader.plot_train_test_split()

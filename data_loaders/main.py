@@ -40,34 +40,34 @@ def _create_lazy_loader(module_path: str, class_name: str) -> Callable[..., Any]
 
 AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     # Synthetic datasets
-    'XOR': _create_lazy_loader('data_loaders.synthetic_generators.XOR', 'XOR_generator'),
-    'Moons': _create_lazy_loader('data_loaders.synthetic_generators.moons', 'moons_generator'),
-    'Blobs': _create_lazy_loader('data_loaders.synthetic_generators.blobs', 'blobs_generator'),
-    'Circles': _create_lazy_loader('data_loaders.synthetic_generators.circles', 'circles_generator'),
-    'Sklearn Normal': _create_lazy_loader('data_loaders.synthetic_generators.classification', 'sklearn_normal_generator'),
-    'Gaussian': _create_lazy_loader('data_loaders.synthetic_generators.gaussian', 'gaussian_generator'),
+    'XOR': _create_lazy_loader('data_loaders.synthetic_generators.XOR', 'XORGenerator'),
+    'Moons': _create_lazy_loader('data_loaders.synthetic_generators.moons', 'MoonsGenerator'),
+    'Blobs': _create_lazy_loader('data_loaders.synthetic_generators.blobs', 'BlobsGenerator'),
+    'Circles': _create_lazy_loader('data_loaders.synthetic_generators.circles', 'CirclesGenerator'),
+    'Sklearn Normal': _create_lazy_loader('data_loaders.synthetic_generators.classification', 'SklearnNormalGenerator'),
+    'Gaussian': _create_lazy_loader('data_loaders.synthetic_generators.gaussian', 'GaussianGenerator'),
 
     # Toy datasets from sklearn
-    'Iris': _create_lazy_loader('data_loaders.web_loaders.iris', 'iris_loader'),
-    'Wine': _create_lazy_loader('data_loaders.web_loaders.wine', 'wine_loader'),
-    'Breast Cancer': _create_lazy_loader('data_loaders.web_loaders.breast_cancer', 'breast_cancer_loader'),
+    'Iris': _create_lazy_loader('data_loaders.web_loaders.iris', 'IrisLoader'),
+    'Wine': _create_lazy_loader('data_loaders.web_loaders.wine', 'WineLoader'),
+    'Breast Cancer': _create_lazy_loader('data_loaders.web_loaders.breast_cancer', 'BreastCancerLoader'),
 
     # Real datasets
-    'Abalone Gender': _create_lazy_loader('data_loaders.local_loaders.abalone_gender', 'abalone_gender_loader'),
-    'Banknote Authentication': _create_lazy_loader('data_loaders.local_loaders.banknote', 'banknote_loader'),
-    'Breast Cancer Wisconsin': _create_lazy_loader('data_loaders.local_loaders.breast_cancer_W', 'breast_cancer_W_loader'),
-    'Chronic Kidney Disease': _create_lazy_loader('data_loaders.local_loaders.chronic_kidney_disease', 'chronic_kidney_disease_loader'),
-    'Costcla Credit Scoring Kaggle 2011': _create_lazy_loader('data_loaders.local_loaders.costcla', 'costcla_CreditScoring_Kaggle2011_loader'),
-    'Costcla Credit Scoring PAKDD 2009': _create_lazy_loader('data_loaders.local_loaders.costcla', 'costcla_CreditScoring_PAKDD2009_loader'),
-    'Costcla Direct Marketing': _create_lazy_loader('data_loaders.local_loaders.costcla', 'costcla_DirectMarketing_loader'),
-    'Diabetes Pima Indian': _create_lazy_loader('data_loaders.local_loaders.diabetes', 'diabetes_pima_indians_loader'),
-    'Habermans Breast Cancer': _create_lazy_loader('data_loaders.local_loaders.Habermans_breast_cancer', 'habermans_breast_cancer_loader'),
-    'Heart Disease': _create_lazy_loader('data_loaders.web_loaders.heart_disease', 'heart_disease_loader'),
-    'Hepatitis': _create_lazy_loader('data_loaders.local_loaders.hepititus', 'hepatitis_loader'),
-    'Ionosphere': _create_lazy_loader('data_loaders.local_loaders.ionosphere', 'ionosphere_loader'),
-    'MNIST': _create_lazy_loader('data_loaders.web_loaders.mnist', 'mnist_loader'),
-    'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.local_loaders.sonar_rocks', 'sonar_rocks_loader'),
-    'Wheat Seeds': _create_lazy_loader('data_loaders.local_loaders.wheat_seeds', 'wheat_seeds_loader'),
+    'Abalone Gender': _create_lazy_loader('data_loaders.local_loaders.abalone_gender', 'AbaloneGenderLoader'),
+    'Banknote Authentication': _create_lazy_loader('data_loaders.local_loaders.banknote', 'BanknoteLoader'),
+    'Breast Cancer Wisconsin': _create_lazy_loader('data_loaders.local_loaders.breast_cancer_W', 'BreastCancerWLoader'),
+    'Chronic Kidney Disease': _create_lazy_loader('data_loaders.local_loaders.chronic_kidney_disease', 'ChronicKidneyDiseaseLoader'),
+    'Costcla Credit Scoring Kaggle 2011': _create_lazy_loader('data_loaders.local_loaders.costcla', 'CostclaCreditScoringKaggle2011Loader'),
+    'Costcla Credit Scoring PAKDD 2009': _create_lazy_loader('data_loaders.local_loaders.costcla', 'CostclaCreditScoringPAKDD2009Loader'),
+    'Costcla Direct Marketing': _create_lazy_loader('data_loaders.local_loaders.costcla', 'CostclaDirectMarketingLoader'),
+    'Diabetes Pima Indian': _create_lazy_loader('data_loaders.local_loaders.diabetes', 'DiabetesPimaIndiansLoader'),
+    'Habermans Breast Cancer': _create_lazy_loader('data_loaders.local_loaders.Habermans_breast_cancer', 'HabermansBreastCancerLoader'),
+    'Heart Disease': _create_lazy_loader('data_loaders.web_loaders.heart_disease', 'HeartDiseaseLoader'),
+    'Hepatitis': _create_lazy_loader('data_loaders.local_loaders.hepititus', 'HepatitisLoader'),
+    'Ionosphere': _create_lazy_loader('data_loaders.local_loaders.ionosphere', 'IonosphereLoader'),
+    'MNIST': _create_lazy_loader('data_loaders.web_loaders.mnist', 'MnistLoader'),
+    'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.local_loaders.sonar_rocks', 'SonarRocksLoader'),
+    'Wheat Seeds': _create_lazy_loader('data_loaders.local_loaders.wheat_seeds', 'WheatSeedsLoader'),
     }
 
 
@@ -121,7 +121,7 @@ def get_dataset_old(
         data_set = {'data': train_data, 'data_test': test_data}
 
     # scale
-    scaler = utils.normaliser(data_set['data'])
+    scaler = utils.Normaliser(data_set['data'])
     if scale == True:
         data_set['data'] = scaler(data_set['data'])
         data_set['data_test'] = scaler(data_set['data_test'])

@@ -14,7 +14,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class banknote_loader(AbstractLoader):
+class BanknoteLoader(AbstractLoader):
     """Load the UCI Banknote Authentication dataset.
 
     Binary classification: distinguish authentic (class 0) from counterfeit
@@ -69,7 +69,7 @@ class banknote_loader(AbstractLoader):
     
     
 if __name__ == "__main__":
-    loader = banknote_loader()
+    loader = BanknoteLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     # loader.plot_train_test_split()

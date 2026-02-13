@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 
 
-class dim_reducer:
+class DimReducer:
     """Dimensionality reduction wrapper fitted on training data.
 
     Fits a reduction model on ``X_train`` and exposes a ``transform`` method
@@ -34,7 +34,7 @@ class dim_reducer:
         self.num_dims = num_dims
         if X_train.shape[1] > self.num_dims:
             if reducer == 'TSNE':
-                self.reducer_model: Any = TNSE_dim_reducer(X_train)
+                self.reducer_model: Any = TSNEDimReducer(X_train)
             elif reducer == 'PCA':
                 from sklearn.decomposition import PCA
                 self.reducer_model = PCA(n_components=num_dims, svd_solver='full').fit(X_train)
@@ -76,7 +76,7 @@ class dim_reducer:
         return self.reducer_model.transform(X)
 
 
-class TNSE_dim_reducer:
+class TSNEDimReducer:
     """t-SNE dimensionality reducer using the openTSNE library.
 
     Fits a t-SNE embedding on ``X_train`` and stores the fitted embedding so

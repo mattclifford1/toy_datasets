@@ -6,7 +6,7 @@ import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
-class sklearn_normal_generator(AbstractLoader):
+class SklearnNormalGenerator(AbstractLoader):
     """Generate a synthetic classification dataset via sklearn's make_classification.
 
     Wraps :func:`sklearn.datasets.make_classification` to produce a
@@ -55,6 +55,6 @@ class sklearn_normal_generator(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = sklearn_normal_generator()
+    loader = SklearnNormalGenerator()
     # loader.plot_dataset()
     loader.plot_train_test_split()

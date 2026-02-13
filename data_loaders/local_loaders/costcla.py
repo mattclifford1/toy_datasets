@@ -15,7 +15,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class costcla_CreditScoring_Kaggle2011_loader(AbstractLoader):
+class CostclaCreditScoringKaggle2011Loader(AbstractLoader):
     """Load the Kaggle 2011 Credit Scoring dataset (costcla format).
 
     Binary credit default classification with an associated cost matrix.
@@ -61,7 +61,7 @@ class costcla_CreditScoring_Kaggle2011_loader(AbstractLoader):
         return _get_costcla_dataset('CreditScoring_Kaggle2011_costcla')
 
 
-class costcla_CreditScoring_PAKDD2009_loader(AbstractLoader):
+class CostclaCreditScoringPAKDD2009Loader(AbstractLoader):
     """Load the PAKDD 2009 Credit Scoring dataset (costcla format).
 
     Binary credit default classification with an associated cost matrix.
@@ -107,7 +107,7 @@ class costcla_CreditScoring_PAKDD2009_loader(AbstractLoader):
         return _get_costcla_dataset('CreditScoring_PAKDD2009_costcla')
 
 
-class costcla_DirectMarketing_loader(AbstractLoader):
+class CostclaDirectMarketingLoader(AbstractLoader):
     """Load the Direct Marketing dataset (costcla format).
 
     Binary classification predicting response to a direct marketing campaign,
@@ -197,6 +197,6 @@ def _get_costcla_dataset(dataset: str = "CreditScoring_Kaggle2011_costcla", norm
 
 
 if __name__ == '__main__':
-    loader = costcla_CreditScoring_Kaggle2011_loader()
+    loader = CostclaCreditScoringKaggle2011Loader()
     # loader.plot_dataset()
     loader.plot_train_test_split()

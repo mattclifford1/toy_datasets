@@ -13,7 +13,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 
-class iris_loader(AbstractLoader):
+class IrisLoader(AbstractLoader):
     """Load the Iris dataset as a binary classification problem.
 
     The original 3-class Iris dataset is converted to binary by merging
@@ -92,6 +92,6 @@ class iris_loader(AbstractLoader):
         
 
 if __name__ == "__main__":
-    loader = iris_loader()
+    loader = IrisLoader()
     print(loader)
     # loader.plot_train_test_split()

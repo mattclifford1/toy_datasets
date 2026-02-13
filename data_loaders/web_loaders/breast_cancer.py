@@ -13,7 +13,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 
-class breast_cancer_loader(AbstractLoader):
+class BreastCancerLoader(AbstractLoader):
     """Load the Breast Cancer Wisconsin (Diagnostic) dataset.
 
     Labels are swapped from the sklearn convention so that the minority class
@@ -84,7 +84,7 @@ class breast_cancer_loader(AbstractLoader):
         
 
 if __name__ == "__main__":
-    loader = breast_cancer_loader()
+    loader = BreastCancerLoader()
     # loader.plot_dataset()
     print(loader)
     # loader.plot_train_test_split()

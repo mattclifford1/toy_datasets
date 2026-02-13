@@ -3,7 +3,7 @@ Tests for data_loaders/embeddings.py
 """
 import pytest
 import numpy as np
-from data_loaders.embeddings import dim_reducer
+from data_loaders.embeddings import DimReducer
 
 
 class TestDimReducerPCA:
@@ -12,7 +12,7 @@ class TestDimReducerPCA:
     def test_pca_reduces_dimensions(self):
         """PCA should reduce to specified dimensions."""
         X_train = np.random.randn(100, 10)
-        reducer = dim_reducer(X_train, reducer='PCA', num_dims=2)
+        reducer = DimReducer(X_train, reducer='PCA', num_dims=2)
 
         X_reduced = reducer.transform(X_train)
 
@@ -23,7 +23,7 @@ class TestDimReducerPCA:
         X_train = np.random.randn(100, 10)
         X_test = np.random.randn(20, 10)
 
-        reducer = dim_reducer(X_train, reducer='PCA', num_dims=3)
+        reducer = DimReducer(X_train, reducer='PCA', num_dims=3)
 
         X_train_reduced = reducer.transform(X_train)
         X_test_reduced = reducer.transform(X_test)
@@ -34,7 +34,7 @@ class TestDimReducerPCA:
     def test_pca_feature_names(self):
         """PCA should generate appropriate feature names."""
         X_train = np.random.randn(50, 5)
-        reducer = dim_reducer(X_train, reducer='PCA', num_dims=2)
+        reducer = DimReducer(X_train, reducer='PCA', num_dims=2)
 
         assert reducer.feature_names == ['PCA 1', 'PCA 2']
 
@@ -45,7 +45,7 @@ class TestDimReducerKernelPCA:
     def test_kernel_pca_reduces_dimensions(self):
         """Kernel PCA should reduce to specified dimensions."""
         X_train = np.random.randn(100, 10)
-        reducer = dim_reducer(X_train, reducer='kernelPCA', num_dims=2)
+        reducer = DimReducer(X_train, reducer='kernelPCA', num_dims=2)
 
         X_reduced = reducer.transform(X_train)
 
@@ -59,7 +59,7 @@ class TestDimReducerUMAP:
         """UMAP should reduce to specified dimensions."""
         np.random.seed(42)
         X_train = np.random.randn(100, 10)
-        reducer = dim_reducer(X_train, reducer='UMAP', num_dims=2)
+        reducer = DimReducer(X_train, reducer='UMAP', num_dims=2)
 
         X_reduced = reducer.transform(X_train)
 
@@ -71,7 +71,7 @@ class TestDimReducerUMAP:
         X_train = np.random.randn(100, 10)
         y_train = np.array([0]*50 + [1]*50)
 
-        reducer = dim_reducer(
+        reducer = DimReducer(
             X_train, y_train=y_train, reducer='UMAP_supervised', num_dims=2
         )
 
@@ -87,7 +87,7 @@ class TestDimReducerTSNE:
         """t-SNE should reduce to 2 dimensions."""
         np.random.seed(42)
         X_train = np.random.randn(50, 10)
-        reducer = dim_reducer(X_train, reducer='TSNE', num_dims=2)
+        reducer = DimReducer(X_train, reducer='TSNE', num_dims=2)
 
         X_reduced = reducer.transform(X_train)
 
@@ -95,12 +95,12 @@ class TestDimReducerTSNE:
 
 
 class TestDimReducerLowDimInput:
-    """Tests for dim_reducer with already low-dimensional input."""
+    """Tests for DimReducer with already low-dimensional input."""
 
     def test_low_dim_input_no_reduction(self):
         """Data already at target dims should not be reduced."""
         X_train = np.random.randn(50, 2)
-        reducer = dim_reducer(X_train, reducer='PCA', num_dims=2)
+        reducer = DimReducer(X_train, reducer='PCA', num_dims=2)
 
         X_transformed = reducer.transform(X_train)
 
@@ -111,32 +111,32 @@ class TestDimReducerLowDimInput:
     def test_low_dim_input_feature_names(self):
         """Low-dim input should have 'Feature' names."""
         X_train = np.random.randn(50, 2)
-        reducer = dim_reducer(X_train, reducer='PCA', num_dims=2)
+        reducer = DimReducer(X_train, reducer='PCA', num_dims=2)
 
         assert reducer.feature_names == ['Feature 1', 'Feature 2']
 
 
 class TestDimReducerInvalid:
-    """Tests for invalid dim_reducer inputs."""
+    """Tests for invalid DimReducer inputs."""
 
     def test_unknown_reducer_raises(self):
         """Unknown reducer type should raise ValueError."""
         X_train = np.random.randn(50, 10)
 
         with pytest.raises(ValueError, match="Unknown reducer type"):
-            dim_reducer(X_train, reducer='InvalidReducer', num_dims=2)
+            DimReducer(X_train, reducer='InvalidReducer', num_dims=2)
 
 
 class TestDimReducerReproducibility:
-    """Tests for dim_reducer reproducibility."""
+    """Tests for DimReducer reproducibility."""
 
     def test_pca_reproducible(self):
         """PCA should give same results for same input."""
         np.random.seed(42)
         X_train = np.random.randn(50, 10)
 
-        reducer1 = dim_reducer(X_train, reducer='PCA', num_dims=2)
-        reducer2 = dim_reducer(X_train, reducer='PCA', num_dims=2)
+        reducer1 = DimReducer(X_train, reducer='PCA', num_dims=2)
+        reducer2 = DimReducer(X_train, reducer='PCA', num_dims=2)
 
         X1 = reducer1.transform(X_train)
         X2 = reducer2.transform(X_train)

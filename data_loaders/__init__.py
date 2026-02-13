@@ -2,26 +2,26 @@ from __future__ import annotations
 
 from data_loaders.main import AVAILABLE_DATASETS, get_dataset
 from data_loaders.abstract_loader import AbstractLoader
-from data_loaders.utils import normaliser, proportional_split
+from data_loaders.utils import Normaliser, proportional_split
 from data_loaders.downsampling import proportional_downsample
 from data_loaders.upsampling import (
     proportional_upsample,
     RandomDuplicateUpsampler,
     SMOTEUpsampler,
 )
-from data_loaders.embeddings import dim_reducer
+from data_loaders.embeddings import DimReducer
 
 __all__ = [
     'get_dataset',
     'AVAILABLE_DATASETS',
     'AbstractLoader',
-    'normaliser',
+    'Normaliser',
     'proportional_split',
     'proportional_downsample',
     'proportional_upsample',
     'RandomDuplicateUpsampler',
     'SMOTEUpsampler',
-    'dim_reducer',
+    'DimReducer',
     'get_available_dataset_list',
     'print_available_datasets',
 ]

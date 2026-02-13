@@ -7,39 +7,39 @@ from data_loaders import utils
 
 
 class TestNormaliser:
-    """Tests for the normaliser class."""
+    """Tests for the Normaliser class."""
 
-    def test_normaliser_output_range(self):
+    def test_Normaliser_output_range(self):
         """Normaliser should scale data to [-1, 1] range."""
         X = np.array([[0, 100], [50, 200], [100, 300]])
-        norm = utils.normaliser(X)
+        norm = utils.Normaliser(X)
         X_scaled = norm(X)
 
         assert X_scaled.min() >= -1.0
         assert X_scaled.max() <= 1.0
 
-    def test_normaliser_preserves_shape(self):
+    def test_Normaliser_preserves_shape(self):
         """Normaliser should preserve array shape."""
         X = np.random.randn(50, 10)
-        norm = utils.normaliser(X)
+        norm = utils.Normaliser(X)
         X_scaled = norm(X)
 
         assert X_scaled.shape == X.shape
 
-    def test_normaliser_transform_instance(self):
+    def test_Normaliser_transform_instance(self):
         """transform_instance should work on single rows."""
         X = np.array([[0, 0], [10, 10]])
-        norm = utils.normaliser(X)
+        norm = utils.Normaliser(X)
         instance = np.array([5, 5])
         result = norm.transform_instance(instance)
 
         assert result.shape == (2,)
         np.testing.assert_array_almost_equal(result, [0.0, 0.0])
 
-    def test_normaliser_consistent_scaling(self):
+    def test_Normaliser_consistent_scaling(self):
         """Same data should produce same scaled values."""
         X = np.random.randn(100, 5)
-        norm = utils.normaliser(X)
+        norm = utils.Normaliser(X)
 
         X_scaled1 = norm(X)
         X_scaled2 = norm(X)

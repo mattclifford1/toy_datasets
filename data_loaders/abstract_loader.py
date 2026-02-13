@@ -155,9 +155,9 @@ class AbstractLoader(ABC):
 
         # reduce dims
         if self.dim_reducer is not None:
-            from data_loaders.embeddings import dim_reducer
+            from data_loaders.embeddings import DimReducer
 
-            reducer = dim_reducer(
+            reducer = DimReducer(
                 X_train=train_data['X'],
                 y_train=train_data['y'],
                 reducer=self.dim_reducer,
@@ -169,7 +169,7 @@ class AbstractLoader(ABC):
         # scale if needed
         if self.scale:
             # only fit the scaler on the train data
-            normaliser = utils.normaliser(train_data['X'])
+            normaliser = utils.Normaliser(train_data['X'])
             train_data['X'] = normaliser(train_data['X'])
             test_data['X'] = normaliser(test_data['X'])
 
@@ -435,7 +435,7 @@ class AbstractLoader(ABC):
         return self.get_info()
 
 
-class example_dataset(AbstractLoader):
+class ExampleDataset(AbstractLoader):
     """Minimal example loader demonstrating how to subclass AbstractLoader.
 
     Generates a small hard-coded 3-feature, 2-class dataset for testing and
@@ -475,7 +475,7 @@ class example_dataset(AbstractLoader):
 
 if __name__ == "__main__":
     # show example dataset how to construct and test the features
-    loader = example_dataset(scale=True,
+    loader = ExampleDataset(scale=True,
                              dim_reducer='PCA',
                              reduce_to_dim=2)
     print(loader)

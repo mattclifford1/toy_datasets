@@ -15,7 +15,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class abalone_gender_loader(AbstractLoader):
+class AbaloneGenderLoader(AbstractLoader):
     """Load the UCI Abalone gender dataset.
 
     Binary classification: predict whether an abalone is Male (class 0) or
@@ -82,6 +82,6 @@ class abalone_gender_loader(AbstractLoader):
     
 
 if __name__ == "__main__":
-    loader = abalone_gender_loader()
+    loader = AbaloneGenderLoader()
     # loader.plot_dataset()
     loader.plot_train_test_split()

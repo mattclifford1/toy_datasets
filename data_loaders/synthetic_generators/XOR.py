@@ -9,7 +9,7 @@ from data_loaders.utils import set_seed
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
-class XOR_generator(AbstractLoader):
+class XORGenerator(AbstractLoader):
     """Generate a synthetic XOR classification dataset.
 
     Class 0 and class 1 points are drawn from two pairs of Gaussian clusters
@@ -117,7 +117,7 @@ class XOR_generator(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = XOR_generator(
+    loader = XORGenerator(
         num_samples=500,
         train_size=0.5,
         minority_reduce_scaler=10,

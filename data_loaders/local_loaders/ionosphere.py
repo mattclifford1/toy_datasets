@@ -17,7 +17,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class ionosphere_loader(AbstractLoader):
+class IonosphereLoader(AbstractLoader):
     """Load the UCI Ionosphere radar dataset.
 
     Binary classification: distinguish 'good' radar returns (complex structure
@@ -74,7 +74,7 @@ class ionosphere_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = ionosphere_loader()
+    loader = IonosphereLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     # loader.plot_train_test_split()

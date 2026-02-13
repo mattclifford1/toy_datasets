@@ -11,7 +11,7 @@ from data_loaders.utils import set_seed
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
-class gaussian_generator(AbstractLoader):
+class GaussianGenerator(AbstractLoader):
     """
     Generate 2-class multivariate Gaussian data for binary classification.
 
@@ -56,20 +56,20 @@ class gaussian_generator(AbstractLoader):
     Examples
     --------
     # Simple 2-class with spherical covariance
-    >>> loader = gaussian_generator(num_samples=400, class_separation=3.0)
+    >>> loader = GaussianGenerator(num_samples=400, class_separation=3.0)
 
     # Different scales per class
-    >>> loader = gaussian_generator(cov_type='diagonal', cov_scale=[1.0, 2.0])
+    >>> loader = GaussianGenerator(cov_type='diagonal', cov_scale=[1.0, 2.0])
 
     # Custom means with correlated features
-    >>> loader = gaussian_generator(
+    >>> loader = GaussianGenerator(
     ...     means=[[0, 0], [5, 0]],
     ...     cov_type='symmetric',
     ...     cov_correlation=0.7
     ... )
 
     # Fully custom specification
-    >>> loader = gaussian_generator(
+    >>> loader = GaussianGenerator(
     ...     means=[[0, 0], [3, 3]],
     ...     covs=[[[1, 0.5], [0.5, 1]], [[2, -0.3], [-0.3, 1]]]
     ... )
@@ -259,13 +259,13 @@ class gaussian_generator(AbstractLoader):
 if __name__ == "__main__":
     # Example: 2-class spherical
     print("2-class spherical:")
-    loader = gaussian_generator(num_samples=400, class_separation=4.0)
+    loader = GaussianGenerator(num_samples=400, class_separation=4.0)
     print(loader.get_info(long=False))
     loader.plot_dataset(terminal_plot=True)
 
     # Example: Different scales per class
     print("\nDifferent scales per class:")
-    loader = gaussian_generator(
+    loader = GaussianGenerator(
         cov_type='diagonal',
         cov_scale=[0.5, 2.0],
         class_separation=6.0
@@ -275,7 +275,7 @@ if __name__ == "__main__":
 
     # Example: Custom means with symmetric covariance
     print("\nSymmetric covariance with correlation:")
-    loader = gaussian_generator(
+    loader = GaussianGenerator(
         means=[[0, 0], [4, 4]],
         cov_type='symmetric',
         cov_correlation=0.8

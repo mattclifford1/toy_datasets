@@ -28,7 +28,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class sonar_rocks_loader(AbstractLoader):
+class SonarRocksLoader(AbstractLoader):
     """Load the UCI Sonar Rocks vs Mines dataset.
 
     Binary classification: distinguish rocks (class 0) from metal-cylinder
@@ -81,7 +81,7 @@ class sonar_rocks_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = sonar_rocks_loader()
+    loader = SonarRocksLoader()
     print(loader)
     loader.plot_dataset()
     # loader.plot_train_test_split()

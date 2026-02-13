@@ -17,7 +17,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class breast_cancer_W_loader(AbstractLoader):
+class BreastCancerWLoader(AbstractLoader):
     """Load the Wisconsin Breast Cancer (Diagnostic) dataset from a local CSV.
 
     Binary classification: Benign (class 0) vs. Malignant (class 1) based on
@@ -78,7 +78,7 @@ class breast_cancer_W_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = breast_cancer_W_loader()
+    loader = BreastCancerWLoader()
     print(loader)
     # loader.plot_dataset()
     # loader.plot_train_test_split()

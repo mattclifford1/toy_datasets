@@ -7,7 +7,7 @@ from data_loaders.utils import set_seed
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
-class normal_data_loader(AbstractLoader):
+class NormalDataLoader(AbstractLoader):
     def __init__(self,
                  shuffle: bool = True,
                  num_train: int = 1000,
@@ -69,7 +69,7 @@ class normal_data_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = normal_data_loader()
+    loader = NormalDataLoader()
     loader.get_train_test_split()
     loader.plot_dataset(terminal_plot=True)
     # loader.plot_train_test_split()

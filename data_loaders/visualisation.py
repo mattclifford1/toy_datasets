@@ -60,7 +60,7 @@ def plot_dataset(
     """
     import matplotlib.pyplot as plt
     from data_loaders.terminal_plots import terminal_show
-    from data_loaders.embeddings import dim_reducer
+    from data_loaders.embeddings import DimReducer
 
     # Validation: terminal_plot and ax are incompatible
     if terminal_plot and ax is not None:
@@ -107,7 +107,7 @@ def plot_dataset(
     colors = ["#3ea3e6", "#e56a6a"]  # blue, red
 
     # get 2d embedder fitted on train data
-    embedder = dim_reducer(X, y, reducer=dim_reducer_method)
+    embedder = DimReducer(X, y, reducer=dim_reducer_method)
 
     # transform all datasets first to determine global axis limits
     embeddings = [embedder.transform(Xd) for Xd in Xs]

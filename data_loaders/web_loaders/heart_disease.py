@@ -11,7 +11,7 @@ from ucimlrepo import fetch_ucirepo
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
-class heart_disease_loader(AbstractLoader):
+class HeartDiseaseLoader(AbstractLoader):
     """Load the UCI Heart Disease dataset as a binary classification problem.
 
     Fetches the dataset from the UCI ML repository (id=45).  Columns ``'ca'``
@@ -83,7 +83,7 @@ class heart_disease_loader(AbstractLoader):
         
 
 if __name__ == "__main__":
-    loader = heart_disease_loader()
+    loader = HeartDiseaseLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     loader.plot_train_test_split()

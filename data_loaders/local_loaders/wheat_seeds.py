@@ -17,7 +17,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class wheat_seeds_loader(AbstractLoader):
+class WheatSeedsLoader(AbstractLoader):
     """Load the UCI Wheat Seeds dataset as a binary classification problem.
 
     The original 3-class dataset (Kama=1, Rosa=2, Canadian=3) is converted to
@@ -93,7 +93,7 @@ class wheat_seeds_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = wheat_seeds_loader()
+    loader = WheatSeedsLoader()
     print(loader.get_info(long=True))
     loader.plot_dataset()
     # loader.plot_train_test_split()

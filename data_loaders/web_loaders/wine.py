@@ -13,7 +13,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
 
-class wine_loader(AbstractLoader):
+class WineLoader(AbstractLoader):
     """Load the Wine dataset as a binary classification problem.
 
     The original 3-class Wine dataset (178 samples, 13 chemical features) is
@@ -84,7 +84,7 @@ class wine_loader(AbstractLoader):
         
 
 if __name__ == "__main__":
-    loader = wine_loader()
+    loader = WineLoader()
     # loader.plot_dataset()
     print(loader)
     # loader.plot_train_test_split()

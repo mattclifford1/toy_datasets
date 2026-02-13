@@ -14,7 +14,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class diabetes_pima_indians_loader(AbstractLoader):
+class DiabetesPimaIndiansLoader(AbstractLoader):
     """Load the Pima Indians Diabetes Database.
 
     Binary classification: predict the onset of diabetes (class 1) vs. no
@@ -85,7 +85,7 @@ class diabetes_pima_indians_loader(AbstractLoader):
 
     
 if __name__ == "__main__":
-    loader = diabetes_pima_indians_loader()
+    loader = DiabetesPimaIndiansLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     loader.plot_train_test_split()

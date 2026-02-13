@@ -121,7 +121,7 @@ def _get_data(
     data_test = {'X': np.array(X_test), 'y': np.array(y_test)}
 
     # scale data
-    scaler = utils.normaliser(data)
+    scaler = utils.Normaliser(data)
     if scale == True:
         data = scaler(data)
         data_test = scaler(data_test)

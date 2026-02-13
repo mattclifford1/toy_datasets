@@ -14,7 +14,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class hepatitis_loader(AbstractLoader):
+class HepatitisLoader(AbstractLoader):
     """Load the UCI Hepatitis dataset.
 
     Binary classification: predict whether a hepatitis patient Survived
@@ -76,7 +76,7 @@ class hepatitis_loader(AbstractLoader):
         
 
 if __name__ == "__main__":
-    loader = hepatitis_loader()
+    loader = HepatitisLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     # loader.plot_train_test_split()

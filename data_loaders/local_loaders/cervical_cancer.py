@@ -15,7 +15,7 @@ from data_loaders.abstract_loader import AbstractLoader, DataDict
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
-class cervical_cancer_loader(AbstractLoader):
+class CervicalCancerLoader(AbstractLoader):
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.7,
@@ -45,6 +45,6 @@ class cervical_cancer_loader(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = cervical_cancer_loader()
+    loader = CervicalCancerLoader()
     # loader.plot_dataset()
     loader.plot_train_test_split()

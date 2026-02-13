@@ -11,7 +11,7 @@ from torch.utils import data as torch_data
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
 
-class mnist_loader(AbstractLoader):
+class MnistLoader(AbstractLoader):
     """Load the MNIST handwritten-digit dataset.
 
     Images (28×28 pixels) are flattened to 784-dimensional vectors.
@@ -136,7 +136,7 @@ class mnist_loader(AbstractLoader):
 
 
 if __name__ == '__main__':
-    loader = mnist_loader()
+    loader = MnistLoader()
     print(loader.get_info(long=True))
     # loader.plot_dataset()
     # loader.plot_train_test_split()

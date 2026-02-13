@@ -6,7 +6,7 @@ import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
-class moons_generator(AbstractLoader):
+class MoonsGenerator(AbstractLoader):
     """Generate a synthetic two-moons (half-moons) classification dataset.
 
     Wraps :func:`sklearn.datasets.make_moons` to produce two interleaving
@@ -54,6 +54,6 @@ class moons_generator(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = moons_generator()
+    loader = MoonsGenerator()
     loader.plot_dataset(terminal_plot=True)
     loader.plot_train_test_split(terminal_plot=True)

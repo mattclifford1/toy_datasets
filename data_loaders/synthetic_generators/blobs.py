@@ -6,7 +6,7 @@ import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
-class blobs_generator(AbstractLoader):
+class BlobsGenerator(AbstractLoader):
     """Generate a synthetic isotropic Gaussian blobs classification dataset.
 
     Wraps :func:`sklearn.datasets.make_blobs` to produce well-separated
@@ -54,6 +54,6 @@ class blobs_generator(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = blobs_generator()
+    loader = BlobsGenerator()
     # loader.plot_dataset()
     loader.plot_train_test_split()

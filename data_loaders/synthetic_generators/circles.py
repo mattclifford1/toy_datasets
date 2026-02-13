@@ -6,7 +6,7 @@ import sklearn.datasets
 from data_loaders.synthetic_generators import _generic_sklearn_loader
 from data_loaders.abstract_loader import AbstractLoader, DataDict
 
-class circles_generator(AbstractLoader):
+class CirclesGenerator(AbstractLoader):
     """Generate a synthetic concentric circles classification dataset.
 
     Wraps :func:`sklearn.datasets.make_circles` to produce two concentric
@@ -55,6 +55,6 @@ class circles_generator(AbstractLoader):
 
 
 if __name__ == "__main__":
-    loader = circles_generator()
+    loader = CirclesGenerator()
     # loader.plot_dataset()
     loader.plot_train_test_split()

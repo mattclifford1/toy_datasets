@@ -8,7 +8,7 @@ import numpy as np
 RANDOM_STATE = 42
 
 
-class normaliser:
+class Normaliser:
     """MinMax scaler fitted on training data, scaling features to [-1, 1].
 
     Parameters
