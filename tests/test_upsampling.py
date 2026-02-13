@@ -4,7 +4,6 @@ Tests for data_loaders/upsampling.py
 import pytest
 import numpy as np
 
-from data_loaders.resampling import upsampling
 from data_loaders.resampling.upsampling import (
     RandomDuplicateMinorityUpsampler,
     SMOTEUpsampler,
