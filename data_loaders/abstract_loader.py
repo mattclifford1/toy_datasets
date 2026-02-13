@@ -365,7 +365,7 @@ class AbstractLoader(ABC):
         tuple or None
             Returns (fig, ax) when new figure is created, None otherwise
         """
-        from data_loaders.visualisation import plot_dataset
+        from data_loaders.plotting.visualisation import plot_dataset
         if data_override is not None:
             data = data_override
         else:
@@ -408,7 +408,7 @@ class AbstractLoader(ABC):
         tuple or None
             Returns (fig, [ax1, ax2]) when new figure is created, None otherwise
         """
-        from data_loaders.visualisation import plot_dataset
+        from data_loaders.plotting.visualisation import plot_dataset
 
         if train_data_override is None or test_data_override is None:
             train_data_original, test_data_original = self.get_train_test_split()

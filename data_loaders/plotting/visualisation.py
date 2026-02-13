@@ -59,7 +59,7 @@ def plot_dataset(
         If ax format doesn't match expected (single vs tuple)
     """
     import matplotlib.pyplot as plt
-    from data_loaders.terminal_plots import terminal_show
+    from data_loaders.plotting.terminal_plots import terminal_show
     from data_loaders.embeddings import DimReducer
 
     # Validation: terminal_plot and ax are incompatible

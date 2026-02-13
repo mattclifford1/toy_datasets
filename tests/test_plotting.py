@@ -8,7 +8,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from data_loaders.main import get_dataset
-from data_loaders.visualisation import plot_dataset
+from data_loaders.plotting.visualisation import plot_dataset
 
 
 class TestPlotDatasetAxesParameter:

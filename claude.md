@@ -24,7 +24,7 @@ Config in `pyproject.toml` with `distribution = false` (application mode, not li
 - `data_loaders/loaders/external_loaders/` - MIMIC-III/IV medical datasets (require special access)
 - `data_loaders/utils.py` - Normalization, shuffling, train/test splitting, downsampling
 - `data_loaders/embeddings.py` - PCA, UMAP, t-SNE dimensionality reduction
-- `data_loaders/terminal_plots.py` - Terminal-based matplotlib rendering
+- `data_loaders/plotting/` - Dataset visualisation (`visualisation.py`) and terminal rendering (`terminal_plots.py`)
 
 ## Key Patterns
 
