@@ -1,38 +1,17 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from typing import Any
 
 import numpy as np
 
 from data_loaders.utils import set_seed
+from data_loaders.resampling_base import AbstractResampler
 
 
-class AbstractUpsampler(ABC):
-    """Abstract base class for upsampling strategies."""
-
-    @abstractmethod
-    def fit_resample(
-        self, X: np.ndarray, y: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """Resample X and y to balance class counts.
-
-        Parameters
-        ----------
-        X : np.ndarray
-            Feature matrix.
-        y : np.ndarray
-            Label array.
-
-        Returns
-        -------
-        tuple[np.ndarray, np.ndarray]
-            Resampled (X, y).
-        """
-        ...
 
 
-class RandomDuplicateUpsampler(AbstractUpsampler):
+
+class RandomDuplicateUpsampler(AbstractResampler):
     """Upsample minority classes by duplicating samples at random.
 
     All classes are upsampled to match the majority class count.
@@ -54,7 +33,10 @@ class RandomDuplicateUpsampler(AbstractUpsampler):
         self.random_state = random_state
         self.sampling_strategy = sampling_strategy
 
-    def fit_resample(
+    def __repr__(self) -> str:
+        return 'RandomDuplicate'
+
+    def __call__(
         self, X: np.ndarray, y: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
         """Duplicate minority-class rows until all classes are balanced.
@@ -90,7 +72,7 @@ class RandomDuplicateUpsampler(AbstractUpsampler):
         return np.concatenate(X_parts), np.concatenate(y_parts)
 
 
-class SMOTEUpsampler(AbstractUpsampler):
+class SMOTEUpsampler(AbstractResampler):
     """Upsample minority classes using SMOTE (Synthetic Minority Over-sampling Technique).
 
     Requires ``imbalanced-learn`` (``pip install imbalanced-learn``).
@@ -111,7 +93,10 @@ class SMOTEUpsampler(AbstractUpsampler):
         self.random_state = random_state
         self.k_neighbors = k_neighbors
 
-    def fit_resample(
+    def __repr__(self) -> str:
+        return 'SMOTE'
+
+    def __call__(
         self, X: np.ndarray, y: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
         """Generate synthetic minority-class samples via SMOTE.
@@ -181,7 +166,7 @@ def proportional_upsample(
         If *strategy* is not ``'random'`` or ``'smote'``.
     """
     if strategy == 'random':
-        upsampler: AbstractUpsampler = RandomDuplicateUpsampler(
+        upsampler: AbstractResampler = RandomDuplicateUpsampler(
             random_state=seed, **kwargs
         )
     elif strategy == 'smote':
@@ -195,7 +180,7 @@ def proportional_upsample(
     y_orig = data['y']
     n_orig = X_orig.shape[0]
 
-    X_new, y_new = upsampler.fit_resample(X_orig, y_orig)
+    X_new, y_new = upsampler(X_orig, y_orig)
 
     # Build index map: for each new row, which original row does it come from?
     # Original rows are kept as-is (indices 0..n_orig-1 map to themselves).

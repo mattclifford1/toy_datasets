@@ -2,7 +2,54 @@ from typing import Any
 
 import numpy as np
 
+from data_loaders.upsampling import AbstractResampler
 from data_loaders.utils import set_seed
+
+
+class StratifiedSubsampler(AbstractResampler):
+    """Subsample data while preserving class proportions.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of samples to keep.
+    random_state : int, default=42
+        Random seed for reproducibility.
+    """
+
+    def __init__(self, n_samples: int, random_state: int = 42) -> None:
+        self.n_samples = n_samples
+        self.random_state = random_state
+
+    def __repr__(self) -> str:
+        return 'StratifiedSubsample'
+
+    def __call__(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Subsample X and y while preserving class proportions.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            Feature matrix.
+        y : np.ndarray
+            Label array.
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            Subsampled (X, y) with ``n_samples`` rows.
+        """
+        from sklearn.model_selection import train_test_split
+
+        X_sub, _, y_sub, _ = train_test_split(
+            X, y,
+            train_size=self.n_samples,
+            stratify=y,
+            random_state=self.random_state,
+        )
+        return X_sub, y_sub
 
 
 def stratified_subsample(
@@ -29,16 +76,7 @@ def stratified_subsample(
     tuple[np.ndarray, np.ndarray]
         Subsampled (X, y) arrays with ``n_samples`` rows.
     """
-    from sklearn.model_selection import train_test_split
-
-    X_sub, _, y_sub, _ = train_test_split(
-        X, y,
-        train_size=n_samples,
-        stratify=y,
-        random_state=random_state
-    )
-    return X_sub, y_sub
-
+    return StratifiedSubsampler(n_samples, random_state)(X, y)
 
 
 def proportional_downsample(

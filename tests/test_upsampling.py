@@ -19,7 +19,7 @@ class TestRandomDuplicateUpsampler:
         """Imbalanced input should produce equal class counts after resampling."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
         up = RandomDuplicateUpsampler(random_state=42)
-        X_res, y_res = up.fit_resample(X, y)
+        X_res, y_res = up(X, y)
 
         _, counts = np.unique(y_res, return_counts=True)
         assert counts.min() == counts.max()
@@ -30,7 +30,7 @@ class TestRandomDuplicateUpsampler:
         majority_count = int(np.bincount(y).max())
 
         up = RandomDuplicateUpsampler(random_state=42)
-        _, y_res = up.fit_resample(X, y)
+        _, y_res = up(X, y)
 
         _, counts = np.unique(y_res, return_counts=True)
         assert counts.max() == majority_count
@@ -41,20 +41,24 @@ class TestRandomDuplicateUpsampler:
         up1 = RandomDuplicateUpsampler(random_state=7)
         up2 = RandomDuplicateUpsampler(random_state=7)
 
-        X1, y1 = up1.fit_resample(X, y)
-        X2, y2 = up2.fit_resample(X, y)
+        X1, y1 = up1(X, y)
+        X2, y2 = up2(X, y)
 
         np.testing.assert_array_equal(X1, X2)
         np.testing.assert_array_equal(y1, y2)
 
     def test_returns_correct_types(self, imbalanced_data):
-        """fit_resample should return numpy arrays."""
+        """__call__ should return numpy arrays."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
         up = RandomDuplicateUpsampler(random_state=42)
-        X_res, y_res = up.fit_resample(X, y)
+        X_res, y_res = up(X, y)
 
         assert isinstance(X_res, np.ndarray)
         assert isinstance(y_res, np.ndarray)
+
+    def test_repr(self):
+        """__repr__ should return 'RandomDuplicate'."""
+        assert repr(RandomDuplicateUpsampler()) == 'RandomDuplicate'
 
 
 @pytest.mark.slow
@@ -65,7 +69,7 @@ class TestSMOTEUpsampler:
         """Imbalanced input should produce equal class counts after SMOTE."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
         up = SMOTEUpsampler(random_state=42)
-        _, y_res = up.fit_resample(X, y)
+        _, y_res = up(X, y)
 
         _, counts = np.unique(y_res, return_counts=True)
         assert counts.min() == counts.max()
@@ -74,7 +78,7 @@ class TestSMOTEUpsampler:
         """Total sample count should increase after SMOTE."""
         X, y = imbalanced_data['X'], imbalanced_data['y']
         up = SMOTEUpsampler(random_state=42)
-        X_res, _ = up.fit_resample(X, y)
+        X_res, _ = up(X, y)
 
         assert X_res.shape[0] > X.shape[0]
 
@@ -84,11 +88,15 @@ class TestSMOTEUpsampler:
         up1 = SMOTEUpsampler(random_state=0)
         up2 = SMOTEUpsampler(random_state=0)
 
-        X1, y1 = up1.fit_resample(X, y)
-        X2, y2 = up2.fit_resample(X, y)
+        X1, y1 = up1(X, y)
+        X2, y2 = up2(X, y)
 
         np.testing.assert_array_equal(X1, X2)
         np.testing.assert_array_equal(y1, y2)
+
+    def test_repr(self):
+        """__repr__ should return 'SMOTE'."""
+        assert repr(SMOTEUpsampler()) == 'SMOTE'
 
 
 class TestProportionalUpsample:

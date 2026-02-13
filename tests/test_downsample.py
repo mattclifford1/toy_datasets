@@ -4,6 +4,41 @@ Tests for data_loaders/utils.py
 import pytest
 import numpy as np
 from data_loaders import downsampling
+from data_loaders.downsampling import StratifiedSubsampler
+from data_loaders.upsampling import AbstractResampler
+
+
+class TestStratifiedSubsampler:
+    """Tests for StratifiedSubsampler class."""
+
+    def test_repr(self):
+        """__repr__ should return 'StratifiedSubsample'."""
+        assert repr(StratifiedSubsampler(n_samples=10)) == 'StratifiedSubsample'
+
+    def test_is_abstract_resampler(self):
+        """StratifiedSubsampler should be an instance of AbstractResampler."""
+        sampler = StratifiedSubsampler(n_samples=10)
+        assert isinstance(sampler, AbstractResampler)
+
+    def test_call_interface(self):
+        """__call__ should return subsampled arrays of the requested size."""
+        X = np.random.randn(100, 5)
+        y = np.array([0] * 50 + [1] * 50)
+        sampler = StratifiedSubsampler(n_samples=20, random_state=42)
+        X_sub, y_sub = sampler(X, y)
+
+        assert X_sub.shape == (20, 5)
+        assert y_sub.shape == (20,)
+
+    def test_preserves_class_proportions(self):
+        """__call__ should approximately preserve class proportions."""
+        X = np.random.randn(1000, 5)
+        y = np.array([0] * 700 + [1] * 300)
+        sampler = StratifiedSubsampler(n_samples=100, random_state=0)
+        _, y_sub = sampler(X, y)
+
+        assert 60 <= np.sum(y_sub == 0) <= 80
+        assert 20 <= np.sum(y_sub == 1) <= 40
 
 
 class TestStratifiedSubsample:
