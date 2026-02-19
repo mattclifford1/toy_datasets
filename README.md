@@ -90,62 +90,6 @@ loader.plot_dataset()           # Visualize the dataset
 loader.plot_train_test_split()  # Visualize train/test split
 ```
 
-## Visualization
-
-### Basic Plotting
-
-```python
-# Default behavior: creates figure and calls plt.show()
-loader = data_loaders.get_dataset('Moons')
-fig, ax = loader.plot_dataset()  # Returns (fig, ax) for further customization
-
-# Train/test split visualization
-fig, axes = loader.plot_train_test_split()  # Returns (fig, [ax1, ax2])
-```
-
-### Custom Axes Integration
-
-Plot on your own matplotlib axes for full control:
-
-```python
-import matplotlib.pyplot as plt
-
-# Single dataset on custom axes
-fig, ax = plt.subplots(figsize=(8, 8))
-loader.plot_dataset(ax=ax)  # Returns None when axes provided
-ax.set_title("My Custom Title")
-plt.show()
-
-# Train/test split on custom axes
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-loader.plot_train_test_split(ax=(ax1, ax2))
-fig.suptitle("Custom Comparison")
-plt.show()
-```
-
-### Multiple Datasets in Grid
-
-```python
-# Compare multiple datasets
-fig, axes = plt.subplots(2, 2, figsize=(14, 14))
-datasets = ['XOR', 'Moons', 'Circles', 'Blobs']
-
-for ax, name in zip(axes.flat, datasets):
-    data_loaders.get_dataset(name).plot_dataset(ax=ax)
-    ax.set_title(name)
-
-plt.tight_layout()
-plt.show()
-```
-
-### Terminal Plotting
-
-```python
-# Render plots directly in terminal (supports sixel/kitty protocols)
-loader.plot_dataset(terminal_plot=True)
-loader.plot_train_test_split(terminal_plot=True)
-```
-
 ## Common Options
 
 ```python
@@ -178,24 +122,40 @@ pdm run pytest -m "not slow"       # Skip slow tests (MNIST, t-SNE)
 pdm run pytest --cov=data_loaders  # With coverage report
 ```
 
+## Sub-packages
+
+Each sub-package has its own README with full details.
+
+| Sub-package | Description |
+|---|---|
+| [`data_loaders/utils/`](data_loaders/utils/README.md) | Normalization, shuffling, seeding, train/test splitting |
+| [`data_loaders/resampling/`](data_loaders/resampling/README.md) | Upsampling, SMOTE, and downsampling for class imbalance |
+| [`data_loaders/embeddings/`](data_loaders/embeddings/README.md) | PCA, kernel PCA, t-SNE, UMAP dimensionality reduction |
+| [`data_loaders/plotting/`](data_loaders/plotting/README.md) | Dataset visualisation and terminal rendering |
+| [`data_loaders/loaders/synthetic_generators/`](data_loaders/loaders/synthetic_generators/README.md) | XOR, Moons, Blobs, Circles, Gaussian generators |
+| [`data_loaders/loaders/web_loaders/`](data_loaders/loaders/web_loaders/README.md) | Iris, Wine, Breast Cancer, Heart Disease, MNIST |
+| [`data_loaders/loaders/local_loaders/`](data_loaders/loaders/local_loaders/readme.md) | CSV-backed loaders (diabetes, banknote, costcla, etc.) |
+| [`data_loaders/loaders/external_loaders/`](data_loaders/loaders/external_loaders/README.md) | MIMIC-III/IV medical datasets (require special access) |
+
 ## Project Structure
 
 ```
 toy_datasets/
 ├── data_loaders/
-│   ├── main.py              # Registry and get_dataset()
-│   ├── abstract_loader.py   # Base class for all loaders
-│   ├── utils.py             # Normalization, splitting utilities
-│   ├── embeddings.py        # PCA, UMAP, t-SNE
-│   ├── terminal_plots.py    # Terminal rendering
-│   ├── loaders/
-│   │   ├── synthetic_generators/  # XOR, Moons, Blobs, etc.
-│   │   ├── web_loaders/           # Iris, Wine, MNIST, etc.
-│   │   ├── local_loaders/         # CSV-based datasets
-│   │   └── external_loaders/      # MIMIC (requires access)
-├── data/                    # Local CSV datasets
-├── tests/                   # pytest test suite
-└── pyproject.toml           # PDM configuration
+│   ├── main.py                   # Registry and get_dataset()
+│   ├── utils/                    # Normalization, splitting utilities
+│   ├── resampling/               # Upsampling and downsampling
+│   ├── embeddings/               # PCA, UMAP, t-SNE wrappers
+│   ├── plotting/                 # Visualisation and terminal rendering
+│   └── loaders/
+│       ├── abstract_loader.py    # Base class for all loaders
+│       ├── synthetic_generators/ # XOR, Moons, Blobs, etc.
+│       ├── web_loaders/          # Iris, Wine, MNIST, etc.
+│       ├── local_loaders/        # CSV-based datasets
+│       └── external_loaders/     # MIMIC (requires access)
+├── data_loaders/datasets/        # Bundled CSV files
+├── tests/                        # pytest test suite
+└── pyproject.toml                # PDM configuration
 ```
 
 ## License
