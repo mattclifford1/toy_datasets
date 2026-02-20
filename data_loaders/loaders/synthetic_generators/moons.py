@@ -49,7 +49,9 @@ class MoonsGenerator(AbstractLoader):
         data = _generic_sklearn_loader(load_func=sklearn.datasets.make_moons,
                                         samples=self.num_samples,
                                         test=False,
-                                        noise=self.moons_noise)
+                                        noise=self.moons_noise,
+                                        seed=self.set_seed,
+                                        )
         return data
 
 

@@ -50,7 +50,9 @@ class SklearnNormalGenerator(AbstractLoader):
         data = _generic_sklearn_loader(load_func=sklearn.datasets.make_classification,
                                         samples=self.num_samples,
                                         test=False,
-                                        n_features=self.normal_features)
+                                        n_features=self.normal_features,
+                                        seed=self.set_seed,
+                                        )
         return data
 
 

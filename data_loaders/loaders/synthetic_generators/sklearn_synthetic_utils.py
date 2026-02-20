@@ -16,6 +16,7 @@ def _generic_sklearn_loader(
         load_func: Callable[..., Any],
         samples: int = 200,
         test: bool = False,
+        seed: bool | None | int = None,
         **kwargs: Any,
 ) -> dict[str, Any]:
     """Sample from a sklearn synthetic dataset generator.
@@ -36,8 +37,12 @@ def _generic_sklearn_loader(
     dict
         Data dict with keys ``'X'`` and ``'y'``.
     """
-    seed = 42
-    if test == True and load_func != sklearn.datasets.make_blobs:
+    if seed == True:
+        seed = 42
+    elif seed == False:
+        seed = None
+    
+    if isinstance(seed, int) and test == True and load_func != sklearn.datasets.make_blobs:
         seed += 1
 
     X, y = load_func(

@@ -50,7 +50,9 @@ class CirclesGenerator(AbstractLoader):
                                         samples=self.num_samples,
                                         test=False,
                                         noise=self.circles_noise,
-                                        factor=0.8)
+                                        factor=0.8,
+                                        seed=self.set_seed,
+                                        )
         return data
 
 

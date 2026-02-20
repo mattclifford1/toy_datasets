@@ -49,7 +49,9 @@ class BlobsGenerator(AbstractLoader):
         data = _generic_sklearn_loader(load_func=sklearn.datasets.make_blobs,
                                         samples=self.num_samples,
                                         test=False,
-                                        n_features=self.blobs_features)
+                                        n_features=self.blobs_features,
+                                        seed=self.set_seed,
+                                        )
         return data
 
 
