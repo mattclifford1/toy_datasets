@@ -42,6 +42,9 @@ class GaussianGenerator(AbstractLoader):
     cov_scale : float or list of float
         Scale factor(s) for covariance. Single value applies to both classes,
         or provide [scale0, scale1]. Default: 1.0
+    cov1_scaler : float
+        Relative scale of class 1's covariance w.r.t. class 0.
+        If cov1_scaler=2, then cov1 = 2 × cov0. Default: 1.0
     cov_correlation : float
         Correlation strength for 'symmetric' cov_type (-1 to 1).
         Default: 0.5
@@ -60,6 +63,9 @@ class GaussianGenerator(AbstractLoader):
 
     # Different scales per class
     >>> loader = GaussianGenerator(cov_type='diagonal', cov_scale=[1.0, 2.0])
+
+    # Class 1 has 3x the spread of class 0
+    >>> loader = GaussianGenerator(cov1_scaler=3.0)
 
     # Custom means with correlated features
     >>> loader = GaussianGenerator(
@@ -85,6 +91,7 @@ class GaussianGenerator(AbstractLoader):
         covs: list[list[list[float]]] | None = None,
         cov_type: str = 'spherical',
         cov_scale: float | list[float] = 1.0,
+        cov1_scaler: float = 1.0,
         cov_correlation: float = 0.5,
         random_cov_range: tuple[float, float] = (0.5, 2.0),
         name: str = 'Gaussian Synthetic',
@@ -123,12 +130,13 @@ class GaussianGenerator(AbstractLoader):
             self.covs = [np.array(c) for c in covs]
         else:
             self.covs = self._generate_covs(
-                n_features, cov_type, cov_scale,
+                n_features, cov_type, cov_scale, cov1_scaler,
                 cov_correlation, random_cov_range
             )
 
         # Store config for metadata
         self.cov_type = cov_type if covs is None else 'custom'
+        self.cov1_scaler = cov1_scaler
         self.class_separation = class_separation
 
         super().__init__(
@@ -149,6 +157,7 @@ class GaussianGenerator(AbstractLoader):
             n_features: int,
             cov_type: str,
             scale: float | list[float],
+            cov1_scaler: float,
             correlation: float,
             random_range: tuple[float, float],
     ) -> list[np.ndarray]:
@@ -165,6 +174,11 @@ class GaussianGenerator(AbstractLoader):
                 n_features, cov_type, scales[i], correlation, random_range, seed=i
             )
             covs.append(cov)
+
+        # Apply relative scaling: cov1 = cov1_scaler * cov0
+        if cov1_scaler != 1.0:
+            covs[1] = cov1_scaler * covs[0]
+
         return covs
 
     def _make_cov_matrix(
@@ -252,6 +266,9 @@ class GaussianGenerator(AbstractLoader):
             desc += f"Class {i}: {n} samples\n"
             desc += f"  Mean: {np.round(mean, 2).tolist()}\n"
             desc += f"  Cov diagonal: {np.round(np.diag(cov), 2).tolist()}\n"
+
+        if self.cov1_scaler != 1.0:
+            desc += f"Cov1 scaler: {self.cov1_scaler}x (relative to class 0)\n"
 
         return desc
 

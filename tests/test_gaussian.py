@@ -162,6 +162,29 @@ class TestGaussianCovarianceScale:
         assert np.trace(loader.covs[0]) == 2.0  # 1.0 * 2 features
         assert np.trace(loader.covs[1]) == 8.0  # 4.0 * 2 features
 
+    def test_cov1_scaler_default_no_effect(self):
+        """cov1_scaler=1.0 should leave both covs equal (spherical default)."""
+        loader = GaussianGenerator(cov_type='spherical', cov1_scaler=1.0)
+
+        np.testing.assert_array_equal(loader.covs[0], loader.covs[1])
+
+    def test_cov1_scaler_doubles_cov(self):
+        """cov1_scaler=2.0 should make cov1 == 2 * cov0 element-wise."""
+        loader = GaussianGenerator(cov_type='spherical', cov1_scaler=2.0)
+
+        np.testing.assert_array_equal(loader.covs[1], 2.0 * loader.covs[0])
+
+    def test_cov1_scaler_with_existing_scale(self):
+        """cov1_scaler should be applied relative to cov0, not independent cov1."""
+        loader = GaussianGenerator(
+            cov_type='spherical',
+            cov_scale=0.5,
+            cov1_scaler=3.0
+        )
+
+        # cov0 = 0.5 * I; cov1 should be 3 * cov0 = 1.5 * I
+        np.testing.assert_array_equal(loader.covs[1], 3.0 * loader.covs[0])
+
 
 class TestGaussianCustomCovariance:
     """Tests for custom covariance matrices."""
