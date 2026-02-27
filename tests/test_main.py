@@ -128,6 +128,33 @@ class TestAllDatasets:
         assert len(X.shape) == 2, f"{dataset_name}: X should be 2D"
 
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
+    def test_X_is_float(self, dataset_name):
+        """X feature matrix should be a float numpy array."""
+        if dataset_name == 'MNIST':
+            pytest.skip("MNIST is slow to load; tested separately")
+
+        loader = get_dataset(dataset_name)
+        X = loader.get_X()
+
+        assert np.issubdtype(X.dtype, np.floating), \
+            f"{dataset_name}: X dtype is {X.dtype}, expected floating"
+
+    @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
+    def test_y_is_binary_int(self, dataset_name):
+        """y label array should be integer dtype with only values 0 and 1."""
+        if dataset_name == 'MNIST':
+            pytest.skip("MNIST is slow to load; tested separately")
+
+        loader = get_dataset(dataset_name)
+        y = loader.get_y()
+
+        assert np.issubdtype(y.dtype, np.integer), \
+            f"{dataset_name}: y dtype is {y.dtype}, expected integer"
+        unique = set(np.unique(y).tolist())
+        assert unique.issubset({0, 1}), \
+            f"{dataset_name}: y contains non-binary labels {unique}"
+
+    @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_train_test_split(self, dataset_name):
         """All loaders should support train/test split."""
         if dataset_name == 'MNIST':

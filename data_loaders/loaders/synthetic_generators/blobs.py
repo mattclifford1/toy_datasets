@@ -51,6 +51,7 @@ class BlobsGenerator(AbstractLoader):
                                         test=False,
                                         n_features=self.blobs_features,
                                         seed=self.set_seed,
+                                        centers=2,
                                         )
         return data
 

@@ -66,7 +66,9 @@ class HepatitisLoader(AbstractLoader):
         df = df[~df.isin(['?']).any(axis=1)]
         data['y'] = df.pop('Class').to_numpy().copy()
         data['y'][data['y'] == 2] = 0
-        data['X'] = df.to_numpy()
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col])
+        data['X'] = df.to_numpy().astype(float)
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['Survived', 'Died']
         # add name and description

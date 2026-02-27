@@ -155,6 +155,7 @@ class ChronicKidneyDiseaseLoader(AbstractLoader):
         # convert to binary labels
         data['y'][data['y']=='ckd'] = 1
         data['y'][data['y']=='notckd'] = 0
+        data['y'] = data['y'].astype(int)
 
         # convert features to numeric
         for col in df.columns:

@@ -184,6 +184,7 @@ def _get_costcla_dataset(dataset: str = "CreditScoring_Kaggle2011_costcla", norm
             data[csv] = data[csv].ravel()
         # get feature names
         if csv == 'X':
+            data[csv] = data[csv].astype(float)
             data['feature_names'] = df.columns.to_list()
 
     # normalise X data

@@ -44,12 +44,12 @@ class TestSyntheticGenerators:
         assert var_high > var_low
 
     def test_blobs_centers(self):
-        """Blobs generator should create specified centers."""
-        loader = get_dataset('Blobs', n_samples=100, centers=3)
+        """Blobs generator should produce binary labels (2 centers)."""
+        loader = get_dataset('Blobs', n_samples=100)
         y = loader.get_y()
 
         unique_classes = np.unique(y)
-        assert len(unique_classes) == 3
+        assert len(unique_classes) == 2
 
     def test_circles_factor(self):
         """Circles generator should respect factor parameter."""

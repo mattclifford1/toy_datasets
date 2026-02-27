@@ -109,7 +109,7 @@ class XORGenerator(AbstractLoader):
         for mean, cov, num_sample, label in zip(means, covs, num_samples, labels):
             set_seed(seed)
             X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
-            y.append(np.ones(num_sample)*label)
+            y.append(np.full(num_sample, label, dtype=np.int64))
         X = np.vstack(X)
         y = np.hstack(y)
         # X, y = sklearn.utils.shuffle(X, y, random_state=seed)

@@ -65,7 +65,7 @@ class HabermansBreastCancerLoader(AbstractLoader):
         data['y'] = df.pop('Survived_Longer_5_Years').to_numpy().copy()
         data['y'][data['y']==1] = 0  
         data['y'][data['y']==2] = 1
-        data['X'] = df.to_numpy()
+        data['X'] = df.to_numpy().astype(float)
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['survived 5 years or longer', 'died within 5 year']
         # add name and description
