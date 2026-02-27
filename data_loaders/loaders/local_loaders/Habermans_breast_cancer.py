@@ -62,7 +62,7 @@ class HabermansBreastCancerLoader(AbstractLoader):
         data = {}
         df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
                         'datasets', 'Habermans_breast_cancer', 'data.csv'))
-        data['y'] = df.pop('Survived_Longer_5_Years').to_numpy()
+        data['y'] = df.pop('Survived_Longer_5_Years').to_numpy().copy()
         data['y'][data['y']==1] = 0  
         data['y'][data['y']==2] = 1
         data['X'] = df.to_numpy()

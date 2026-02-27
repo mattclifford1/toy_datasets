@@ -64,7 +64,7 @@ class HepatitisLoader(AbstractLoader):
         # df.pop('LIVERBIG')
         # df.pop('LIVERFIRM')
         df = df[~df.isin(['?']).any(axis=1)]
-        data['y'] = df.pop('Class').to_numpy()
+        data['y'] = df.pop('Class').to_numpy().copy()
         data['y'][data['y'] == 2] = 0
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()

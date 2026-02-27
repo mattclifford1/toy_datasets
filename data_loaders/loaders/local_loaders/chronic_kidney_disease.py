@@ -151,7 +151,7 @@ class ChronicKidneyDiseaseLoader(AbstractLoader):
         # remove rows with missing target
         df = df[df['class'].notna()]
 
-        data['y'] = df.pop('class').to_numpy()
+        data['y'] = df.pop('class').to_numpy().copy()
         # convert to binary labels
         data['y'][data['y']=='ckd'] = 1
         data['y'][data['y']=='notckd'] = 0
