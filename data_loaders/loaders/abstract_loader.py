@@ -4,6 +4,7 @@ Generic class for data loaders to inherit from
 '''
 from __future__ import annotations
 
+import threading
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
@@ -90,6 +91,7 @@ class AbstractLoader(ABC):
         self.scale = scale
         self.dim_reducer = dim_reducer
         self.reduce_to_dim = reduce_to_dim
+        self._load_lock = threading.Lock()
 
 
     @abstractmethod
@@ -201,27 +203,28 @@ class AbstractLoader(ABC):
         returns:
             - data: dict containing 'X', 'y', 'description' (if available)
         '''
-        if not self.already_loaded:
-            self.already_loaded = True
-            self.data = self.load_data()
-            # check valid
-            if not isinstance(self.data, dict):
-                raise ValueError("load_data() needs to return a dict containing 'X' and 'y'")
-            if 'X' not in self.data.keys() or 'y' not in self.data.keys():
-                raise ValueError("load_data() needs to return a dict containing 'X' and 'y'")
-            # shuffle
-            if self.shuffle:
-                self.data = utils.shuffle_data(
-                    self.data,
-                    seed=self.set_seed
-                    )
-            # downsample if needed
-            if self.percent_of_data is not None:
-                self.data = downsampling.proportional_downsample(
-                    self.data,
-                    percent_of_data=self.percent_of_data,
-                    seed=self.set_seed
-                    )
+        with self._load_lock:
+            if not self.already_loaded:
+                self.already_loaded = True
+                self.data = self.load_data()
+                # check valid
+                if not isinstance(self.data, dict):
+                    raise ValueError("load_data() needs to return a dict containing 'X' and 'y'")
+                if 'X' not in self.data.keys() or 'y' not in self.data.keys():
+                    raise ValueError("load_data() needs to return a dict containing 'X' and 'y'")
+                # shuffle
+                if self.shuffle:
+                    self.data = utils.shuffle_data(
+                        self.data,
+                        seed=self.set_seed
+                        )
+                # downsample if needed
+                if self.percent_of_data is not None:
+                    self.data = downsampling.proportional_downsample(
+                        self.data,
+                        percent_of_data=self.percent_of_data,
+                        seed=self.set_seed
+                        )
 
         return self.data
 
@@ -235,7 +238,7 @@ class AbstractLoader(ABC):
             Feature matrix of shape ``(n_samples, n_features)``.
         """
         data = self.get_data_dict()
-        return data['X']
+        return data['X'].copy()
 
 
     def get_y(self) -> np.ndarray:
@@ -247,7 +250,7 @@ class AbstractLoader(ABC):
             Integer label array of shape ``(n_samples,)``.
         """
         data = self.get_data_dict()
-        return data['y']
+        return data['y'].copy()
 
 
     def get_description(self) -> str:
