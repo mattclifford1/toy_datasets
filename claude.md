@@ -79,6 +79,25 @@ Test structure:
 - `tests/test_loaders.py` - Individual loader category tests
 
 
+## README figures
+
+The README contains two auto-generated collapsible sections. Keep them in sync whenever relevant code changes.
+
+**When to regenerate:**
+- New dataset added to `AVAILABLE_DATASETS` in `data_loaders/main.py` → run the gallery script and add the dataset to `DATASET_GROUPS` in `scripts/generate_dataset_figures.py`
+- New loader option added to `AbstractLoader` → add a figure function to `scripts/generate_options_figures.py` and run it
+
+**Scripts:**
+```bash
+uv run python scripts/generate_dataset_figures.py   # regenerates assets/figures/*.png + GALLERY_SECTION.md
+uv run python scripts/generate_options_figures.py   # regenerates assets/figures/options/*.png + OPTIONS_SECTION.md
+```
+
+**After running**, paste the generated `GALLERY_SECTION.md` or `OPTIONS_SECTION.md` content into the corresponding `<details>` block in `README.md`:
+- Gallery section: replaces content between `<summary><strong>All datasets — figures &amp; stats</strong></summary>` and its closing `</details>`
+- Options section: replaces content between `<summary><strong>Loader options — visual demos</strong></summary>` and its closing `</details>`
+
+
 ## coding style
 always wise clear and consise code.
 
