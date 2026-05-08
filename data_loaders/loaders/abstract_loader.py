@@ -363,6 +363,7 @@ class AbstractLoader(ABC):
             dim_reducer_method: str | None = None,
             clf: Callable | None = None,
             y_pred: np.ndarray | None = None,
+            show_legend: bool = True,
     ) -> tuple[Any, Any] | None:
         """
         Plot the dataset.
@@ -383,6 +384,8 @@ class AbstractLoader(ABC):
             regions are drawn only when data is already 2D (no dim reduction applied).
         y_pred : np.ndarray, optional
             Pre-computed predictions for X (used instead of calling clf for point coloring).
+        show_legend : bool, default=True
+            If False, suppress the legend.
 
         Returns
         -------
@@ -407,6 +410,7 @@ class AbstractLoader(ABC):
             dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
             clf=clf,
             y_pred=y_pred,
+            show_legend=show_legend,
         )
 
 
@@ -422,6 +426,7 @@ class AbstractLoader(ABC):
             y_pred_test: np.ndarray | None = None,
             overlay_train_test: bool = False,
             test_alpha: float = 0.3,
+            show_legend: bool = True,
     ) -> tuple[Any, Any] | None:
         """
         Create train/test split and plot both datasets.
@@ -452,6 +457,8 @@ class AbstractLoader(ABC):
             test uses open markers at test_alpha opacity.
         test_alpha : float, default=0.3
             Alpha for test data scatter points when overlay_train_test=True.
+        show_legend : bool, default=True
+            If False, suppress the legend on all axes.
 
         Returns
         -------
@@ -487,6 +494,7 @@ class AbstractLoader(ABC):
             y_pred_test=y_pred_test,
             overlay_train_test=overlay_train_test,
             test_alpha=test_alpha,
+            show_legend=show_legend,
         )
 
     def __str__(self) -> str:

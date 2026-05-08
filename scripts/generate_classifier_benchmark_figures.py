@@ -290,12 +290,12 @@ def generate_group_clf_plots(
                     overlay_train_test=True,
                     clf=clf_instance.predict,
                     test_alpha=0.4,
+                    show_legend=False,
                     ax=ax,
                 )
                 ax.set_xlabel(f'{embedder.reducer_name} 1', fontsize=7)
                 ax.set_ylabel(f'{embedder.reducer_name} 2', fontsize=7)
                 ax.set_title(f'{short}  [{best_clf_name}  bal-acc={best_score:.2f}]', fontsize=9)
-                ax.legend(fontsize=6, loc='best')
             except Exception as e:
                 ax.set_visible(False)
                 print(f'    ERROR on {name}: {e}')

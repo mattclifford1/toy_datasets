@@ -86,6 +86,7 @@ def plot_dataset(
         y_pred_test: np.ndarray | None = None,
         overlay_train_test: bool = False,
         test_alpha: float = 0.3,
+        show_legend: bool = True,
 ) -> tuple[Any, Any] | None:
     """
     Plot dataset in 2D using dimensionality reduction.
@@ -128,6 +129,8 @@ def plot_dataset(
         use open markers at test_alpha opacity.
     test_alpha : float, default=0.3
         Alpha for test data scatter points when overlay_train_test=True.
+    show_legend : bool, default=True
+        If False, suppress the legend on all axes.
 
     Returns
     -------
@@ -260,7 +263,8 @@ def plot_dataset(
     plot_ax.set_title(title)
     plot_ax.set_xlabel(embedder.feature_names[0])
     plot_ax.set_ylabel(embedder.feature_names[1])
-    plot_ax.legend()
+    if show_legend:
+        plot_ax.legend()
     plot_ax.set_xlim(*xlim)
     plot_ax.set_ylim(*ylim)
 
@@ -290,7 +294,8 @@ def plot_dataset(
         test_ax.set_title(f"Test set in {embedder.reducer_name} space")
         test_ax.set_xlabel(embedder.feature_names[0])
         test_ax.set_ylabel(embedder.feature_names[1])
-        test_ax.legend()
+        if show_legend:
+            test_ax.legend()
         test_ax.set_xlim(*xlim)
         test_ax.set_ylim(*ylim)
 
