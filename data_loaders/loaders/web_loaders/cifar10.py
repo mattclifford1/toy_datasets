@@ -47,6 +47,8 @@ class Cifar10Loader(AbstractLoader):
         Additional keyword arguments forwarded to :class:`AbstractLoader`.
     """
 
+    default_dim_reducer: str = 'TSNE'
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.1,

@@ -63,7 +63,7 @@ def generate_figure(name: str) -> str | None:
             y=y,
             dataset_name=name,
             label_names=label_names if isinstance(label_names, list) else None,
-            dim_reducer_method='PCA',
+            dim_reducer_method=loader.default_dim_reducer,
         )
         fname = f'{safe_filename(name)}.png'
         fpath = os.path.join(FIGURES_DIR, fname)

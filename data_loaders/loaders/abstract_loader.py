@@ -24,6 +24,13 @@ class AbstractLoader(ABC):
     least ``'X'`` and ``'y'`` keys.  All splitting, shuffling, scaling, and
     dimensionality-reduction logic lives here so individual loaders stay lean.
 
+    Class attributes
+    ----------------
+    default_dim_reducer : str
+        Dimensionality reduction method used by :meth:`plot_dataset` and
+        :meth:`plot_train_test_split` when none is specified.  Image loader
+        subclasses override this to ``'TSNE'``.
+
     Parameters
     ----------
     shuffle : bool, default=True
@@ -44,7 +51,7 @@ class AbstractLoader(ABC):
     test_post_process : callable or None, default=None
         Function ``(X, y) -> (X, y)`` applied to test data after splitting.
     percent_of_data : float or None, default=None
-        If set, downsample the full dataset to this percentage (0–100) while
+        If set, downsample the full dataset to this percentage (0-100) while
         preserving class proportions.
     set_seed : bool or int, default=True
         Random seed for shuffling and splitting. True uses 42, False disables.
@@ -61,6 +68,8 @@ class AbstractLoader(ABC):
     **kwargs
         Additional keyword arguments (ignored, allows flexible subclass init).
     """
+
+    default_dim_reducer: str = 'PCA'
 
     def __init__(self,
                  shuffle: bool = True,
@@ -351,6 +360,7 @@ class AbstractLoader(ABC):
             data_override: DataDict | None = None,
             terminal_plot: bool = False,
             ax: Any = None,
+            dim_reducer_method: str | None = None,
     ) -> tuple[Any, Any] | None:
         """
         Plot the dataset.
@@ -362,6 +372,9 @@ class AbstractLoader(ABC):
             If True, render plot in terminal
         ax : matplotlib.axes.Axes, optional
             If provided, plot on this axes instead of creating new figure
+        dim_reducer_method : str or None, default=None
+            Dimensionality reduction method for plotting. If None, uses
+            ``self.default_dim_reducer``.
 
         Returns
         -------
@@ -382,7 +395,8 @@ class AbstractLoader(ABC):
             dataset_name=self.name,
             label_names=self.get_label_names(),
             terminal_plot=terminal_plot,
-            ax=ax  # Pass through
+            ax=ax,
+            dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
         )
 
 
@@ -392,6 +406,7 @@ class AbstractLoader(ABC):
             test_data_override: DataDict | None = None,
             terminal_plot: bool = False,
             ax: Any = None,
+            dim_reducer_method: str | None = None,
     ) -> tuple[Any, Any] | None:
         """
         Create train/test split and plot both datasets.
@@ -405,6 +420,9 @@ class AbstractLoader(ABC):
         ax : tuple of 2 matplotlib.axes.Axes, optional
             Tuple of 2 Axes (train_ax, test_ax) to plot on.
             If None (default): create new figure with 2 subplots
+        dim_reducer_method : str or None, default=None
+            Dimensionality reduction method for plotting. If None, uses
+            ``self.default_dim_reducer``.
 
         Returns
         -------
@@ -432,7 +450,8 @@ class AbstractLoader(ABC):
             dataset_name=self.name,
             label_names=self.get_label_names(),
             terminal_plot=terminal_plot,
-            ax=ax  # Pass through
+            ax=ax,
+            dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
         )
 
     def __str__(self) -> str:
