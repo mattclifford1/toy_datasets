@@ -59,14 +59,14 @@ def _scatter_predictions(
         if mask_correct.any():
             ax.scatter(
                 X_2d[mask_correct, 0], X_2d[mask_correct, 1],
-                facecolor=fc, edgecolor=ec, alpha=alpha, s=12,
+                facecolor=fc, edgecolor=ec, alpha=alpha, s=20,
                 linewidths=0.8 if open_markers else 0,
             )
         if mask_wrong.any():
             ax.scatter(
                 X_2d[mask_wrong, 0], X_2d[mask_wrong, 1],
                 marker='X', facecolor=fc, edgecolor='black',
-                alpha=alpha, s=25, linewidths=0.5, zorder=5,
+                alpha=alpha, s=40, linewidths=0.5, zorder=5,
                 label=f'Misclassified{label_suffix}' if mask_wrong.any() else None,
             )
 
@@ -215,17 +215,17 @@ def plot_dataset(
         for cls in [0, 1]:
             n = int(np.sum(y == cls))
             lbl = f"Class {cls}: {label_names[cls]} (n={n})" if label_names else f"Class {cls} (n={n})"
-            plot_ax.scatter([], [], color=colors[cls], s=12, label=lbl)
+            plot_ax.scatter([], [], color=colors[cls], s=20, label=lbl)
         if np.any(y != y_pred_train):
             plot_ax.scatter([], [], marker='X', color='grey', edgecolor='black',
-                            s=25, linewidths=0.5, label='Misclassified (train)')
+                            s=40, linewidths=0.5, label='Misclassified (train)')
     else:
         for cls in [0, 1]:
             n = int(np.sum(y == cls))
             lbl = f"Class {cls}: {label_names[cls]} (n={n})" if label_names else f"Class {cls} (n={n})"
             plot_ax.scatter(
                 X_2d[y == cls, 0], X_2d[y == cls, 1],
-                color=colors[cls], alpha=0.8, s=12, label=lbl,
+                color=colors[cls], alpha=0.8, s=20, label=lbl,
             )
 
     # --- test scatter (overlay mode) ---
@@ -235,20 +235,20 @@ def plot_dataset(
                                  colors, alpha=test_alpha, open_markers=True)
             if np.any(y_test != y_pred_test_resolved):
                 plot_ax.scatter([], [], marker='X', facecolor='none', edgecolor='black',
-                                s=25, linewidths=0.5, label='Misclassified (test)')
+                                s=40, linewidths=0.5, label='Misclassified (test)')
         else:
             for cls in [0, 1]:
                 plot_ax.scatter(
                     X_2d_test[y_test == cls, 0], X_2d_test[y_test == cls, 1],
                     facecolor='none', edgecolor=colors[cls],
-                    alpha=test_alpha, s=12, linewidths=0.8,
+                    alpha=test_alpha, s=20, linewidths=0.8,
                 )
         # legend markers for test
         for cls in [0, 1]:
             n = int(np.sum(y_test == cls))
             lbl = f"Class {cls} test (n={n})"
             plot_ax.scatter([], [], facecolor='none', edgecolor=colors[cls],
-                            s=12, linewidths=0.8, label=lbl)
+                            s=20, linewidths=0.8, label=lbl)
 
     title = (
         f"Train + Test in {embedder.reducer_name} space"
@@ -275,17 +275,17 @@ def plot_dataset(
             for cls in [0, 1]:
                 n = int(np.sum(y_test == cls))
                 lbl = f"Class {cls}: {label_names[cls]} (n={n})" if label_names else f"Class {cls} (n={n})"
-                test_ax.scatter([], [], color=colors[cls], s=12, label=lbl)
+                test_ax.scatter([], [], color=colors[cls], s=20, label=lbl)
             if np.any(y_test != y_pred_test_resolved):
                 test_ax.scatter([], [], marker='X', color='grey', edgecolor='black',
-                                s=25, linewidths=0.5, label='Misclassified')
+                                s=40, linewidths=0.5, label='Misclassified')
         else:
             for cls in [0, 1]:
                 n = int(np.sum(y_test == cls))
                 lbl = f"Class {cls}: {label_names[cls]} (n={n})" if label_names else f"Class {cls} (n={n})"
                 test_ax.scatter(
                     X_2d_test[y_test == cls, 0], X_2d_test[y_test == cls, 1],
-                    color=colors[cls], alpha=0.8, s=12, label=lbl,
+                    color=colors[cls], alpha=0.8, s=20, label=lbl,
                 )
         test_ax.set_title(f"Test set in {embedder.reducer_name} space")
         test_ax.set_xlabel(embedder.feature_names[0])
