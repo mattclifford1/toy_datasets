@@ -9,6 +9,21 @@ dimensionality reduction automatically when the data has more than two
 features. The terminal rendering helpers let you display plots directly in
 your terminal without a GUI.
 
+## Visual Examples
+
+**Single low-dimensional dataset** — raw 2D scatter, no reduction needed:
+
+![Moons dataset](../../assets/figures/moons.png)
+
+**High-dimensional dataset** — 13 features projected to 2D via PCA automatically:
+
+![Wine dataset (PCA)](../../assets/figures/wine.png)
+
+**Train/test split view** — `plot_train_test_split` renders both sets side-by-side with
+consistent axis scaling:
+
+![Train/test split](../../assets/figures/options/train_test_split.png)
+
 ## Functions and Classes
 
 **`plot_dataset(X, y, X_test, y_test, dataset_name, label_names, terminal_plot, dim_reducer_method, ax)`**

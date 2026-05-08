@@ -8,6 +8,12 @@ Dimensionality reduction wrappers for visualization and preprocessing.
 exposes a `transform` method for projecting any split into the reduced space.
 If the input already has `<= num_dims` features, no reduction is applied.
 
+## Visual comparison
+
+Wine dataset (13 features) projected to 2D by PCA, t-SNE, and UMAP:
+
+![Dim reducer comparison](../../assets/figures/options/dim_reducer.png)
+
 ## Classes
 
 **`DimReducer(X_train, y_train, reducer, num_dims)`**
