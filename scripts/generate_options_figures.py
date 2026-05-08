@@ -180,6 +180,89 @@ def generate_minority_reduce_figure() -> str | None:
         return None
 
 
+def generate_clf_figure() -> str | None:
+    """Show decision boundary and misclassification markers using clf on Moons (2D)."""
+    print('  Generating clf figure...')
+    try:
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.svm import SVC
+
+        loader = get_dataset('Moons', set_seed=42, num_samples=300)
+        train, test = loader.get_train_test_split()
+        label_names = loader.get_label_names()
+        lnames = label_names if isinstance(label_names, list) else None
+
+        clf_lr = LogisticRegression().fit(train['X'], train['y'])
+        clf_svm = SVC(kernel='rbf', gamma=2).fit(train['X'], train['y'])
+
+        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+        fig.suptitle('clf — decision boundary and misclassification markers (Moons dataset)', fontsize=13)
+
+        # No clf
+        _plot_dataset(X=train['X'], y=train['y'], label_names=lnames,
+                      dim_reducer_method='PCA', ax=axes[0])
+        axes[0].set_title('No classifier')
+
+        # Linear clf (LogisticRegression) — some misclassifications on non-linear data
+        _plot_dataset(X=train['X'], y=train['y'], label_names=lnames,
+                      dim_reducer_method='PCA', clf=clf_lr.predict, ax=axes[1])
+        axes[1].set_title("clf=LogisticRegression  (linear boundary)")
+
+        # Non-linear clf (SVM-RBF) — fits Moons well
+        _plot_dataset(X=train['X'], y=train['y'], label_names=lnames,
+                      dim_reducer_method='PCA', clf=clf_svm.predict, ax=axes[2])
+        axes[2].set_title("clf=SVC(rbf)  (non-linear boundary)")
+
+        fig.tight_layout()
+        fpath = os.path.join(FIGURES_DIR, 'clf.png')
+        fig.savefig(fpath, bbox_inches='tight', dpi=100)
+        plt.close(fig)
+        return 'options/clf.png'
+    except Exception as e:
+        print(f'  ERROR: {e}')
+        return None
+
+
+def generate_overlay_figure() -> str | None:
+    """Show overlay_train_test mode vs side-by-side on Moons with a classifier."""
+    print('  Generating overlay_train_test figure...')
+    try:
+        from sklearn.linear_model import LogisticRegression
+
+        loader = get_dataset('Moons', set_seed=42, num_samples=300)
+        train, test = loader.get_train_test_split()
+        label_names = loader.get_label_names()
+        lnames = label_names if isinstance(label_names, list) else None
+
+        clf = LogisticRegression().fit(train['X'], train['y'])
+
+        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+        fig.suptitle('overlay_train_test and y_pred — Moons dataset', fontsize=13)
+
+        # Side-by-side (default)
+        _plot_dataset(X=train['X'], y=train['y'], X_test=test['X'], y_test=test['y'],
+                      label_names=lnames, dim_reducer_method='PCA',
+                      ax=(axes[0], axes[1]))
+        axes[0].set_title('overlay_train_test=False (default)\ntrain')
+        axes[1].set_title('overlay_train_test=False (default)\ntest')
+
+        # Overlay mode with clf
+        _plot_dataset(X=train['X'], y=train['y'], X_test=test['X'], y_test=test['y'],
+                      label_names=lnames, dim_reducer_method='PCA',
+                      overlay_train_test=True, clf=clf.predict,
+                      test_alpha=0.4, ax=axes[2])
+        axes[2].set_title('overlay_train_test=True\n(open markers = test, boundary = clf)')
+
+        fig.tight_layout()
+        fpath = os.path.join(FIGURES_DIR, 'overlay_train_test.png')
+        fig.savefig(fpath, bbox_inches='tight', dpi=100)
+        plt.close(fig)
+        return 'options/overlay_train_test.png'
+    except Exception as e:
+        print(f'  ERROR: {e}')
+        return None
+
+
 def generate_dim_reducer_figure() -> str | None:
     """Show Wine (13 features) projected to 2D with PCA, t-SNE, and UMAP."""
     print('  Generating dim_reducer figure...')
@@ -293,6 +376,53 @@ def build_options_markdown(results: dict[str, str | None]) -> str:
         '',
         img_line('dim_reducer'),
         '',
+        '---',
+        '',
+        "### `clf` — classifier decision boundary",
+        '',
+        'Pass a trained classifier to overlay its decision boundary and highlight misclassified',
+        'points (marked with **×**). The classifier must accept inputs in the **original feature',
+        'space**. Decision boundary regions are drawn when the data is already 2D (no dim',
+        'reduction needed); for high-dim data, only misclassification markers are shown.',
+        '',
+        '```python',
+        'from sklearn.linear_model import LogisticRegression',
+        '',
+        'train, test = get_dataset("Moons").get_train_test_split()',
+        'clf = LogisticRegression().fit(train["X"], train["y"])',
+        '',
+        '# Pass clf to see boundary + misclassification markers',
+        'plot_dataset(train["X"], train["y"], clf=clf.predict)',
+        '',
+        '# Or use pre-computed predictions (no boundary, just markers)',
+        'plot_dataset(train["X"], train["y"], y_pred=clf.predict(train["X"]))',
+        '```',
+        '',
+        img_line('clf'),
+        '',
+        '---',
+        '',
+        "### `overlay_train_test` — train and test on one plot",
+        '',
+        'By default, train and test are shown in separate side-by-side subplots.',
+        'Set `overlay_train_test=True` to plot both on one axes: train as filled circles,',
+        'test as open circles at `test_alpha` opacity (default `0.3`).',
+        'Combine with `clf` to show the decision boundary and misclassifications together.',
+        '',
+        '```python',
+        'train, test = get_dataset("Moons").get_train_test_split()',
+        'clf = LogisticRegression().fit(train["X"], train["y"])',
+        '',
+        '# Overlay with custom test transparency and classifier boundary',
+        'plot_dataset(train["X"], train["y"], X_test=test["X"], y_test=test["y"],',
+        '             overlay_train_test=True, test_alpha=0.4, clf=clf.predict)',
+        '',
+        '# Also available on AbstractLoader:',
+        'loader.plot_train_test_split(overlay_train_test=True, clf=clf.predict)',
+        '```',
+        '',
+        img_line('overlay_train_test'),
+        '',
         '</details>',
     ]
     return '\n'.join(lines)
@@ -307,6 +437,8 @@ def main() -> None:
     results['percent_of_data'] = generate_percent_of_data_figure()
     results['minority_reduce'] = generate_minority_reduce_figure()
     results['dim_reducer'] = generate_dim_reducer_figure()
+    results['clf'] = generate_clf_figure()
+    results['overlay_train_test'] = generate_overlay_figure()
 
     options_md = build_options_markdown(results)
     options_path = os.path.join(REPO_ROOT, 'assets', 'figures', 'OPTIONS_SECTION.md')

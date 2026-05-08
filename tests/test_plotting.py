@@ -83,7 +83,7 @@ class TestPlotDatasetAxesParameter:
         X, y = sample_data
         fig, (ax1, ax2) = plt.subplots(1, 2)
 
-        with pytest.raises(ValueError, match="For single dataset, ax should be a single Axes"):
+        with pytest.raises(ValueError, match="For single/overlay plot, ax should be a single Axes"):
             plot_dataset(X, y, ax=(ax1, ax2), dim_reducer_method='PCA')
 
         plt.close('all')

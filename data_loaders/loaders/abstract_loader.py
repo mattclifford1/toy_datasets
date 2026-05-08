@@ -361,6 +361,8 @@ class AbstractLoader(ABC):
             terminal_plot: bool = False,
             ax: Any = None,
             dim_reducer_method: str | None = None,
+            clf: Callable | None = None,
+            y_pred: np.ndarray | None = None,
     ) -> tuple[Any, Any] | None:
         """
         Plot the dataset.
@@ -375,6 +377,12 @@ class AbstractLoader(ABC):
         dim_reducer_method : str or None, default=None
             Dimensionality reduction method for plotting. If None, uses
             ``self.default_dim_reducer``.
+        clf : callable, optional
+            Classifier callable in original feature space: ``clf(X) -> labels``.
+            Misclassified points are marked with 'X' markers. Decision boundary
+            regions are drawn only when data is already 2D (no dim reduction applied).
+        y_pred : np.ndarray, optional
+            Pre-computed predictions for X (used instead of calling clf for point coloring).
 
         Returns
         -------
@@ -397,6 +405,8 @@ class AbstractLoader(ABC):
             terminal_plot=terminal_plot,
             ax=ax,
             dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
+            clf=clf,
+            y_pred=y_pred,
         )
 
 
@@ -407,6 +417,11 @@ class AbstractLoader(ABC):
             terminal_plot: bool = False,
             ax: Any = None,
             dim_reducer_method: str | None = None,
+            clf: Callable | None = None,
+            y_pred: np.ndarray | None = None,
+            y_pred_test: np.ndarray | None = None,
+            overlay_train_test: bool = False,
+            test_alpha: float = 0.3,
     ) -> tuple[Any, Any] | None:
         """
         Create train/test split and plot both datasets.
@@ -417,17 +432,32 @@ class AbstractLoader(ABC):
         test_data_override: dict containing 'X', 'y' to plot instead of the dataset's own test split (useful for plotting modified versions of the test data, e.g. after dimensionality reduction)
         terminal_plot : bool, default=False
             If True, render plot in terminal
-        ax : tuple of 2 matplotlib.axes.Axes, optional
-            Tuple of 2 Axes (train_ax, test_ax) to plot on.
-            If None (default): create new figure with 2 subplots
+        ax : tuple of 2 matplotlib.axes.Axes or single Axes, optional
+            For side-by-side layout (default): tuple of 2 Axes (train_ax, test_ax).
+            For overlay_train_test=True: single Axes.
+            If None (default): create new figure automatically.
         dim_reducer_method : str or None, default=None
             Dimensionality reduction method for plotting. If None, uses
             ``self.default_dim_reducer``.
+        clf : callable, optional
+            Classifier callable in original feature space: ``clf(X) -> labels``.
+            Misclassified points are marked with 'X' markers. Decision boundary
+            regions are drawn only when data is already 2D (no dim reduction applied).
+        y_pred : np.ndarray, optional
+            Pre-computed predictions for training data (used instead of calling clf).
+        y_pred_test : np.ndarray, optional
+            Pre-computed predictions for test data (used instead of calling clf).
+        overlay_train_test : bool, default=False
+            If True, plot train and test on one axes. Train uses filled markers;
+            test uses open markers at test_alpha opacity.
+        test_alpha : float, default=0.3
+            Alpha for test data scatter points when overlay_train_test=True.
 
         Returns
         -------
         tuple or None
-            Returns (fig, [ax1, ax2]) when new figure is created, None otherwise
+            Returns (fig, [ax1, ax2]) for side-by-side, (fig, ax) for overlay,
+            when new figure is created. Returns None if ax was provided.
         """
         from data_loaders.plotting.visualisation import plot_dataset
 
@@ -452,6 +482,11 @@ class AbstractLoader(ABC):
             terminal_plot=terminal_plot,
             ax=ax,
             dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
+            clf=clf,
+            y_pred=y_pred,
+            y_pred_test=y_pred_test,
+            overlay_train_test=overlay_train_test,
+            test_alpha=test_alpha,
         )
 
     def __str__(self) -> str:

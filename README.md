@@ -9,6 +9,8 @@ Python package providing a unified interface for loading synthetic and real-worl
 - Built-in train/test splitting with class balance preservation
 - MinMax normalization to [-1, 1] range
 - Dimensionality reduction (PCA, UMAP, t-SNE)
+- Classifier visualization: decision boundary shading and misclassification markers
+- Train/test overlay mode with configurable test transparency
 - Terminal-based plotting (sixel/kitty protocols)
 
 
@@ -791,6 +793,53 @@ train, test = dataset.get_train_test_split()
 
 ![dim_reducer](assets/figures/options/dim_reducer.png)
 
+---
+
+### `clf` — classifier decision boundary
+
+Pass a trained classifier to overlay its decision boundary and highlight misclassified
+points (marked with **×**). The classifier must accept inputs in the **original feature
+space**. Decision boundary regions are drawn when the data is already 2D (no dim
+reduction needed); for high-dim data, only misclassification markers are shown.
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+train, test = get_dataset("Moons").get_train_test_split()
+clf = LogisticRegression().fit(train["X"], train["y"])
+
+# Pass clf to see boundary + misclassification markers
+plot_dataset(train["X"], train["y"], clf=clf.predict)
+
+# Or use pre-computed predictions (no boundary, just markers)
+plot_dataset(train["X"], train["y"], y_pred=clf.predict(train["X"]))
+```
+
+![clf](assets/figures/options/clf.png)
+
+---
+
+### `overlay_train_test` — train and test on one plot
+
+By default, train and test are shown in separate side-by-side subplots.
+Set `overlay_train_test=True` to plot both on one axes: train as filled circles,
+test as open circles at `test_alpha` opacity (default `0.3`).
+Combine with `clf` to show the decision boundary and misclassifications together.
+
+```python
+train, test = get_dataset("Moons").get_train_test_split()
+clf = LogisticRegression().fit(train["X"], train["y"])
+
+# Overlay with custom test transparency and classifier boundary
+plot_dataset(train["X"], train["y"], X_test=test["X"], y_test=test["y"],
+             overlay_train_test=True, test_alpha=0.4, clf=clf.predict)
+
+# Also available on AbstractLoader:
+loader.plot_train_test_split(overlay_train_test=True, clf=clf.predict)
+```
+
+![overlay_train_test](assets/figures/options/overlay_train_test.png)
+
 </details>
 
 ## Installation
@@ -844,8 +893,12 @@ loader.get_description()        # Dataset description
 loader.get_feature_names()      # List of feature names
 loader.get_label_names()        # List of class names
 loader.get_info()               # Full dataset info string
-loader.plot_dataset()           # Visualize the dataset
-loader.plot_train_test_split()  # Visualize train/test split
+
+# Visualize the full dataset (supports clf, y_pred)
+loader.plot_dataset()
+# Visualize train/test split (supports clf, y_pred, y_pred_test,
+#                             overlay_train_test, test_alpha)
+loader.plot_train_test_split()
 ```
 
 ## Common Options
