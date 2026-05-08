@@ -114,10 +114,10 @@ def plot_dataset(
         provide a tuple of 2 Axes. If None: create a new figure.
     clf : callable, optional
         Classifier callable in the original feature space: ``clf(X) -> labels``.
-        Used to mark misclassified points on the scatter. If the data is already
-        2D (no dim reduction applied), also draws shaded decision regions and
-        boundary line. For high-dim data with dim reduction, only point marking
-        is shown — wrap clf with your dim reducer to get boundary visualization.
+        Used to mark misclassified points on the scatter and to draw shaded
+        decision regions with a boundary line. For already-2D data the clf is
+        used directly; when a dim reducer is applied (e.g. TSNE), a KNN proxy
+        classifier is fitted in the projected 2D space to approximate the boundary.
     y_pred : np.ndarray, optional
         Pre-computed predictions for X. If provided alongside clf, these are used
         for point coloring (clf is still used for the decision boundary if applicable).
@@ -204,12 +204,22 @@ def plot_dataset(
         else (np.array(clf(X_test)) if clf is not None and has_test else None)
     )
 
-    # decision boundary — only when clf is provided and no dim reduction was applied
-    can_draw_boundary = clf is not None and embedder.reducer_model is None
+    # decision boundary classifier: direct clf for already-2D data; KNN proxy in the
+    # projected space when a dim reducer was applied (e.g. TSNE has no inverse transform)
+    boundary_clf = None
+    if clf is not None:
+        if embedder.reducer_model is None:
+            boundary_clf = clf
+        else:
+            from sklearn.neighbors import KNeighborsClassifier
+            proxy = KNeighborsClassifier(n_neighbors=5)
+            proxy.fit(X_2d, y)
+            boundary_clf = proxy.predict
+
     plot_ax = axes[0]
 
-    if can_draw_boundary:
-        _plot_decision_boundary(plot_ax, clf, xlim, ylim, colors)
+    if boundary_clf is not None:
+        _plot_decision_boundary(plot_ax, boundary_clf, xlim, ylim, colors)
 
     # --- train scatter ---
     if y_pred_train is not None:
@@ -271,8 +281,8 @@ def plot_dataset(
     # --- test scatter (side-by-side mode) ---
     if side_by_side:
         test_ax = axes[1]
-        if can_draw_boundary:
-            _plot_decision_boundary(test_ax, clf, xlim, ylim, colors)
+        if boundary_clf is not None:
+            _plot_decision_boundary(test_ax, boundary_clf, xlim, ylim, colors)
 
         if y_pred_test_resolved is not None:
             _scatter_predictions(test_ax, X_2d_test, y_test, y_pred_test_resolved, colors, alpha=0.8)

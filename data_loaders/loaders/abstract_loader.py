@@ -381,7 +381,8 @@ class AbstractLoader(ABC):
         clf : callable, optional
             Classifier callable in original feature space: ``clf(X) -> labels``.
             Misclassified points are marked with 'X' markers. Decision boundary
-            regions are drawn only when data is already 2D (no dim reduction applied).
+            regions are always drawn: directly for 2D data, or via a KNN proxy
+            fitted in the projected space when dim reduction is applied.
         y_pred : np.ndarray, optional
             Pre-computed predictions for X (used instead of calling clf for point coloring).
         show_legend : bool, default=True
@@ -447,7 +448,8 @@ class AbstractLoader(ABC):
         clf : callable, optional
             Classifier callable in original feature space: ``clf(X) -> labels``.
             Misclassified points are marked with 'X' markers. Decision boundary
-            regions are drawn only when data is already 2D (no dim reduction applied).
+            regions are always drawn: directly for 2D data, or via a KNN proxy
+            fitted in the projected space when dim reduction is applied.
         y_pred : np.ndarray, optional
             Pre-computed predictions for training data (used instead of calling clf).
         y_pred_test : np.ndarray, optional
