@@ -55,7 +55,8 @@ Each `__init__.py` defines `__all__` to explicitly export the public API.
 Synthetic: xor, moons, blobs, circles, gaussian, madelon
 Classic: iris, wine, breast_cancer
 Medical: diabetes, heart_disease, breast_cancer_* variants
-Other: banknote, wheat_seeds, mnist
+Image: mnist, cifar-10, cifar-100, cifar-10n
+Other: banknote, wheat_seeds
 
 ## Testing
 

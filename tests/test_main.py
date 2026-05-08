@@ -114,8 +114,8 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_returns_valid_X_y(self, dataset_name):
         """All loaders should return valid X and y arrays."""
-        if dataset_name == 'MNIST':
-            pytest.skip("MNIST is slow to load; tested separately")
+        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+            pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
         X = loader.get_X()
@@ -130,8 +130,8 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_X_is_float(self, dataset_name):
         """X feature matrix should be a float numpy array."""
-        if dataset_name == 'MNIST':
-            pytest.skip("MNIST is slow to load; tested separately")
+        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+            pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
         X = loader.get_X()
@@ -142,8 +142,8 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_y_is_binary_int(self, dataset_name):
         """y label array should be integer dtype with only values 0 and 1."""
-        if dataset_name == 'MNIST':
-            pytest.skip("MNIST is slow to load; tested separately")
+        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+            pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
         y = loader.get_y()
@@ -157,8 +157,8 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_train_test_split(self, dataset_name):
         """All loaders should support train/test split."""
-        if dataset_name == 'MNIST':
-            pytest.skip("MNIST is slow to load; tested separately")
+        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+            pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
         train, test = loader.get_train_test_split()
@@ -171,8 +171,8 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_has_name(self, dataset_name):
         """All loaders should have a name."""
-        if dataset_name == 'MNIST':
-            pytest.skip("MNIST is slow to load; tested separately")
+        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+            pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
         assert loader.name != 'No dataset name available'
@@ -200,3 +200,45 @@ class TestMNIST:
 
         unique_classes = np.unique(y)
         assert len(unique_classes) == 2
+
+
+class TestCIFAR:
+    """Separate tests for CIFAR datasets (slow to load)."""
+
+    @pytest.mark.slow
+    def test_cifar10_loads(self):
+        """CIFAR-10 should return X shape (n, 3072) and binary y."""
+        loader = get_dataset('CIFAR-10', size=256)
+        X = loader.get_X()
+        y = loader.get_y()
+
+        assert isinstance(X, np.ndarray)
+        assert X.shape[1] == 3072
+        assert X.shape[0] == y.shape[0]
+        assert set(np.unique(y).tolist()).issubset({0, 1})
+
+    @pytest.mark.slow
+    def test_cifar10_multiclass(self):
+        """CIFAR-10 multiclass mode should produce 10 distinct classes."""
+        loader = get_dataset('CIFAR-10', size=256, binary=False)
+        y = loader.get_y()
+        assert len(np.unique(y)) == 10
+
+    @pytest.mark.slow
+    def test_cifar100_loads(self):
+        """CIFAR-100 should return X shape (n, 3072) and binary y."""
+        loader = get_dataset('CIFAR-100', size=256)
+        X = loader.get_X()
+        y = loader.get_y()
+
+        assert isinstance(X, np.ndarray)
+        assert X.shape[1] == 3072
+        assert X.shape[0] == y.shape[0]
+        assert set(np.unique(y).tolist()).issubset({0, 1})
+
+    @pytest.mark.slow
+    def test_cifar100_multiclass(self):
+        """CIFAR-100 multiclass mode should produce 100 distinct classes."""
+        loader = get_dataset('CIFAR-100', size=2500, binary=False)
+        y = loader.get_y()
+        assert len(np.unique(y)) == 100

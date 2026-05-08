@@ -61,6 +61,9 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     'Hepatitis': _create_lazy_loader('data_loaders.loaders.local_loaders.hepititus', 'HepatitisLoader'),
     'Ionosphere': _create_lazy_loader('data_loaders.loaders.local_loaders.ionosphere', 'IonosphereLoader'),
     'MNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.mnist', 'MnistLoader'),
+    'CIFAR-10': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar10', 'Cifar10Loader'),
+    'CIFAR-100': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar100', 'Cifar100Loader'),
+    'CIFAR-10N': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar10n', 'Cifar10NLoader'),
     'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.loaders.local_loaders.sonar_rocks', 'SonarRocksLoader'),
     'Wheat Seeds': _create_lazy_loader('data_loaders.loaders.local_loaders.wheat_seeds', 'WheatSeedsLoader'),
     }

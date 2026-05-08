@@ -26,6 +26,7 @@ SKIP_DATASETS: set[str] = {
     'Costcla Credit Scoring Kaggle 2011',
     'Costcla Credit Scoring PAKDD 2009',
     'Costcla Direct Marketing',
+    'CIFAR-10N',  # requires manual label file download
 }
 
 # Dataset groupings for the gallery (order preserved)
@@ -38,8 +39,9 @@ DATASET_GROUPS: dict[str, list[str]] = {
     ],
     'Other': [
         'Banknote Authentication', 'Wheat Seeds', 'Ionosphere',
-        'Sonar Rocks vs Mines', 'Abalone Gender', 'MNIST',
+        'Sonar Rocks vs Mines', 'Abalone Gender',
     ],
+    'Image': ['MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'],
 }
 
 

@@ -24,9 +24,12 @@ Python package providing a unified interface for loading synthetic and real-worl
 - `Diabetes Pima Indian`, `Heart Disease`, `Breast Cancer Wisconsin`
 - `Habermans Breast Cancer`, `Chronic Kidney Disease`, `Hepatitis`
 
+**Image:**
+- `MNIST`, `CIFAR-10`, `CIFAR-100`, `CIFAR-10N`
+
 **Other:**
 - `Banknote Authentication`, `Wheat Seeds`, `Ionosphere`
-- `Sonar Rocks vs Mines`, `Abalone Gender`, `MNIST`
+- `Sonar Rocks vs Mines`, `Abalone Gender`
 - `Costcla Credit Scoring Kaggle 2011`, `Costcla Credit Scoring PAKDD 2009`
 - `Costcla Direct Marketing`
 
@@ -631,6 +634,11 @@ Data Loader for Abalone Gender
 
 ![Abalone Gender](assets/figures/abalone_gender.png)
 
+</details>
+
+<details>
+<summary><strong>Image</strong></summary>
+
 #### MNIST
 
 ```
@@ -648,6 +656,69 @@ Data Loader for MNIST
 ```
 
 ![MNIST](assets/figures/mnist.png)
+
+#### CIFAR-10
+
+```
+Data Loader for CIFAR-10
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: airplane
+
+ Dataset Info:
+    - Number of features: 3072
+    - Total instances: 50000
+      - Class 0: 45000 instances (Other classes)
+      - Class 1: 5000 instances (airplane)
+```
+
+32×32 RGB images flattened to 3072-dimensional vectors. Binary mode pits one class against all others.
+
+```python
+loader = get_dataset('CIFAR-10', binary=False)  # all 10 classes
+loader = get_dataset('CIFAR-10', minority_id=[3, 5])  # cat + dog vs rest
+```
+
+![CIFAR-10](assets/figures/cifar-10.png)
+
+#### CIFAR-100
+
+```
+Data Loader for CIFAR-100
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: apple
+
+ Dataset Info:
+    - Number of features: 3072
+    - Total instances: 50000
+      - Class 0: 49500 instances (Other classes)
+      - Class 1: 500 instances (apple)
+```
+
+Same 32×32 RGB format as CIFAR-10 but with 100 fine-grained classes (e.g. apple, bicycle, dolphin).
+
+```python
+loader = get_dataset('CIFAR-100', binary=False)  # all 100 classes
+loader = get_dataset('CIFAR-100', minority_id=[0, 8])  # apple + bicycle vs rest
+```
+
+![CIFAR-100](assets/figures/cifar-100.png)
+
+#### CIFAR-10N
+
+CIFAR-10N uses the same images as CIFAR-10 but replaces clean labels with real human annotation
+noise from the CIFAR-10N paper (Wei et al., 2022). Useful for benchmarking label-noise-robust methods.
+
+The noisy label file (`CIFAR-10_human.pt`) must be placed manually at
+`data_loaders/loaders/datasets/CIFAR-10N/CIFAR-10_human.pt` (see the loader docstring for instructions).
+
+```python
+# Choose a label noise type: 'aggre_label' (default), 'random_label1/2/3', 'worst_label'
+loader = get_dataset('CIFAR-10N', label_noise_type='worst_label')
+```
 
 </details>
 
@@ -820,7 +891,7 @@ Each sub-package has its own README with full details.
 | [`data_loaders/embeddings/`](data_loaders/embeddings/README.md) | PCA, kernel PCA, t-SNE, UMAP dimensionality reduction |
 | [`data_loaders/plotting/`](data_loaders/plotting/README.md) | Dataset visualisation and terminal rendering |
 | [`data_loaders/loaders/synthetic_generators/`](data_loaders/loaders/synthetic_generators/README.md) | XOR, Moons, Blobs, Circles, Gaussian generators |
-| [`data_loaders/loaders/web_loaders/`](data_loaders/loaders/web_loaders/README.md) | Iris, Wine, Breast Cancer, Heart Disease, MNIST |
+| [`data_loaders/loaders/web_loaders/`](data_loaders/loaders/web_loaders/README.md) | Iris, Wine, Breast Cancer, Heart Disease, MNIST, CIFAR-10, CIFAR-100, CIFAR-10N |
 | [`data_loaders/loaders/local_loaders/`](data_loaders/loaders/local_loaders/readme.md) | CSV-backed loaders (diabetes, banknote, costcla, etc.) |
 | [`data_loaders/loaders/external_loaders/`](data_loaders/loaders/external_loaders/README.md) | MIMIC-III/IV medical datasets (require special access) |
 
@@ -837,7 +908,7 @@ toy_datasets/
 │   └── loaders/
 │       ├── abstract_loader.py    # Base class for all loaders
 │       ├── synthetic_generators/ # XOR, Moons, Blobs, etc.
-│       ├── web_loaders/          # Iris, Wine, MNIST, etc.
+│       ├── web_loaders/          # Iris, Wine, MNIST, CIFAR-10/100/10N, etc.
 │       ├── local_loaders/        # CSV-based datasets
 │       └── external_loaders/     # MIMIC (requires access)
 ├── data_loaders/datasets/        # Bundled CSV files
