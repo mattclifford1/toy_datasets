@@ -2,8 +2,8 @@
 Examples demonstrating how to use the toy_datasets package.
 
 Run with:
-    pdm run python examples.py           # Core examples
-    pdm run python examples.py --plot    # Include terminal plotting (requires sixel/kitty)
+    uv run python examples.py           # Core examples
+    uv run python examples.py --plot    # Include terminal plotting (requires sixel/kitty)
 """
 import numpy as np
 import data_loaders
@@ -302,7 +302,7 @@ if __name__ == "__main__":
     else:
         print("\n" + "-" * 60)
         print("Tip: Run with --no_plots flag to skip terminal plotting examples")
-        print("  pdm run python examples.py --no_plots")
+        print("  uv run python examples.py --no_plots")
         print("-" * 60)
 
     print("\n" + "=" * 60)

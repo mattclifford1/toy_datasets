@@ -1,7 +1,7 @@
 """Generate dataset figures and a README gallery section for all available datasets.
 
 Run with:
-    pdm run python scripts/generate_dataset_figures.py
+    uv run python scripts/generate_dataset_figures.py
 
 Outputs:
     assets/figures/<dataset_name>.png  - one figure per dataset

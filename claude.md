@@ -4,15 +4,15 @@ Python package providing a unified interface for loading synthetic and real-worl
 
 ## Development Environment
 
-Always use PDM (Python Dependency Manager) for environment and dependency management.
+Always use uv for environment and dependency management.
 
-- `pdm install` - Install dependencies and create virtual environment
-- `pdm install -G dev` - Install with dev dependencies
-- `pdm add <package>` - Add a new dependency
-- `pdm run <command>` - Run command in the PDM environment
-- `pdm add -e path/to/package --dev` - Install a package in development mode
+- `uv sync` - Install dependencies and create virtual environment
+- `uv sync --group dev` - Install with dev dependencies
+- `uv add <package>` - Add a new dependency
+- `uv run <command>` - Run command in the uv environment
+- `uv add --editable path/to/package --group dev` - Install a package in development mode
 
-Config in `pyproject.toml` with `distribution = false` (application mode, not library).
+Config in `pyproject.toml`.
 
 ## Architecture
 
@@ -59,15 +59,15 @@ Other: banknote, wheat_seeds, mnist
 
 ## Testing
 
-Uses pytest for testing. Install dev dependencies first: `pdm install -G dev`
+Uses pytest for testing. Install dev dependencies first: `uv sync --group dev`
 
 ```bash
-pdm run pytest                              # Run all tests
-pdm run pytest -m "not slow"                # Skip slow tests (MNIST, t-SNE)
-pdm run pytest --cov=data_loaders           # With coverage report
-pdm run pytest -v                           # Verbose output
-pdm run pytest tests/test_utils.py          # Run specific test file
-pdm run pytest -k "test_shuffle"            # Run tests matching pattern
+uv run pytest                              # Run all tests
+uv run pytest -m "not slow"                # Skip slow tests (MNIST, t-SNE)
+uv run pytest --cov=data_loaders           # With coverage report
+uv run pytest -v                           # Verbose output
+uv run pytest tests/test_utils.py          # Run specific test file
+uv run pytest -k "test_shuffle"            # Run tests matching pattern
 ```
 
 Test structure:

@@ -1,7 +1,7 @@
 """Generate figures demonstrating loader options for the README options section.
 
 Run with:
-    pdm run python scripts/generate_options_figures.py
+    uv run python scripts/generate_options_figures.py
 
 Outputs:
     assets/figures/options/<option>.png  - one figure per loader option

@@ -724,16 +724,16 @@ train, test = dataset.get_train_test_split()
 
 ## Installation
 
-Requires Python 3.11+. Uses PDM for dependency management.
+Requires Python 3.11+. Uses uv for dependency management.
 
 ```bash
 # Clone and install
 git clone https://github.com/your-username/toy_datasets.git
 cd toy_datasets
-pdm install
+uv sync
 
 # Or install with dev dependencies
-pdm install -G dev
+uv sync --group dev
 ```
 
 ## Quick Start
@@ -804,9 +804,9 @@ loader = data_loaders.get_dataset(
 ## Testing
 
 ```bash
-pdm run pytest                     # Run all tests
-pdm run pytest -m "not slow"       # Skip slow tests (MNIST, t-SNE)
-pdm run pytest --cov=data_loaders  # With coverage report
+uv run pytest                     # Run all tests
+uv run pytest -m "not slow"       # Skip slow tests (MNIST, t-SNE)
+uv run pytest --cov=data_loaders  # With coverage report
 ```
 
 ## Sub-packages
@@ -842,7 +842,7 @@ toy_datasets/
 │       └── external_loaders/     # MIMIC (requires access)
 ├── data_loaders/datasets/        # Bundled CSV files
 ├── tests/                        # pytest test suite
-└── pyproject.toml                # PDM configuration
+└── pyproject.toml                # Project configuration
 ```
 
 ## License
