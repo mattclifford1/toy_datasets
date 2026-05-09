@@ -793,6 +793,52 @@ train, test = dataset.get_train_test_split()
 
 ![dim_reducer](assets/figures/options/dim_reducer.png)
 
+#### Reusing a reducer across plots
+
+When comparing multiple plots (e.g. the same dataset at different downsampling rates), you need all plots to share the **same** projection. TSNE and UMAP are non-deterministic and fit-dependent, so a fresh fit per plot produces incomparable coordinate spaces.
+
+**Option A — fit explicitly, then pass to each plot:**
+
+```python
+from data_loaders import get_dataset
+from data_loaders.plotting.visualisation import plot_dataset
+
+loader = get_dataset('Moons')
+
+# Fit once on the full dataset
+reducer = loader.fit_dim_reducer('TSNE')
+
+# Reuse the same projection for every plot
+for pct in [100, 50, 25]:
+    sub = get_dataset('Moons', percent_of_data=pct)
+    data = sub.get_data_dict()
+    plot_dataset(data['X'], data['y'],
+                 dim_reducer=reducer,
+                 dataset_name=f'Moons {pct}%')
+```
+
+**Option B — extract the reducer after the first plot:**
+
+```python
+loader = get_dataset('Moons')
+
+# First plot fits and stores the reducer automatically
+fig, ax = loader.plot_dataset(dim_reducer_method='TSNE')
+reducer = loader.last_dim_reducer   # retrieve the fitted reducer
+
+# Pass it to subsequent plots so they share the same projection
+loader2 = get_dataset('Moons', percent_of_data=50)
+loader2.plot_dataset(dim_reducer=reducer)
+
+# Works with plot_train_test_split too
+loader2.plot_train_test_split(dim_reducer=reducer)
+```
+
+The `dim_reducer` parameter is accepted by:
+- `plot_dataset()` in `data_loaders.plotting.visualisation`
+- `loader.plot_dataset()`
+- `loader.plot_train_test_split()`
+
 ---
 
 ### `clf` — classifier decision boundary

@@ -101,6 +101,7 @@ class AbstractLoader(ABC):
         self.dim_reducer = dim_reducer
         self.reduce_to_dim = reduce_to_dim
         self._load_lock = threading.Lock()
+        self.last_dim_reducer: Any = None  # set after plot_dataset / plot_train_test_split
 
 
     @abstractmethod
@@ -355,12 +356,37 @@ class AbstractLoader(ABC):
         return msg
 
 
+    def fit_dim_reducer(self, method: str | None = None) -> Any:
+        """Fit and return a DimReducer on this dataset's data.
+
+        Use this to obtain a fitted reducer that can be passed to
+        :meth:`plot_dataset` or :meth:`plot_train_test_split` so that multiple
+        plots share the same projection (important for TSNE/UMAP comparisons).
+
+        Parameters
+        ----------
+        method : str or None, default=None
+            Reduction algorithm. If None uses ``self.default_dim_reducer``.
+            Supported: ``'PCA'``, ``'kernelPCA'``, ``'TSNE'``, ``'UMAP'``,
+            ``'UMAP_supervised'``.
+
+        Returns
+        -------
+        DimReducer
+            Fitted reducer ready to pass to :meth:`plot_dataset` or
+            :meth:`plot_train_test_split` via the ``dim_reducer`` parameter.
+        """
+        from data_loaders.embeddings import DimReducer
+        data = self.get_data_dict()
+        return DimReducer(data['X'], data['y'], reducer=method or self.default_dim_reducer)
+
     def plot_dataset(
             self,
             data_override: DataDict | None = None,
             terminal_plot: bool = False,
             ax: Any = None,
             dim_reducer_method: str | None = None,
+            dim_reducer: Any = None,
             clf: Callable | None = None,
             y_pred: np.ndarray | None = None,
             show_legend: bool = True,
@@ -377,7 +403,13 @@ class AbstractLoader(ABC):
             If provided, plot on this axes instead of creating new figure
         dim_reducer_method : str or None, default=None
             Dimensionality reduction method for plotting. If None, uses
-            ``self.default_dim_reducer``.
+            ``self.default_dim_reducer``. Ignored when ``dim_reducer`` is given.
+        dim_reducer : DimReducer or None, default=None
+            Pre-fitted :class:`~data_loaders.embeddings.DimReducer` instance.
+            When provided, it is used directly (bypasses ``dim_reducer_method``).
+            After the call the reducer is also stored as ``self.last_dim_reducer``.
+            Use :meth:`fit_dim_reducer` or a previous ``self.last_dim_reducer``
+            to keep the same projection across multiple plots.
         clf : callable, optional
             Classifier callable in original feature space: ``clf(X) -> labels``.
             Misclassified points are marked with 'X' markers. Decision boundary
@@ -393,11 +425,17 @@ class AbstractLoader(ABC):
         tuple or None
             Returns (fig, ax) when new figure is created, None otherwise
         """
+        from data_loaders.embeddings import DimReducer
         from data_loaders.plotting.visualisation import plot_dataset
         if data_override is not None:
             data = data_override
         else:
             data = self.get_data_dict()
+
+        if dim_reducer is None:
+            dim_reducer = DimReducer(data['X'], data['y'],
+                                     reducer=dim_reducer_method or self.default_dim_reducer)
+        self.last_dim_reducer = dim_reducer
 
         return plot_dataset(
             X=data['X'],
@@ -408,7 +446,7 @@ class AbstractLoader(ABC):
             label_names=self.get_label_names(),
             terminal_plot=terminal_plot,
             ax=ax,
-            dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
+            dim_reducer=dim_reducer,
             clf=clf,
             y_pred=y_pred,
             show_legend=show_legend,
@@ -422,6 +460,7 @@ class AbstractLoader(ABC):
             terminal_plot: bool = False,
             ax: Any = None,
             dim_reducer_method: str | None = None,
+            dim_reducer: Any = None,
             clf: Callable | None = None,
             y_pred: np.ndarray | None = None,
             y_pred_test: np.ndarray | None = None,
@@ -444,7 +483,12 @@ class AbstractLoader(ABC):
             If None (default): create new figure automatically.
         dim_reducer_method : str or None, default=None
             Dimensionality reduction method for plotting. If None, uses
-            ``self.default_dim_reducer``.
+            ``self.default_dim_reducer``. Ignored when ``dim_reducer`` is given.
+        dim_reducer : DimReducer or None, default=None
+            Pre-fitted :class:`~data_loaders.embeddings.DimReducer` instance.
+            When provided, it is used directly (bypasses ``dim_reducer_method``).
+            The reducer is fitted on the train data if not supplied. After the
+            call it is stored as ``self.last_dim_reducer`` so it can be reused.
         clf : callable, optional
             Classifier callable in original feature space: ``clf(X) -> labels``.
             Misclassified points are marked with 'X' markers. Decision boundary
@@ -468,6 +512,7 @@ class AbstractLoader(ABC):
             Returns (fig, [ax1, ax2]) for side-by-side, (fig, ax) for overlay,
             when new figure is created. Returns None if ax was provided.
         """
+        from data_loaders.embeddings import DimReducer
         from data_loaders.plotting.visualisation import plot_dataset
 
         if train_data_override is None or test_data_override is None:
@@ -481,6 +526,11 @@ class AbstractLoader(ABC):
         else:
             test_data = test_data_original
 
+        if dim_reducer is None:
+            dim_reducer = DimReducer(train_data['X'], train_data['y'],
+                                     reducer=dim_reducer_method or self.default_dim_reducer)
+        self.last_dim_reducer = dim_reducer
+
         return plot_dataset(
             X=train_data['X'],
             y=train_data['y'],
@@ -490,7 +540,7 @@ class AbstractLoader(ABC):
             label_names=self.get_label_names(),
             terminal_plot=terminal_plot,
             ax=ax,
-            dim_reducer_method=dim_reducer_method or self.default_dim_reducer,
+            dim_reducer=dim_reducer,
             clf=clf,
             y_pred=y_pred,
             y_pred_test=y_pred_test,

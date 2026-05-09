@@ -80,6 +80,7 @@ def plot_dataset(
         label_names: list[str | int] | None = None,
         terminal_plot: bool = False,
         dim_reducer_method: str = 'TSNE',
+        dim_reducer: Any = None,
         ax: Any = None,
         clf: Callable[[np.ndarray], np.ndarray] | None = None,
         y_pred: np.ndarray | None = None,
@@ -109,6 +110,12 @@ def plot_dataset(
         If True, render plot in terminal (requires ax=None).
     dim_reducer_method : str, default='TSNE'
         Dimensionality reduction method: 'PCA', 'TSNE', or 'UMAP'.
+        Ignored when ``dim_reducer`` is provided.
+    dim_reducer : DimReducer or None, default=None
+        Pre-fitted :class:`~data_loaders.embeddings.DimReducer` instance.
+        When provided, it is used directly so the same projection can be shared
+        across multiple plots (important for TSNE/UMAP comparisons). When None,
+        a new reducer is fitted on ``X`` using ``dim_reducer_method``.
     ax : matplotlib.axes.Axes or tuple of 2 Axes, optional
         Axes to plot on. For train/test split with overlay_train_test=False,
         provide a tuple of 2 Axes. If None: create a new figure.
@@ -184,7 +191,7 @@ def plot_dataset(
 
     colors = ["#3ea3e6", "#e56a6a"]  # blue, red
 
-    embedder = DimReducer(X, y, reducer=dim_reducer_method)
+    embedder = dim_reducer if dim_reducer is not None else DimReducer(X, y, reducer=dim_reducer_method)
     X_2d = embedder.transform(X)
     X_2d_test = embedder.transform(X_test) if has_test else None
 
