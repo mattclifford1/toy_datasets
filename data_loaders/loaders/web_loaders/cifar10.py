@@ -90,14 +90,11 @@ class Cifar10Loader(AbstractLoader):
         y = np.zeros(self.size, dtype=np.int64)
         counter = 0
         for _, (d, t) in enumerate(train_loader):
-            d_np = d.numpy()
-            for i in range(d.shape[0]):
-                X[counter, :] = d_np[i].reshape(-1)
-                y[counter] = t[i]
-                counter += 1
-                if counter == self.size:
-                    break
-            if counter == self.size:
+            n = min(d.shape[0], self.size - counter)
+            X[counter:counter + n] = d.numpy()[:n].reshape(n, -1)
+            y[counter:counter + n] = t.numpy()[:n]
+            counter += n
+            if counter >= self.size:
                 break
 
         for cls in self.classes_remove:

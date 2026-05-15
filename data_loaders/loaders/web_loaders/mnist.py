@@ -15,7 +15,7 @@ class MnistLoader(AbstractLoader):
     """Load the MNIST handwritten-digit dataset.
 
     Images (28×28 pixels) are flattened to 784-dimensional vectors.
-    In the default binary mode, a specified minority digit (default: 9) is
+    In the default binary mode, a specified minority digit (default: digit 0) is
     labelled 1 and all other digits are labelled 0.
 
     Dataset stats: up to 60 000 training samples, 784 features per sample.
@@ -98,21 +98,14 @@ class MnistLoader(AbstractLoader):
 
         
         X = np.empty([self.size, 28*28], dtype=np.float32)
-        # X = np.empty([self.size, 1, 28, 28], dtype=np.float32)
-        y = np.zeros(self.size, dtype=np.int64)
+        y = np.empty(self.size, dtype=np.int64)
         counter = 0
-        # for batch_idx, (d, t) in tqdm(enumerate(train_loader), total=self.size//256, desc='torch to numpy MNIST', leave=False):
-        for batch_idx, (d, t) in enumerate(train_loader):
-            d_np = d.numpy()
-            # t_np = t.numpy()
-            for i in range(d.shape[0]):
-                X[counter, :] = d_np[i, :, :, :].reshape(-1)
-                # X[counter, :, :, :] = d_np[i, :, :, :]
-                y[counter] = t[i]
-                counter += 1
-                if counter == self.size:
-                    break
-            if counter == self.size:
+        for _, (d, t) in enumerate(train_loader):
+            n = min(d.shape[0], self.size - counter)
+            X[counter:counter + n] = d.numpy()[:n].reshape(n, -1)
+            y[counter:counter + n] = t.numpy()[:n]
+            counter += n
+            if counter >= self.size:
                 break
         
         # remove some classes
