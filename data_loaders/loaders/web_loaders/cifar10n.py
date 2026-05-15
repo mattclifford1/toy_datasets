@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from typing import Any, Literal
 
 import numpy as np
@@ -113,22 +114,24 @@ class Cifar10NLoader(AbstractLoader):
         label_dir = os.path.join(this_dir, '..', 'datasets', 'CIFAR-10N')
         os.makedirs(label_dir, exist_ok=True)
 
-        train_loader = torch_data.DataLoader(
-            datasets.CIFAR10(cifar10_dir, train=True, download=True,
-                             transform=transforms.ToTensor()),
-            batch_size=256, shuffle=False, drop_last=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', np.exceptions.VisibleDeprecationWarning)
+            cifar_dataset = datasets.CIFAR10(cifar10_dir, train=True, download=True,
+                                             transform=transforms.ToTensor())
+            train_loader = torch_data.DataLoader(
+                cifar_dataset, batch_size=256, shuffle=False, drop_last=False)
 
-        X = np.empty([self.size, 32 * 32 * 3], dtype=np.float32)
-        counter = 0
-        for _, (d, _) in enumerate(train_loader):
-            d_np = d.numpy()
-            for i in range(d.shape[0]):
-                X[counter, :] = d_np[i].reshape(-1)
-                counter += 1
+            X = np.empty([self.size, 32 * 32 * 3], dtype=np.float32)
+            counter = 0
+            for _, (d, _) in enumerate(train_loader):
+                d_np = d.numpy()
+                for i in range(d.shape[0]):
+                    X[counter, :] = d_np[i].reshape(-1)
+                    counter += 1
+                    if counter == self.size:
+                        break
                 if counter == self.size:
                     break
-            if counter == self.size:
-                break
 
         label_path = os.path.join(label_dir, _CIFAR10N_FILENAME)
         noise_data = self._load_noisy_labels(label_path)

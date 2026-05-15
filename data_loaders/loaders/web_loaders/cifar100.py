@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from typing import Any
 
 import numpy as np
@@ -94,24 +95,26 @@ class Cifar100Loader(AbstractLoader):
         """
         this_dir = os.path.dirname(os.path.abspath(__file__))
         download_dir = os.path.join(this_dir, '..', 'datasets', 'CIFAR-100')
-        train_loader = torch_data.DataLoader(
-            datasets.CIFAR100(download_dir, train=True, download=True,
-                              transform=transforms.ToTensor()),
-            batch_size=256, shuffle=False, drop_last=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', np.exceptions.VisibleDeprecationWarning)
+            cifar_dataset = datasets.CIFAR100(download_dir, train=True, download=True,
+                                              transform=transforms.ToTensor())
+            train_loader = torch_data.DataLoader(
+                cifar_dataset, batch_size=256, shuffle=False, drop_last=False)
 
-        X = np.empty([self.size, 32 * 32 * 3], dtype=np.float32)
-        y = np.zeros(self.size, dtype=np.int64)
-        counter = 0
-        for _, (d, t) in enumerate(train_loader):
-            d_np = d.numpy()
-            for i in range(d.shape[0]):
-                X[counter, :] = d_np[i].reshape(-1)
-                y[counter] = t[i]
-                counter += 1
+            X = np.empty([self.size, 32 * 32 * 3], dtype=np.float32)
+            y = np.zeros(self.size, dtype=np.int64)
+            counter = 0
+            for _, (d, t) in enumerate(train_loader):
+                d_np = d.numpy()
+                for i in range(d.shape[0]):
+                    X[counter, :] = d_np[i].reshape(-1)
+                    y[counter] = t[i]
+                    counter += 1
+                    if counter == self.size:
+                        break
                 if counter == self.size:
                     break
-            if counter == self.size:
-                break
 
         for cls in self.classes_remove:
             mask = y != cls

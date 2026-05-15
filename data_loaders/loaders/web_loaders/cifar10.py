@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from typing import Any
 
 import numpy as np
@@ -81,21 +82,23 @@ class Cifar10Loader(AbstractLoader):
         """
         this_dir = os.path.dirname(os.path.abspath(__file__))
         download_dir = os.path.join(this_dir, '..', 'datasets', 'CIFAR-10')
-        train_loader = torch_data.DataLoader(
-            datasets.CIFAR10(download_dir, train=True, download=True,
-                             transform=transforms.ToTensor()),
-            batch_size=256, shuffle=False, drop_last=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', np.exceptions.VisibleDeprecationWarning)
+            cifar_dataset = datasets.CIFAR10(download_dir, train=True, download=True,
+                                             transform=transforms.ToTensor())
+            train_loader = torch_data.DataLoader(
+                cifar_dataset, batch_size=256, shuffle=False, drop_last=False)
 
-        X = np.empty([self.size, 32 * 32 * 3], dtype=np.float32)
-        y = np.zeros(self.size, dtype=np.int64)
-        counter = 0
-        for _, (d, t) in enumerate(train_loader):
-            n = min(d.shape[0], self.size - counter)
-            X[counter:counter + n] = d.numpy()[:n].reshape(n, -1)
-            y[counter:counter + n] = t.numpy()[:n]
-            counter += n
-            if counter >= self.size:
-                break
+            X = np.empty([self.size, 32 * 32 * 3], dtype=np.float32)
+            y = np.zeros(self.size, dtype=np.int64)
+            counter = 0
+            for _, (d, t) in enumerate(train_loader):
+                n = min(d.shape[0], self.size - counter)
+                X[counter:counter + n] = d.numpy()[:n].reshape(n, -1)
+                y[counter:counter + n] = t.numpy()[:n]
+                counter += n
+                if counter >= self.size:
+                    break
 
         for cls in self.classes_remove:
             mask = y != cls
