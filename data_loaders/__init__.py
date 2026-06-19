@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from data_loaders.main import AVAILABLE_DATASETS, get_dataset
 from data_loaders.loaders.abstract_loader import AbstractLoader
-from data_loaders.utils import Normaliser, proportional_split
+from data_loaders.utils import Normaliser, binarise_labels, proportional_split
 from data_loaders.resampling import (
     AbstractResampler,
     RandomDuplicateMinorityUpsampler,
@@ -17,6 +17,7 @@ __all__ = [
     'AVAILABLE_DATASETS',
     'AbstractLoader',
     'Normaliser',
+    'binarise_labels',
     'proportional_split',
     'proportional_downsample',
     'StratifiedSubsampler',

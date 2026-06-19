@@ -262,3 +262,52 @@ class TestProportionalSplit:
         # combined: minority is further reduced
         assert combined_counts[1] < combined_counts[0]
         assert combined_counts[1] < equal_counts[1]
+
+
+class TestBinariseLabels:
+    """Tests for binarise_labels across the label formats loaders encounter."""
+
+    def test_value_remap_numpy_int(self):
+        """Collapse a class into another (e.g. iris 2 -> 0)."""
+        y = np.array([0, 1, 2, 2, 1])
+        out = utils.binarise_labels(y, {0: 0, 1: 1, 2: 0})
+        assert out.tolist() == [0, 1, 0, 0, 1]
+        assert out.dtype.kind in 'iu'
+
+    def test_swap_does_not_collide(self):
+        """A 0<->1 swap must not collide (the bug in-place reassignment hits)."""
+        y = np.array([0, 1, 0, 1])
+        out = utils.binarise_labels(y, {0: 1, 1: 0})
+        assert out.tolist() == [1, 0, 1, 0]
+
+    def test_many_to_one_merge(self):
+        """Merge several raw classes into one (e.g. wheat 2,3 -> 0)."""
+        y = np.array([1, 2, 3, 1])
+        out = utils.binarise_labels(y, {1: 1, 2: 0, 3: 0})
+        assert out.tolist() == [1, 0, 0, 1]
+
+    def test_string_keys(self):
+        """Map string labels to ints (e.g. sonar R/M)."""
+        out = utils.binarise_labels(np.array(['R', 'M', 'R'], dtype=object), {'R': 0, 'M': 1})
+        assert out.tolist() == [0, 1, 0]
+
+    def test_list_input(self):
+        """Plain list input is accepted."""
+        out = utils.binarise_labels(['B', 'M', 'B'], {'B': 0, 'M': 1})
+        assert out.tolist() == [0, 1, 0]
+
+    def test_does_not_mutate_input(self):
+        """The input array must be left unchanged."""
+        y = np.array([0, 1, 2])
+        _ = utils.binarise_labels(y, {0: 0, 1: 1, 2: 0})
+        assert y.tolist() == [0, 1, 2]
+
+    def test_unmapped_value_raises(self):
+        """An unmapped label value raises a clear ValueError."""
+        with pytest.raises(ValueError, match="9"):
+            utils.binarise_labels(np.array([0, 1, 9]), {0: 0, 1: 1})
+
+    def test_unused_mapping_key_is_allowed(self):
+        """Mapping keys absent from y are allowed (no-op)."""
+        out = utils.binarise_labels(np.array([0, 1]), {0: 0, 1: 1, 5: 1})
+        assert out.tolist() == [0, 1]
