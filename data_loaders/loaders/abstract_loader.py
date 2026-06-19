@@ -7,6 +7,7 @@ from __future__ import annotations
 import threading
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -15,6 +16,9 @@ from data_loaders import utils
 from data_loaders.resampling import downsampling
 
 DataDict = dict[str, Any]
+
+# directory holding packaged dataset files (data_loaders/datasets/)
+_DATASETS_DIR = Path(__file__).resolve().parents[1] / 'datasets'
 
 
 class AbstractLoader(ABC):
@@ -111,6 +115,49 @@ class AbstractLoader(ABC):
             - data: dict containing 'X', 'y'
         '''
         raise NotImplementedError("This is an abstract class")
+
+
+    # ------------------------------------------------------------------
+    # helpers for loaders that read files bundled in data_loaders/datasets/
+    # ------------------------------------------------------------------
+    @staticmethod
+    def local_dataset_path(dataset: str, filename: str = 'data.csv') -> str:
+        """Absolute path to a file bundled under ``data_loaders/datasets/``.
+
+        Centralises the location of packaged dataset files so individual
+        loaders do not each rebuild the same relative path.
+
+        Parameters
+        ----------
+        dataset : str
+            Sub-directory name inside ``data_loaders/datasets/``.
+        filename : str, default='data.csv'
+            File to locate within that sub-directory.
+
+        Returns
+        -------
+        str
+            Absolute path to the requested file.
+        """
+        return str(_DATASETS_DIR / dataset / filename)
+
+    @staticmethod
+    def local_dataset_description(dataset: str, filename: str = 'description.txt') -> str:
+        """Read the description text bundled with a local dataset.
+
+        Parameters
+        ----------
+        dataset : str
+            Sub-directory name inside ``data_loaders/datasets/``.
+        filename : str, default='description.txt'
+            Description file name within that sub-directory.
+
+        Returns
+        -------
+        str
+            Contents of the description file.
+        """
+        return (_DATASETS_DIR / dataset / filename).read_text()
 
 
     def get_train_test_split(
