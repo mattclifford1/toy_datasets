@@ -2,6 +2,12 @@
 '''
 loader for cervical cancer dataset: https://archive.ics.uci.edu/dataset/383/cervical+cancer+risk+factors
 This dataset focuses on the prediction of indicators/diagnosis of cervical cancer. The features cover demographic information, habits, and historic medical records.
+
+🚧 DEV NOTE: IN CONSTRUCTION — not finished and intentionally not registered in
+``AVAILABLE_DATASETS`` (data_loaders/main.py) or exported from this package's
+``__init__``. Outstanding work: choose the target column, decide how to handle
+the multiple possible targets, and impute/remove missing values (see the TODOs
+in ``load_data``). Do not rely on this loader until those are resolved.
 '''
 from __future__ import annotations
 
