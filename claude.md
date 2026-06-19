@@ -2,6 +2,34 @@
 
 Python package providing a unified interface for loading synthetic and real-world toy datasets for ML experimentation.
 
+## Design Philosophy
+
+We try to keep this package in line with the "deep-module" philosophy: a simple,
+shallow interface backed by a powerful, deep implementation. The common case
+should be trivial to get up and running without getting bogged down in details
+or arguments — `get_dataset(name)` then `get_X()` / `get_train_test_split()` /
+`plot_dataset()` — but we still allow for deep customisation when the user wants
+it (splitting, class balancing, scaling, dimensionality reduction, post-process
+hooks, etc.).
+
+Consistency across the datasets is key. Practical rules that follow from this:
+
+- **Push shared work down into `AbstractLoader`, not up into every loader.** A
+  leaf loader should ideally only implement `load_data()` and pass a handful of
+  sensible defaults to `super().__init__()`. Splitting, shuffling, scaling,
+  dimensionality reduction, info/plotting, and reading packaged dataset files
+  all live in the base class so individual loaders stay lean and identical in
+  shape.
+- **Every loader returns the same dict contract:** `{'X', 'y'}` required, plus
+  optional `'feature_names'`, `'label_names'`, `'description'` (and
+  `'cost_matrix'` for cost-sensitive datasets). Don't invent per-loader shapes.
+- **No copy-pasted infrastructure in leaf loaders** (path building, file
+  reading, re-shuffling, normalisation). If two loaders need the same helper,
+  it belongs in the base class or a shared util — not duplicated.
+- **Defaults over arguments.** Prefer good per-dataset defaults set in
+  `__init__` over forcing the caller to pass options; expose the knob via
+  `**kwargs` so power users can still override it.
+
 ## Development Environment
 
 Always use uv for environment and dependency management.
@@ -22,7 +50,7 @@ Config in `pyproject.toml`.
 - `data_loaders/loaders/web_loaders/` - Iris, Wine, MNIST, Heart Disease, Breast Cancer (from sklearn/online)
 - `data_loaders/loaders/local_loaders/` - Breast cancer variants, diabetes, banknote, wheat seeds (from local CSV files in `data/`)
 - `data_loaders/loaders/external_loaders/` - MIMIC-III/IV medical datasets (require special access)
-- `data_loaders/utils/` - Normalization (`normalisation.py`), shuffling/seeding (`shuffling.py`), train/test splitting (`splitting.py`)
+- `data_loaders/utils/` - Normalization (`normalisation.py`), shuffling/seeding (`shuffling.py`), train/test splitting (`splitting.py`), label remapping (`labels.py`)
 - `data_loaders/embeddings/` - Dimensionality reduction subpackage: `base.py` (ABC), `pca.py`, `tsne.py`, `umap.py`, `dim_reducer.py` (string-dispatch orchestrator)
 - `data_loaders/plotting/` - Dataset visualisation (`visualisation.py`) and terminal rendering (`terminal_plots.py`)
 
@@ -32,6 +60,9 @@ Config in `pyproject.toml`.
 - Loaders provide: `get_X()`, `get_y()`, `get_train_test_split()`, `plot_dataset()`
 - Normalization uses MinMax scaling to [-1, 1] range
 - Train/test splits support configurable ratio, shuffling, and class balance
+- Loaders implement only `load_data()`; shuffling is done by `AbstractLoader.get_data_dict()` (don't re-shuffle inside `load_data()`)
+- Local loaders read bundled files via `self.local_dataset_path(name)` / `self.local_dataset_description(name)` — never rebuild `os.path` strings
+- Remap raw labels (string or numeric) to integer classes with `binarise_labels(y, mapping)` from `data_loaders.utils` — handles merges and swaps safely; don't do in-place `y[y==k]=v`
 
 ## Public API
 
@@ -41,7 +72,7 @@ Each `__init__.py` defines `__all__` to explicitly export the public API.
 - `get_dataset` - Main entry point for loading datasets
 - `AVAILABLE_DATASETS` - Registry dict of all loaders
 - `AbstractLoader` - Base class for custom loaders
-- `normaliser`, `proportional_split`, `proportional_downsample` - Utilities
+- `Normaliser`, `proportional_split`, `proportional_downsample`, `binarise_labels` - Utilities
 - `dim_reducer` - Dimensionality reduction wrapper
 - `get_available_dataset_list()`, `print_available_datasets()` - Helpers
 

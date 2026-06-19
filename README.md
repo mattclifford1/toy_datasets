@@ -2,6 +2,13 @@
 
 Python package providing a unified interface for loading synthetic and real-world toy datasets for ML experimentation.
 
+Built around a **deep-module** philosophy: a tiny, consistent interface
+(`get_dataset(name)` → `get_X()`, `get_train_test_split()`, `plot_dataset()`)
+that works the same for every dataset, backed by a powerful base class that
+handles splitting, balancing, scaling, dimensionality reduction and plotting for
+you. The simple case stays simple, but deep customisation is there when you need
+it.
+
 ## Features
 
 - Unified API for 20+ datasets via `get_dataset(name)`
