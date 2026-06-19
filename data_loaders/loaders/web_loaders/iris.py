@@ -6,9 +6,8 @@ from __future__ import annotations
 
 from typing import Any
 
-import numpy as np
 from sklearn.datasets import load_iris
-from data_loaders import utils
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
@@ -69,18 +68,10 @@ class IrisLoader(AbstractLoader):
         '''
         # get dataset
         data_cls = load_iris()
-        # convert to binary datatset (0 vs 1,2)
-        y = data_cls.target
-        y[np.where(y == 2)] = 0
+        # convert to binary dataset: Setosa (0) and Virginica (2) -> 0, Versicolor (1) -> 1
+        y = binarise_labels(data_cls.target, {0: 0, 1: 1, 2: 0})
+        # shuffling is handled by AbstractLoader.get_data_dict()
         data = {'X': data_cls.data, 'y': y}
-        # shuffle the dataset
-        data = utils.shuffle_data(data)
-        # add the feature names
-        data['feature_names'] = ['Sepal length',
-                                'Sepal width',
-                                'Petal length',
-                                'Petal width']
-
         # add name and description
         data['feature_names'] = data_cls.feature_names
         data['description'] = data_cls.DESCR

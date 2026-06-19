@@ -4,14 +4,10 @@ loader for the Pima Indians Diabetes Database: https://www.kaggle.com/datasets/u
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class DiabetesPimaIndiansLoader(AbstractLoader):
@@ -58,9 +54,8 @@ class DiabetesPimaIndiansLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'diabetes_pima_indians', 'data.csv'))
-        
+        df = pd.read_csv(self.local_dataset_path('diabetes_pima_indians'))
+
         data['y'] = df.pop('Outcome').to_numpy()
 
         # keep:            glucose, BMI, age, insulin, and skin thickness
@@ -78,9 +73,7 @@ class DiabetesPimaIndiansLoader(AbstractLoader):
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['No Diabetes', 'Diabetes']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'diabetes_pima_indians', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('diabetes_pima_indians')
         return data
 
     

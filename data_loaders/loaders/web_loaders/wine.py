@@ -6,9 +6,8 @@ from __future__ import annotations
 
 from typing import Any
 
-import numpy as np
 from sklearn.datasets import load_wine
-from data_loaders import utils
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
@@ -67,12 +66,10 @@ class WineLoader(AbstractLoader):
         '''
         # get dataset
         data_cls = load_wine()
-        # convert to binary datatset (0 vs 1,2)
-        y = data_cls.target
-        y[np.where(y>1)] = 1
+        # convert to binary dataset: class 0 vs classes 1 and 2 merged into 1
+        y = binarise_labels(data_cls.target, {0: 0, 1: 1, 2: 1})
+        # shuffling is handled by AbstractLoader.get_data_dict()
         data = {'X': data_cls.data, 'y': y}
-        # shuffle the dataset
-        data = utils.shuffle_data(data)
         # add name and description
         data['feature_names'] = data_cls.feature_names
         data['description'] = data_cls.DESCR

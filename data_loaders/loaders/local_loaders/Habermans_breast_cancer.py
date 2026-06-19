@@ -7,14 +7,11 @@ for breast cancer.
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class HabermansBreastCancerLoader(AbstractLoader):
@@ -60,17 +57,13 @@ class HabermansBreastCancerLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'Habermans_breast_cancer', 'data.csv'))
-        data['y'] = df.pop('Survived_Longer_5_Years').to_numpy().copy()
-        data['y'][data['y']==1] = 0  
-        data['y'][data['y']==2] = 1
+        df = pd.read_csv(self.local_dataset_path('Habermans_breast_cancer'))
+        # 1 -> survived >= 5 years (0), 2 -> died within 5 years (1)
+        data['y'] = binarise_labels(df.pop('Survived_Longer_5_Years'), {1: 0, 2: 1})
         data['X'] = df.to_numpy().astype(float)
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['survived 5 years or longer', 'died within 5 year']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'Habermans_breast_cancer', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('Habermans_breast_cancer')
         return data
 
 

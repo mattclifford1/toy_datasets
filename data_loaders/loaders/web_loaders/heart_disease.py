@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 from ucimlrepo import fetch_ucirepo
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
@@ -71,9 +72,8 @@ class HeartDiseaseLoader(AbstractLoader):
             inds = np.where(data['y']==i)
             data['y'] = np.delete(data['y'], inds)
             data['X'] = np.delete(data['X'], inds, axis=0)
-        data['y'][data['y']==2] = 1
-        data['y'][data['y']==3] = 1
-        data['y'][data['y']==4] = 1
+        # remaining severities (0, 3, 4) -> no disease (0) vs disease (1)
+        data['y'] = binarise_labels(data['y'], {0: 0, 3: 1, 4: 1})
 
         data['feature_names'] = heart_disease.metadata
         # add name and description

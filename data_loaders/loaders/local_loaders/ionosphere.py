@@ -7,14 +7,11 @@ attributes: 34
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class IonosphereLoader(AbstractLoader):
@@ -56,20 +53,16 @@ class IonosphereLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'Ionosphere', 'data.csv'), header=None)
+        df = pd.read_csv(self.local_dataset_path('Ionosphere'), header=None)
         df.drop(df[df[0] == 'I'].index, inplace=True)
-        df[34] = df[34].map({'b': 0, 'g': 1}).astype('int64')
-        data['y'] = df.pop(34).to_numpy()  # type: ignore
+        data['y'] = binarise_labels(df.pop(34), {'b': 0, 'g': 1})
         data['X'] = df.to_numpy()
         data['feature_names'] = []
         for i in range(1, 18):
             data['feature_names'].append(f'Pulse {i} real')
             data['feature_names'].append(f'Pulse {i} imaginary')
         data['label_names'] = ['bad', 'good']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'Ionosphere', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('Ionosphere')
         return data
 
 

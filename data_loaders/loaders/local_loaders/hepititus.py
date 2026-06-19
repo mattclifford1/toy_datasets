@@ -4,14 +4,11 @@ loader for hepititus: https://archive.ics.uci.edu/dataset/46/hepatitis
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class HepatitisLoader(AbstractLoader):
@@ -56,24 +53,21 @@ class HepatitisLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'hepititus', 'data.csv'))
+        df = pd.read_csv(self.local_dataset_path('hepititus'))
         df.pop('PROTIME')
         df.pop('ALKPHOSPHATE')
         df.pop('ALBUMIN')
         # df.pop('LIVERBIG')
         # df.pop('LIVERFIRM')
         df = df[~df.isin(['?']).any(axis=1)]
-        data['y'] = df.pop('Class').to_numpy().copy()
-        data['y'][data['y'] == 2] = 0
+        # Class: 1 -> Died (1), 2 -> Survived (0)
+        data['y'] = binarise_labels(df.pop('Class'), {1: 1, 2: 0})
         for col in df.columns:
             df[col] = pd.to_numeric(df[col])
         data['X'] = df.to_numpy().astype(float)
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['Survived', 'Died']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'hepititus', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('hepititus')
         return data
         
 

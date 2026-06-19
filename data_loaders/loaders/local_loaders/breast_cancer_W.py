@@ -7,14 +7,11 @@ A few of the images can be found at http://www.cs.wisc.edu/~street/images/
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
-import numpy as np
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class BreastCancerWLoader(AbstractLoader):
@@ -60,16 +57,13 @@ class BreastCancerWLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'breast_cancer_Wisconsin', 'data.csv'))
-        data['y'] = df.pop('diagnosis').map({'B': 0, 'M': 1}).to_numpy()
+        df = pd.read_csv(self.local_dataset_path('breast_cancer_Wisconsin'))
+        data['y'] = binarise_labels(df.pop('diagnosis'), {'B': 0, 'M': 1})
         df.pop('ID')
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['Benign', 'Malignant']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'breast_cancer_Wisconsin', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('breast_cancer_Wisconsin')
         return data
 
 

@@ -6,9 +6,8 @@ from __future__ import annotations
 
 from typing import Any
 
-import numpy as np
 from sklearn.datasets import load_breast_cancer
-from data_loaders import utils
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 
@@ -68,11 +67,9 @@ class BreastCancerLoader(AbstractLoader):
         # size = 0.453 # for even test 
         # get dataset
         data_cls = load_breast_cancer()
-        data = {'X': data_cls.data, 'y': data_cls.target}
-        # swap labels for minority convention
-        data['y'][data['y'] == 1] = 2
-        data['y'][data['y'] == 0] = 1
-        data['y'][data['y'] == 2] = 0
+        # swap labels for minority convention: Malignant (0) -> 1, Benign (1) -> 0
+        y = binarise_labels(data_cls.target, {0: 1, 1: 0})
+        data = {'X': data_cls.data, 'y': y}
         # add name and description
         data['feature_names'] = data_cls.feature_names.tolist()
         data['description'] = data_cls.DESCR

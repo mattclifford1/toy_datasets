@@ -7,14 +7,11 @@ attributes: 7
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class WheatSeedsLoader(AbstractLoader):
@@ -67,21 +64,20 @@ class WheatSeedsLoader(AbstractLoader):
             raise ValueError("Wheat seeds Must either drop class 3 or combine classes")
         
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'wheat_seeds', 'data.csv'), header=None)
+        df = pd.read_csv(self.local_dataset_path('wheat_seeds'), header=None)
         if drop_class_3:
             df.drop(df[df[7] == 3].index, inplace=True)
-            df = df.replace({7: {2: 0}})
+            # Kama (1) -> 1, Rosa (2) -> 0
+            label_mapping = {1: 1, 2: 0}
             data['label_names'] = ['Rosa', 'Kama']
         if combine_classes:
-            df = df.replace({7: {2: 0, 3: 0}})
+            # Kama (1) -> 1, Rosa (2) and Canadian (3) -> 0
+            label_mapping = {1: 1, 2: 0, 3: 0}
             data['label_names'] = ['Rosa or Canadian', 'Kama']
 
-        data['y'] = df.pop(7).to_numpy()  # type: ignore
+        data['y'] = binarise_labels(df.pop(7), label_mapping)
         data['X'] = df.to_numpy()
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'wheat_seeds', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('wheat_seeds')
         data['feature_names'] = ['area',
                                 'perimeter',
                                 'compactness',

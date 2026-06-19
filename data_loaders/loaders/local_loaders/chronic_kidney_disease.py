@@ -5,14 +5,11 @@ This dataset can be used to predict the chronic kidney disease and it can be col
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class ChronicKidneyDiseaseLoader(AbstractLoader):
@@ -55,8 +52,7 @@ class ChronicKidneyDiseaseLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'chronic_kidney_disease', 'data.csv'))
+        df = pd.read_csv(self.local_dataset_path('chronic_kidney_disease'))
         # remove final row error
         df = df.drop(columns=['Unnamed: 25'])
         # drop categorical columns
@@ -151,11 +147,8 @@ class ChronicKidneyDiseaseLoader(AbstractLoader):
         # remove rows with missing target
         df = df[df['class'].notna()]
 
-        data['y'] = df.pop('class').to_numpy().copy()
-        # convert to binary labels
-        data['y'][data['y']=='ckd'] = 1
-        data['y'][data['y']=='notckd'] = 0
-        data['y'] = data['y'].astype(int)
+        # convert to binary labels: ckd -> 1, notckd -> 0
+        data['y'] = binarise_labels(df.pop('class'), {'ckd': 1, 'notckd': 0})
 
         # convert features to numeric
         for col in df.columns:
@@ -164,11 +157,7 @@ class ChronicKidneyDiseaseLoader(AbstractLoader):
         data['X'] = df.to_numpy()
         data['feature_names'] = df.columns.to_list()
         data['label_names'] = ['Chronic Kidney Disease', 'Not Chronic Kidney Disease']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 
-                            'datasets', 'chronic_kidney_disease', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
-        # shuffle the dataset
+        data['description'] = self.local_dataset_description('chronic_kidney_disease')
         return data
 
 

@@ -5,14 +5,11 @@ instances: 4177
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
+from data_loaders.utils import binarise_labels
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class AbaloneGenderLoader(AbstractLoader):
@@ -59,11 +56,9 @@ class AbaloneGenderLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'abalone', 'data.csv'), header=None)
+        df = pd.read_csv(self.local_dataset_path('abalone'), header=None)
         df.drop(df[df[0] == 'I'].index, inplace=True)
-        df[0] = df[0].map({'M': 0, 'F': 1}).astype('int64')
-        data['y'] = df.pop(0).to_numpy()  # type: ignore
+        data['y'] = binarise_labels(df.pop(0), {'M': 0, 'F': 1})
         data['X'] = df.to_numpy()
         data['feature_names'] = ['Length',
                                 'Diameter',
@@ -74,10 +69,7 @@ class AbaloneGenderLoader(AbstractLoader):
                                 'Shell weight',
                                 'Rings']
         data['label_names'] = ['Male', 'Female']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'abalone', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
-
+        data['description'] = self.local_dataset_description('abalone')
         return data
     
 

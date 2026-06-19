@@ -5,13 +5,10 @@ instances: 1372
 '''
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pandas as pd
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
-
-CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 
 class BanknoteLoader(AbstractLoader):
@@ -53,8 +50,7 @@ class BanknoteLoader(AbstractLoader):
             ``'label_names'``, and ``'description'``.
         """
         data = {}
-        df = pd.read_csv(os.path.join(CURRENT_FILE, '..', '..', 
-                        'datasets', 'banknote_authentication', 'data.csv'), header=None)
+        df = pd.read_csv(self.local_dataset_path('banknote_authentication'), header=None)
         data['y'] = df.pop(4).to_numpy()  # type: ignore
         data['X'] = df.to_numpy()
         data['feature_names'] = ['variance of Wavelet Transformed image',
@@ -62,9 +58,7 @@ class BanknoteLoader(AbstractLoader):
                                 'curtosis of Wavelet Transformed image',
                                 'entropy of image']
         data['label_names'] = ['Authentic', 'Counterfeit']
-        # add name and description
-        with open(os.path.join(CURRENT_FILE, '..', '..', 'datasets', 'banknote_authentication', 'description.txt'), 'r') as f:
-            data['description'] = f.read()
+        data['description'] = self.local_dataset_description('banknote_authentication')
         return data
     
     
