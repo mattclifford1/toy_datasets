@@ -6,6 +6,14 @@ import numpy as np
 from data_loaders.main import AVAILABLE_DATASETS, get_dataset
 from data_loaders.loaders.abstract_loader import AbstractLoader
 
+# Image datasets are slow to download/load and are tested separately.
+IMAGE_DATASETS = (
+    'MNIST', 'Fashion-MNIST', 'SVHN', 'EuroSAT',
+    'CIFAR-10', 'CIFAR-100', 'CIFAR-10N',
+    'PneumoniaMNIST', 'BreastMNIST', 'DermaMNIST',
+    'BloodMNIST', 'PathMNIST', 'OCTMNIST',
+)
+
 
 class TestAvailableDatasets:
     """Tests for the AVAILABLE_DATASETS registry."""
@@ -114,7 +122,7 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_returns_valid_X_y(self, dataset_name):
         """All loaders should return valid X and y arrays."""
-        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+        if dataset_name in IMAGE_DATASETS:
             pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
@@ -130,7 +138,7 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_X_is_float(self, dataset_name):
         """X feature matrix should be a float numpy array."""
-        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+        if dataset_name in IMAGE_DATASETS:
             pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
@@ -142,7 +150,7 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_y_is_binary_int(self, dataset_name):
         """y label array should be integer dtype with only values 0 and 1."""
-        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+        if dataset_name in IMAGE_DATASETS:
             pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
@@ -157,7 +165,7 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_train_test_split(self, dataset_name):
         """All loaders should support train/test split."""
-        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+        if dataset_name in IMAGE_DATASETS:
             pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
@@ -171,7 +179,7 @@ class TestAllDatasets:
     @pytest.mark.parametrize("dataset_name", list(AVAILABLE_DATASETS.keys()))
     def test_loader_has_name(self, dataset_name):
         """All loaders should have a name."""
-        if dataset_name in ('MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'):
+        if dataset_name in IMAGE_DATASETS:
             pytest.skip("Image dataset is slow to load; tested separately")
 
         loader = get_dataset(dataset_name)
@@ -242,3 +250,51 @@ class TestCIFAR:
         loader = get_dataset('CIFAR-100', size=2500, binary=False)
         y = loader.get_y()
         assert len(np.unique(y)) == 100
+
+
+class TestExtraImageLoaders:
+    """Separate tests for the additional image loaders (slow to download)."""
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("dataset_name,n_features,n_classes", [
+        ('Fashion-MNIST', 784, 10),
+        ('SVHN', 3072, 10),
+        ('EuroSAT', 12288, 10),
+    ])
+    def test_image_loader(self, dataset_name, n_features, n_classes):
+        """General image loaders return flat float features and binary y."""
+        loader = get_dataset(dataset_name, size=512)
+        X = loader.get_X()
+        y = loader.get_y()
+        assert X.shape[1] == n_features
+        assert X.shape[0] == y.shape[0]
+        assert set(np.unique(y).tolist()).issubset({0, 1})
+
+        multiclass = get_dataset(dataset_name, size=512, binary=False)
+        assert len(np.unique(multiclass.get_y())) == n_classes
+
+
+class TestMedMNIST:
+    """Separate tests for the MedMNIST loaders (slow to download)."""
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize("dataset_name,n_classes", [
+        ('PneumoniaMNIST', 2),
+        ('BreastMNIST', 2),
+        ('DermaMNIST', 7),
+        ('BloodMNIST', 8),
+        ('PathMNIST', 9),
+        ('OCTMNIST', 4),
+    ])
+    def test_medmnist_loader(self, dataset_name, n_classes):
+        """MedMNIST loaders are binary by default and expose native classes."""
+        loader = get_dataset(dataset_name)
+        X = loader.get_X()
+        y = loader.get_y()
+        assert X.shape[1] == 28 * 28 * (3 if dataset_name in
+                                        ('DermaMNIST', 'BloodMNIST', 'PathMNIST') else 1)
+        assert X.shape[0] == y.shape[0]
+        assert set(np.unique(y).tolist()).issubset({0, 1})
+
+        multiclass = get_dataset(dataset_name, binary=False)
+        assert len(np.unique(multiclass.get_y())) == n_classes
