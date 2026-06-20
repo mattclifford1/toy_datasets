@@ -49,8 +49,10 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
 
     # Real datasets
     'Abalone Gender': _create_lazy_loader('data_loaders.loaders.local_loaders.abalone_gender', 'AbaloneGenderLoader'),
+    'Arrhythmia': _create_lazy_loader('data_loaders.loaders.web_loaders.arrhythmia', 'ArrhythmiaLoader'),
     'Banknote Authentication': _create_lazy_loader('data_loaders.loaders.local_loaders.banknote', 'BanknoteLoader'),
     'Breast Cancer Wisconsin': _create_lazy_loader('data_loaders.loaders.local_loaders.breast_cancer_W', 'BreastCancerWLoader'),
+    'Cervical Cancer': _create_lazy_loader('data_loaders.loaders.local_loaders.cervical_cancer', 'CervicalCancerLoader'),
     'Chronic Kidney Disease': _create_lazy_loader('data_loaders.loaders.local_loaders.chronic_kidney_disease', 'ChronicKidneyDiseaseLoader'),
     'Costcla Credit Scoring Kaggle 2011': _create_lazy_loader('data_loaders.loaders.local_loaders.costcla', 'CostclaCreditScoringKaggle2011Loader'),
     'Costcla Credit Scoring PAKDD 2009': _create_lazy_loader('data_loaders.loaders.local_loaders.costcla', 'CostclaCreditScoringPAKDD2009Loader'),
@@ -59,13 +61,28 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     'Habermans Breast Cancer': _create_lazy_loader('data_loaders.loaders.local_loaders.Habermans_breast_cancer', 'HabermansBreastCancerLoader'),
     'Heart Disease': _create_lazy_loader('data_loaders.loaders.web_loaders.heart_disease', 'HeartDiseaseLoader'),
     'Hepatitis': _create_lazy_loader('data_loaders.loaders.local_loaders.hepititus', 'HepatitisLoader'),
+    'Indian Liver Patient': _create_lazy_loader('data_loaders.loaders.web_loaders.liver', 'IndianLiverLoader'),
     'Ionosphere': _create_lazy_loader('data_loaders.loaders.local_loaders.ionosphere', 'IonosphereLoader'),
+    'Parkinsons': _create_lazy_loader('data_loaders.loaders.web_loaders.parkinsons', 'ParkinsonsLoader'),
+    'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.loaders.local_loaders.sonar_rocks', 'SonarRocksLoader'),
+    'Wheat Seeds': _create_lazy_loader('data_loaders.loaders.local_loaders.wheat_seeds', 'WheatSeedsLoader'),
+
+    # Image datasets
     'MNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.mnist', 'MnistLoader'),
+    'Fashion-MNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.fashion_mnist', 'FashionMnistLoader'),
+    'SVHN': _create_lazy_loader('data_loaders.loaders.web_loaders.svhn', 'SVHNLoader'),
+    'EuroSAT': _create_lazy_loader('data_loaders.loaders.web_loaders.eurosat', 'EuroSATLoader'),
     'CIFAR-10': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar10', 'Cifar10Loader'),
     'CIFAR-100': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar100', 'Cifar100Loader'),
     'CIFAR-10N': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar10n', 'Cifar10NLoader'),
-    'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.loaders.local_loaders.sonar_rocks', 'SonarRocksLoader'),
-    'Wheat Seeds': _create_lazy_loader('data_loaders.loaders.local_loaders.wheat_seeds', 'WheatSeedsLoader'),
+
+    # Medical image datasets (MedMNIST)
+    'PneumoniaMNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.med_mnist', 'PneumoniaMNISTLoader'),
+    'BreastMNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.med_mnist', 'BreastMNISTLoader'),
+    'DermaMNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.med_mnist', 'DermaMNISTLoader'),
+    'BloodMNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.med_mnist', 'BloodMNISTLoader'),
+    'PathMNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.med_mnist', 'PathMNISTLoader'),
+    'OCTMNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.med_mnist', 'OCTMNISTLoader'),
 
     # Medical ICU datasets — data NOT shipped (PhysioNet licensing). Provide it
     # via the `data_path` arg or the MIMIC_DATA_DIR env var; see the loaders.

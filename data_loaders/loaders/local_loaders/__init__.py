@@ -3,6 +3,7 @@ from __future__ import annotations
 from .abalone_gender import AbaloneGenderLoader
 from .banknote import BanknoteLoader
 from .breast_cancer_W import BreastCancerWLoader
+from .cervical_cancer import CervicalCancerLoader
 from .chronic_kidney_disease import ChronicKidneyDiseaseLoader
 from .costcla import (
     CostclaCreditScoringKaggle2011Loader,
@@ -20,6 +21,7 @@ __all__ = [
     'AbaloneGenderLoader',
     'BanknoteLoader',
     'BreastCancerWLoader',
+    'CervicalCancerLoader',
     'ChronicKidneyDiseaseLoader',
     'CostclaCreditScoringKaggle2011Loader',
     'CostclaCreditScoringPAKDD2009Loader',
