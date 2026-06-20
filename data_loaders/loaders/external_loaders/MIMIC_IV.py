@@ -67,7 +67,7 @@ def get_ready_for_discharge(
     data = utils.shuffle_data(data, seed=seed)  # type: ignore
     # split into train, test
     train_data, test_data = utils.proportional_split( # type: ignore
-        data, size=0.1, seed=seed)
+        data, train_size=0.1, seed=seed)
     return train_data, test_data
 
 
@@ -145,18 +145,17 @@ def initial_icu_processing(
     # Get the variables of interest
 
     # Obtain only the variables of interes
-    desired_df_data = df_data[features]
+    desired_df_data = df_data[features].copy()
     # Replace values of -1 with 2 (NEGATIVE LABELLED CLASSES DOES NOT SEEM TO WORK WITH DICE)
-    desired_df_data['RFD'].replace(-1, 2, inplace=True)
+    desired_df_data['RFD'] = desired_df_data['RFD'].replace(-1, 2)
 
     # Change gender category from string to float
-    desired_df_data['gender'].replace('M', 0, inplace=True)
-    desired_df_data['gender'].replace('F', 1, inplace=True)
-    desired_df_data['gender'] = desired_df_data['gender'].astype('float')
+    desired_df_data['gender'] = desired_df_data['gender'].replace(
+        {'M': 0, 'F': 1}).astype('float')
 
     # Update the mean and the standard deviation for the data
     columns_to_process = desired_df_data.drop(
-        columns=['RFD', 'stay_id', 'hours_since_admission'], axis=1).columns.tolist()
+        columns=['RFD', 'stay_id', 'hours_since_admission']).columns.tolist()
     # columns_to_process=desired_df_data.columns.tolist()
 
     neutral_data = desired_df_data[desired_df_data['RFD'] == 0]

@@ -63,7 +63,7 @@ def get_mortality(
     df.pop('los')
 
     # label
-    data['y'] = df.pop('outcome').to_numpy()
+    data['y'] = df.pop('outcome').to_numpy().copy()
     # swap the inds as use convention of minority being 1
     # data orignally is 0 is negative outcome (death or readdmission) - 1 successful discharge
     # but we change that to be the opposite
@@ -79,8 +79,8 @@ def get_mortality(
     # split into train, test
     train_data, test_data = utils.proportional_split(  # type: ignore
         data,
-        size=0.5,
-        # size=0.7,
+        train_size=0.5,
+        # train_size=0.7,
         seed=seed)
     return train_data, test_data
 
@@ -109,5 +109,5 @@ def get_sepsis(
     data = utils.shuffle_data(data, seed=seed)  # type: ignore
     # split into train, test
     train_data, test_data = utils.proportional_split(  # type: ignore
-        data, size=0.5, seed=seed)
+        data, train_size=0.5, seed=seed)
     return train_data, test_data
