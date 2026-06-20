@@ -3,6 +3,7 @@ Tests for data_loaders/utils.py
 """
 import pytest
 import numpy as np
+import pandas as pd
 from data_loaders import utils
 
 
@@ -311,3 +312,45 @@ class TestBinariseLabels:
         """Mapping keys absent from y are allowed (no-op)."""
         out = utils.binarise_labels(np.array([0, 1]), {0: 0, 1: 1, 5: 1})
         assert out.tolist() == [0, 1]
+
+
+class TestEncodeCategoricals:
+    """Tests for encode_categoricals across the column types loaders encounter."""
+
+    def test_binary_flags_sorted_to_0_1(self):
+        """Binary categories map to 0/1 in sorted order (N<Y)."""
+        df = pd.DataFrame({'flag': ['Y', 'N', 'Y', 'N']})
+        out = utils.encode_categoricals(df)
+        assert out['flag'].tolist() == [1, 0, 1, 0]
+
+    def test_numeric_columns_untouched(self):
+        """Genuinely numeric columns are passed through unchanged."""
+        df = pd.DataFrame({'num': [1.5, 2.5, 3.5]})
+        out = utils.encode_categoricals(df)
+        assert out['num'].tolist() == [1.5, 2.5, 3.5]
+
+    def test_numeric_with_sentinel_not_encoded(self):
+        """A numeric column carrying a '?' sentinel keeps its values for imputation."""
+        df = pd.DataFrame({'vals': ['1.0', '2.0', '?']})
+        out = utils.encode_categoricals(df)
+        # not factorised: numeric values survive, sentinel becomes NaN downstream
+        assert pd.to_numeric(out['vals'], errors='coerce').dropna().tolist() == [1.0, 2.0]
+
+    def test_multi_category_encoded_by_sorted_order(self):
+        """Multi-category columns map to 0..k-1 by sorted category."""
+        df = pd.DataFrame({'c': ['b', 'a', 'c', 'a']})
+        out = utils.encode_categoricals(df)
+        assert out['c'].tolist() == [1, 0, 2, 0]
+
+    def test_exclude_leaves_column(self):
+        """Columns named in exclude are left unchanged."""
+        df = pd.DataFrame({'keep': ['Y', 'N'], 'enc': ['Y', 'N']})
+        out = utils.encode_categoricals(df, exclude=('keep',))
+        assert out['keep'].tolist() == ['Y', 'N']
+        assert out['enc'].tolist() == [1, 0]
+
+    def test_does_not_mutate_input(self):
+        """The input dataframe must be left unchanged."""
+        df = pd.DataFrame({'flag': ['Y', 'N']})
+        _ = utils.encode_categoricals(df)
+        assert df['flag'].tolist() == ['Y', 'N']
