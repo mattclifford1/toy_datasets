@@ -37,6 +37,10 @@ DATASET_GROUPS: dict[str, list[str]] = {
         'Diabetes Pima Indian', 'Heart Disease', 'Breast Cancer Wisconsin',
         'Habermans Breast Cancer', 'Chronic Kidney Disease', 'Hepatitis',
         'Parkinsons', 'Indian Liver Patient', 'Cervical Cancer', 'Arrhythmia',
+        'Thyroid Sick', 'Stroke Prediction', 'Framingham CHD', 'Thoracic Surgery',
+        'SPECTF Heart', 'Heart Failure', 'Mammographic Mass',
+        'Breast Cancer Prognostic', 'Breast Cancer Coimbra', 'HCC Survival',
+        'Z-Alizadeh Sani CAD',
     ],
     'Other': [
         'Banknote Authentication', 'Wheat Seeds', 'Ionosphere',

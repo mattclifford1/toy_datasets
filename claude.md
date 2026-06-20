@@ -81,11 +81,13 @@ Each `__init__.py` defines `__all__` to explicitly export the public API.
 - `data_loaders.loaders.web_loaders` - All web-based loader classes
 - `data_loaders.loaders.local_loaders` - All CSV-based loader classes
 
-## Available Datasets (~25)
+## Available Datasets (~35)
 
 Synthetic: xor, moons, blobs, circles, gaussian, madelon
 Classic: iris, wine, breast_cancer
-Medical: diabetes, heart_disease, breast_cancer_* variants
+Medical: diabetes, heart_disease, heart_failure, breast_cancer_* variants,
+  thyroid_sick, stroke, framingham, thoracic_surgery, spectf, mammographic_mass,
+  hcc_survival, zalizadeh_sani (many binary + imbalanced)
 Image: mnist, cifar-10, cifar-100, cifar-10n
 Other: banknote, wheat_seeds
 
