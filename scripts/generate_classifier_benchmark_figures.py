@@ -45,6 +45,7 @@ DATASET_GROUPS: dict[str, list[str]] = {
     'Medical': [
         'Diabetes Pima Indian', 'Heart Disease', 'Breast Cancer Wisconsin',
         'Habermans Breast Cancer', 'Chronic Kidney Disease', 'Hepatitis',
+        'Parkinsons', 'Indian Liver Patient', 'Cervical Cancer', 'Arrhythmia',
     ],
     'Other': [
         'Banknote Authentication', 'Wheat Seeds', 'Ionosphere',
@@ -68,6 +69,10 @@ DATASET_SHORT_NAMES: dict[str, str] = {
     'Habermans Breast Cancer': 'Habermans',
     'Chronic Kidney Disease': 'Kidney Disease',
     'Hepatitis': 'Hepatitis',
+    'Parkinsons': 'Parkinsons',
+    'Indian Liver Patient': 'Indian Liver',
+    'Cervical Cancer': 'Cervical Cancer',
+    'Arrhythmia': 'Arrhythmia',
     'Banknote Authentication': 'Banknote',
     'Wheat Seeds': 'Wheat Seeds',
     'Ionosphere': 'Ionosphere',

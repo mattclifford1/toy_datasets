@@ -1,7 +1,5 @@
 <details>
-<summary><strong>All datasets — figures &amp; stats</strong></summary>
-
-### Synthetic
+<summary><strong>Synthetic</strong></summary>
 
 #### XOR
 
@@ -125,7 +123,10 @@ Data Loader for Gaussian Synthetic
 
 ![Gaussian](assets/figures/gaussian.png)
 
-### Classic (sklearn)
+</details>
+
+<details>
+<summary><strong>Classic (sklearn)</strong></summary>
 
 #### Iris
 
@@ -234,7 +235,10 @@ Data Loader for Breast Cancer
 
 ![Breast Cancer](assets/figures/breast_cancer.png)
 
-### Medical
+</details>
+
+<details>
+<summary><strong>Medical</strong></summary>
 
 #### Diabetes Pima Indian
 
@@ -426,7 +430,152 @@ Data Loader for Hepatitis
 
 ![Hepatitis](assets/figures/hepatitis.png)
 
-### Other
+#### Parkinsons
+
+```
+Data Loader for Parkinsons
+
+ Feature Names:
+    - Feature 0: MDVP:Fo
+    - Feature 1: MDVP:Fhi
+    - Feature 2: MDVP:Flo
+    - Feature 3: MDVP:Jitter
+    - Feature 4: MDVP:Jitter
+    - Feature 5: MDVP:RAP
+    - Feature 6: MDVP:PPQ
+    - Feature 7: Jitter:DDP
+    - Feature 8: MDVP:Shimmer
+    - Feature 9: MDVP:Shimmer
+    - Feature 10: Shimmer:APQ3
+    - Feature 11: Shimmer:APQ5
+    - Feature 12: MDVP:APQ
+    - Feature 13: Shimmer:DDA
+    - Feature 14: NHR
+    - Feature 15: HNR
+    - Feature 16: RPDE
+    - Feature 17: DFA
+    - Feature 18: spread1
+    - Feature 19: spread2
+    - Feature 20: D2
+    - Feature 21: PPE
+
+ Label Names:
+    - Label 0: Healthy
+    - Label 1: Parkinson's
+
+ Dataset Info:
+    - Number of features: 22
+    - Total instances: 195
+      - Class 0: 48 instances (Healthy)
+      - Class 1: 147 instances (Parkinson's)
+```
+
+![Parkinsons](assets/figures/parkinsons.png)
+
+#### Indian Liver Patient
+
+```
+Data Loader for Indian Liver Patient
+
+ Feature Names:
+    - Feature 0: Age
+    - Feature 1: Gender
+    - Feature 2: TB
+    - Feature 3: DB
+    - Feature 4: Alkphos
+    - Feature 5: Sgpt
+    - Feature 6: Sgot
+    - Feature 7: TP
+    - Feature 8: ALB
+    - Feature 9: A/G Ratio
+
+ Label Names:
+    - Label 0: No liver disease
+    - Label 1: Liver disease
+
+ Dataset Info:
+    - Number of features: 10
+    - Total instances: 583
+      - Class 0: 167 instances (No liver disease)
+      - Class 1: 416 instances (Liver disease)
+```
+
+![Indian Liver Patient](assets/figures/indian_liver_patient.png)
+
+#### Cervical Cancer
+
+```
+Data Loader for Cervical Cancer
+
+ Feature Names:
+    - Feature 0: Age
+    - Feature 1: Number of sexual partners
+    - Feature 2: First sexual intercourse
+    - Feature 3: Num of pregnancies
+    - Feature 4: Smokes
+    - Feature 5: Smokes (years)
+    - Feature 6: Smokes (packs/year)
+    - Feature 7: Hormonal Contraceptives
+    - Feature 8: Hormonal Contraceptives (years)
+    - Feature 9: IUD
+    - Feature 10: IUD (years)
+    - Feature 11: STDs
+    - Feature 12: STDs (number)
+    - Feature 13: STDs:condylomatosis
+    - Feature 14: STDs:cervical condylomatosis
+    - Feature 15: STDs:vaginal condylomatosis
+    - Feature 16: STDs:vulvo-perineal condylomatosis
+    - Feature 17: STDs:syphilis
+    - Feature 18: STDs:pelvic inflammatory disease
+    - Feature 19: STDs:genital herpes
+    - Feature 20: STDs:molluscum contagiosum
+    - Feature 21: STDs:AIDS
+    - Feature 22: STDs:HIV
+    - Feature 23: STDs:Hepatitis B
+    - Feature 24: STDs:HPV
+    - Feature 25: STDs: Number of diagnosis
+    - Feature 26: STDs: Time since first diagnosis
+    - Feature 27: STDs: Time since last diagnosis
+    - Feature 28: Dx:Cancer
+    - Feature 29: Dx:CIN
+    - Feature 30: Dx:HPV
+    - Feature 31: Dx
+
+ Label Names:
+    - Label 0: Healthy
+    - Label 1: Cervical cancer
+
+ Dataset Info:
+    - Number of features: 32
+    - Total instances: 858
+      - Class 0: 803 instances (Healthy)
+      - Class 1: 55 instances (Cervical cancer)
+```
+
+![Cervical Cancer](assets/figures/cervical_cancer.png)
+
+#### Arrhythmia
+
+```
+Data Loader for Arrhythmia
+
+ Label Names:
+    - Label 0: Normal
+    - Label 1: Arrhythmia
+
+ Dataset Info:
+    - Number of features: 279
+    - Total instances: 452
+      - Class 0: 245 instances (Normal)
+      - Class 1: 207 instances (Arrhythmia)
+```
+
+![Arrhythmia](assets/figures/arrhythmia.png)
+
+</details>
+
+<details>
+<summary><strong>Other</strong></summary>
 
 #### Banknote Authentication
 
@@ -641,6 +790,11 @@ Data Loader for Abalone Gender
 
 ![Abalone Gender](assets/figures/abalone_gender.png)
 
+</details>
+
+<details>
+<summary><strong>Image</strong></summary>
+
 #### MNIST
 
 ```
@@ -652,11 +806,214 @@ Data Loader for MNIST
 
  Dataset Info:
     - Number of features: 784
-    - Total instances: 60000
-      - Class 0: 54077 instances (Digits 0-8)
-      - Class 1: 5923 instances (Digit 9)
+    - Total instances: 3000
+      - Class 0: 2715 instances (Digits 0-8)
+      - Class 1: 285 instances (Digit 9)
 ```
 
 ![MNIST](assets/figures/mnist.png)
+
+#### Fashion-MNIST
+
+```
+Data Loader for Fashion-MNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: T-shirt/top
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 3000
+      - Class 0: 2718 instances (Other classes)
+      - Class 1: 282 instances (T-shirt/top)
+```
+
+![Fashion-MNIST](assets/figures/fashion-mnist.png)
+
+#### SVHN
+
+```
+Data Loader for SVHN
+
+ Label Names:
+    - Label 0: Other digits
+    - Label 1: 0
+
+ Dataset Info:
+    - Number of features: 3072
+    - Total instances: 3000
+      - Class 0: 2806 instances (Other digits)
+      - Class 1: 194 instances (0)
+```
+
+![SVHN](assets/figures/svhn.png)
+
+#### EuroSAT
+
+```
+Data Loader for EuroSAT
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: Highway
+
+ Dataset Info:
+    - Number of features: 12288
+    - Total instances: 3000
+      - Class 0: 2694 instances (Other classes)
+      - Class 1: 306 instances (Highway)
+```
+
+![EuroSAT](assets/figures/eurosat.png)
+
+#### CIFAR-10
+
+```
+Data Loader for CIFAR-10
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: airplane
+
+ Dataset Info:
+    - Number of features: 3072
+    - Total instances: 3000
+      - Class 0: 2701 instances (Other classes)
+      - Class 1: 299 instances (airplane)
+```
+
+![CIFAR-10](assets/figures/cifar-10.png)
+
+#### CIFAR-100
+
+```
+Data Loader for CIFAR-100
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: apple
+
+ Dataset Info:
+    - Number of features: 3072
+    - Total instances: 3000
+      - Class 0: 2976 instances (Other classes)
+      - Class 1: 24 instances (apple)
+```
+
+![CIFAR-100](assets/figures/cifar-100.png)
+
+</details>
+
+<details>
+<summary><strong>Medical Image (MedMNIST)</strong></summary>
+
+#### PneumoniaMNIST
+
+```
+Data Loader for PneumoniaMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: pneumonia
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 2824
+      - Class 0: 728 instances (Other classes)
+      - Class 1: 2096 instances (pneumonia)
+```
+
+![PneumoniaMNIST](assets/figures/pneumoniamnist.png)
+
+#### BreastMNIST
+
+```
+Data Loader for BreastMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: malignant
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 546
+      - Class 0: 399 instances (Other classes)
+      - Class 1: 147 instances (malignant)
+```
+
+![BreastMNIST](assets/figures/breastmnist.png)
+
+#### DermaMNIST
+
+```
+Data Loader for DermaMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: melanoma
+
+ Dataset Info:
+    - Number of features: 2352
+    - Total instances: 2802
+      - Class 0: 2491 instances (Other classes)
+      - Class 1: 311 instances (melanoma)
+```
+
+![DermaMNIST](assets/figures/dermamnist.png)
+
+#### BloodMNIST
+
+```
+Data Loader for BloodMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: basophil
+
+ Dataset Info:
+    - Number of features: 2352
+    - Total instances: 2989
+      - Class 0: 2776 instances (Other classes)
+      - Class 1: 213 instances (basophil)
+```
+
+![BloodMNIST](assets/figures/bloodmnist.png)
+
+#### PathMNIST
+
+```
+Data Loader for PathMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: colorectal adenocarcinoma epithelium
+
+ Dataset Info:
+    - Number of features: 2352
+    - Total instances: 2699
+      - Class 0: 2313 instances (Other classes)
+      - Class 1: 386 instances (colorectal adenocarcinoma epithelium)
+```
+
+![PathMNIST](assets/figures/pathmnist.png)
+
+#### OCTMNIST
+
+```
+Data Loader for OCTMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: choroidal neovascularization
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 2923
+      - Class 0: 1919 instances (Other classes)
+      - Class 1: 1004 instances (choroidal neovascularization)
+```
+
+![OCTMNIST](assets/figures/octmnist.png)
 
 </details>

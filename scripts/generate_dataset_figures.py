@@ -36,12 +36,36 @@ DATASET_GROUPS: dict[str, list[str]] = {
     'Medical': [
         'Diabetes Pima Indian', 'Heart Disease', 'Breast Cancer Wisconsin',
         'Habermans Breast Cancer', 'Chronic Kidney Disease', 'Hepatitis',
+        'Parkinsons', 'Indian Liver Patient', 'Cervical Cancer', 'Arrhythmia',
     ],
     'Other': [
         'Banknote Authentication', 'Wheat Seeds', 'Ionosphere',
         'Sonar Rocks vs Mines', 'Abalone Gender',
     ],
-    'Image': ['MNIST', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'],
+    'Image': ['MNIST', 'Fashion-MNIST', 'SVHN', 'EuroSAT', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'],
+    'Medical Image (MedMNIST)': [
+        'PneumoniaMNIST', 'BreastMNIST', 'DermaMNIST',
+        'BloodMNIST', 'PathMNIST', 'OCTMNIST',
+    ],
+}
+
+# Per-dataset load overrides. Image datasets are capped to a few thousand
+# samples so the 2D projection used for the gallery figure stays quick to
+# compute; ``percent_of_data`` keeps class proportions for the MedMNIST sets
+# whose loaders take no ``size`` argument.
+DATASET_LOAD_KWARGS: dict[str, dict] = {
+    'MNIST': {'size': 3000},
+    'Fashion-MNIST': {'size': 3000},
+    'SVHN': {'size': 3000},
+    'EuroSAT': {'size': 3000},
+    'CIFAR-10': {'size': 3000},
+    'CIFAR-100': {'size': 3000},
+    'PneumoniaMNIST': {'percent_of_data': 60},
+    'BreastMNIST': {},
+    'DermaMNIST': {'percent_of_data': 40},
+    'BloodMNIST': {'percent_of_data': 25},
+    'PathMNIST': {'percent_of_data': 3},
+    'OCTMNIST': {'percent_of_data': 3},
 }
 
 
@@ -53,7 +77,7 @@ def generate_figure(name: str) -> str | None:
     """Load dataset, plot with PCA, save PNG. Returns relative path or None on failure."""
     print(f'  Generating figure for: {name}')
     try:
-        loader = get_dataset(name, set_seed=42)
+        loader = get_dataset(name, set_seed=42, **DATASET_LOAD_KWARGS.get(name, {}))
         X = loader.get_X()
         y = loader.get_y()
         label_names = loader.get_label_names()
@@ -78,7 +102,7 @@ def generate_figure(name: str) -> str | None:
 def get_stats_block(name: str) -> str:
     """Return get_info(long=False) output for a dataset."""
     try:
-        loader = get_dataset(name, set_seed=42)
+        loader = get_dataset(name, set_seed=42, **DATASET_LOAD_KWARGS.get(name, {}))
         return loader.get_info(long=False)
     except Exception as e:
         return f'(stats unavailable: {e})'

@@ -11,7 +11,7 @@ it.
 
 ## Features
 
-- Unified API for 20+ datasets via `get_dataset(name)`
+- Unified API for 40+ datasets via `get_dataset(name)`
 - Consistent dict format: `{'X': features, 'y': labels}`
 - Built-in train/test splitting with class balance preservation
 - MinMax normalization to [-1, 1] range
@@ -29,12 +29,17 @@ it.
 **Classic (sklearn):**
 - `Iris`, `Wine`, `Breast Cancer`
 
-**Medical:**
+**Medical (incl. imbalanced / rare-disease):**
 - `Diabetes Pima Indian`, `Heart Disease`, `Breast Cancer Wisconsin`
 - `Habermans Breast Cancer`, `Chronic Kidney Disease`, `Hepatitis`
+- `Parkinsons`, `Indian Liver Patient`, `Cervical Cancer`, `Arrhythmia`
 
 **Image:**
-- `MNIST`, `CIFAR-10`, `CIFAR-100`, `CIFAR-10N`
+- `MNIST`, `Fashion-MNIST`, `SVHN`, `EuroSAT`, `CIFAR-10`, `CIFAR-100`, `CIFAR-10N`
+
+**Medical image (MedMNIST):**
+- `PneumoniaMNIST`, `BreastMNIST`, `DermaMNIST`
+- `BloodMNIST`, `PathMNIST`, `OCTMNIST`
 
 **Other:**
 - `Banknote Authentication`, `Wheat Seeds`, `Ionosphere`
@@ -487,6 +492,87 @@ Data Loader for Hepatitis
 
 ![Hepatitis](assets/figures/hepatitis.png)
 
+#### Parkinsons
+
+```
+Data Loader for Parkinsons
+
+ Label Names:
+    - Label 0: Healthy
+    - Label 1: Parkinson's
+
+ Dataset Info:
+    - Number of features: 22
+    - Total instances: 195
+      - Class 0: 48 instances (Healthy)
+      - Class 1: 147 instances (Parkinson's)
+```
+
+![Parkinsons](assets/figures/parkinsons.png)
+
+#### Indian Liver Patient
+
+```
+Data Loader for Indian Liver Patient
+
+ Label Names:
+    - Label 0: No liver disease
+    - Label 1: Liver disease
+
+ Dataset Info:
+    - Number of features: 10
+    - Total instances: 583
+      - Class 0: 167 instances (No liver disease)
+      - Class 1: 416 instances (Liver disease)
+```
+
+![Indian Liver Patient](assets/figures/indian_liver_patient.png)
+
+#### Cervical Cancer
+
+A strongly imbalanced rare-disease example — only ~6% of patients have a positive biopsy.
+
+```
+Data Loader for Cervical Cancer
+
+ Label Names:
+    - Label 0: Healthy
+    - Label 1: Cervical cancer
+
+ Dataset Info:
+    - Number of features: 32
+    - Total instances: 858
+      - Class 0: 803 instances (Healthy)
+      - Class 1: 55 instances (Cervical cancer)
+```
+
+![Cervical Cancer](assets/figures/cervical_cancer.png)
+
+#### Arrhythmia
+
+Multi-class ECG dataset with several rare classes. Binary by default (normal vs. any
+arrhythmia); pass `binary=False` to keep the native classes.
+
+```
+Data Loader for Arrhythmia
+
+ Label Names:
+    - Label 0: Normal
+    - Label 1: Arrhythmia
+
+ Dataset Info:
+    - Number of features: 279
+    - Total instances: 452
+      - Class 0: 245 instances (Normal)
+      - Class 1: 207 instances (Arrhythmia)
+```
+
+```python
+loader = get_dataset('Arrhythmia', binary=False)  # 13 native arrhythmia classes
+```
+
+![Arrhythmia](assets/figures/arrhythmia.png)
+
 </details>
 
 <details>
@@ -666,6 +752,75 @@ Data Loader for MNIST
 
 ![MNIST](assets/figures/mnist.png)
 
+#### Fashion-MNIST
+
+A drop-in, more realistic replacement for MNIST: 28×28 greyscale clothing images.
+
+```
+Data Loader for Fashion-MNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: T-shirt/top
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 60000
+```
+
+```python
+loader = get_dataset('Fashion-MNIST', binary=False)       # all 10 clothing classes
+loader = get_dataset('Fashion-MNIST', minority_id=[5, 7])  # sandal + sneaker vs rest
+```
+
+![Fashion-MNIST](assets/figures/fashion-mnist.png)
+
+#### SVHN
+
+Street View House Numbers — real-world 32×32 RGB digit crops, a naturally noisier
+counterpart to MNIST.
+
+```
+Data Loader for SVHN
+
+ Label Names:
+    - Label 0: Other digits
+    - Label 1: 0
+
+ Dataset Info:
+    - Number of features: 3072
+    - Total instances: 73257
+```
+
+```python
+loader = get_dataset('SVHN', binary=False)  # all 10 digit classes
+```
+
+![SVHN](assets/figures/svhn.png)
+
+#### EuroSAT
+
+Sentinel-2 satellite image patches (64×64 RGB) across 10 land-use classes.
+
+```
+Data Loader for EuroSAT
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: Highway
+
+ Dataset Info:
+    - Number of features: 12288
+    - Total instances: 27000
+```
+
+```python
+loader = get_dataset('EuroSAT', binary=False)  # all 10 land-use classes
+loader = get_dataset('EuroSAT', size=10000)     # cap number of samples loaded
+```
+
+![EuroSAT](assets/figures/eurosat.png)
+
 #### CIFAR-10
 
 ```
@@ -728,6 +883,122 @@ The noisy label file (`CIFAR-10_human.pt`) must be placed manually at
 # Choose a label noise type: 'aggre_label' (default), 'random_label1/2/3', 'worst_label'
 loader = get_dataset('CIFAR-10N', label_noise_type='worst_label')
 ```
+
+</details>
+
+<details>
+<summary><strong>Medical image (MedMNIST)</strong></summary>
+
+Standardised, MNIST-shaped (28×28) biomedical images from the
+[MedMNIST](https://medmnist.com/) collection. Each loader is **binary by default**
+(a clinically meaningful minority class vs. the rest); pass `binary=False` to keep the
+native classes, which preserves the strong real-world class imbalance (e.g. rare skin
+lesions in DermaMNIST). RGB subsets (Derma/Blood/Path) have 2352 features, greyscale
+subsets 784.
+
+```python
+loader = get_dataset('DermaMNIST', binary=False)   # 7 skin-lesion classes (imbalanced)
+loader = get_dataset('PneumoniaMNIST')             # chest X-ray: pneumonia vs normal
+loader = get_dataset('BloodMNIST', size=128)        # higher-resolution variant (128×128)
+```
+
+#### PneumoniaMNIST
+
+```
+Data Loader for PneumoniaMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: pneumonia
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 4708
+```
+
+![PneumoniaMNIST](assets/figures/pneumoniamnist.png)
+
+#### BreastMNIST
+
+```
+Data Loader for BreastMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: malignant
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 546
+```
+
+![BreastMNIST](assets/figures/breastmnist.png)
+
+#### DermaMNIST
+
+Dermatoscope skin lesions — 7 classes, heavily imbalanced (melanoma is a minority class).
+
+```
+Data Loader for DermaMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: melanoma
+
+ Dataset Info:
+    - Number of features: 2352
+    - Total instances: 7007
+```
+
+![DermaMNIST](assets/figures/dermamnist.png)
+
+#### BloodMNIST
+
+```
+Data Loader for BloodMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: basophil
+
+ Dataset Info:
+    - Number of features: 2352
+    - Total instances: 11959
+```
+
+![BloodMNIST](assets/figures/bloodmnist.png)
+
+#### PathMNIST
+
+```
+Data Loader for PathMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: colorectal adenocarcinoma epithelium
+
+ Dataset Info:
+    - Number of features: 2352
+    - Total instances: 89996
+```
+
+![PathMNIST](assets/figures/pathmnist.png)
+
+#### OCTMNIST
+
+```
+Data Loader for OCTMNIST
+
+ Label Names:
+    - Label 0: Other classes
+    - Label 1: choroidal neovascularization
+
+ Dataset Info:
+    - Number of features: 784
+    - Total instances: 97477
+```
+
+![OCTMNIST](assets/figures/octmnist.png)
 
 </details>
 
@@ -1035,8 +1306,8 @@ Each sub-package has its own README with full details.
 | [`data_loaders/embeddings/`](data_loaders/embeddings/README.md) | PCA, kernel PCA, t-SNE, UMAP dimensionality reduction |
 | [`data_loaders/plotting/`](data_loaders/plotting/README.md) | Dataset visualisation and terminal rendering |
 | [`data_loaders/loaders/synthetic_generators/`](data_loaders/loaders/synthetic_generators/README.md) | XOR, Moons, Blobs, Circles, Gaussian generators |
-| [`data_loaders/loaders/web_loaders/`](data_loaders/loaders/web_loaders/README.md) | Iris, Wine, Breast Cancer, Heart Disease, MNIST, CIFAR-10, CIFAR-100, CIFAR-10N |
-| [`data_loaders/loaders/local_loaders/`](data_loaders/loaders/local_loaders/readme.md) | CSV-backed loaders (diabetes, banknote, costcla, etc.) |
+| [`data_loaders/loaders/web_loaders/`](data_loaders/loaders/web_loaders/README.md) | Iris, Wine, Breast Cancer, Heart Disease, Parkinsons, Indian Liver, Arrhythmia, MNIST, Fashion-MNIST, SVHN, EuroSAT, CIFAR-10/100/10N, MedMNIST |
+| [`data_loaders/loaders/local_loaders/`](data_loaders/loaders/local_loaders/readme.md) | CSV-backed loaders (diabetes, banknote, cervical cancer, costcla, etc.) |
 | [`data_loaders/loaders/external_loaders/`](data_loaders/loaders/external_loaders/README.md) | MIMIC-III/IV medical datasets (require special access) |
 
 ## Project Structure
