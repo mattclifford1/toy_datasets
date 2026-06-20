@@ -1,0 +1,11 @@
+Framingham Heart Study — 10-year coronary heart disease (CHD) risk.
+
+Binary classification: predict whether a patient develops coronary heart disease
+within 10 years (class 1) or not (class 0) from demographic, behavioural and
+medical risk factors (age, smoking, blood pressure, cholesterol, BMI, glucose,
+diabetes, etc.). The classes are imbalanced (~15% positive) and several columns
+contain missing values, which are median-imputed during loading.
+
+Derived from the Framingham Heart Study longitudinal cohort, widely mirrored as
+the Kaggle "framingham.csv".
+Stats: 4240 samples, 15 features.

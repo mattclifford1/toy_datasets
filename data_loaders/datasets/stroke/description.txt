@@ -1,0 +1,14 @@
+Stroke Prediction dataset.
+
+Binary classification: predict whether a patient has had a stroke (class 1) or
+not (class 0) from demographic and clinical attributes (age, hypertension, heart
+disease, average glucose level, BMI, smoking status, work/residence type, etc.).
+Strongly imbalanced — only ~5% of patients are positive — and the BMI column has
+missing values, making this a good stress test for class-balancing and missing
+data handling.
+
+Categorical columns (gender, ever_married, work_type, residence, smoking_status)
+are integer-encoded and missing BMI values are median-imputed during loading.
+
+Source: Kaggle "Stroke Prediction Dataset" (fedesoriano), id column removed.
+Stats: 5110 samples, 10 features.

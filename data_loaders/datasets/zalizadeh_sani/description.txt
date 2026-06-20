@@ -1,0 +1,16 @@
+Z-Alizadeh Sani coronary artery disease (CAD) dataset.
+
+Binary classification: predict whether a patient has coronary artery disease
+(Cad, class 1) or a normal angiogram (Normal, class 0). Each patient is described
+by 55 features spanning demographics, symptoms, examination findings, ECG signs
+and laboratory blood tests — a rich mix of numeric and categorical variables.
+The classes are imbalanced (~71% CAD).
+
+Categorical columns are integer-encoded during loading: binary Yes/No (and N/Y)
+flags map to 0/1, Sex maps Female=0/Male=1, and multi-category fields (BBB, VHD)
+are integer-encoded by sorted category.
+
+Citation: Alizadehsani et al., "A data mining approach for diagnosis of coronary
+artery disease", Computer Methods and Programs in Biomedicine, 111(1), 2013.
+Source: https://archive.ics.uci.edu/dataset/412/z+alizadeh+sani
+Stats: 303 samples, 55 features.

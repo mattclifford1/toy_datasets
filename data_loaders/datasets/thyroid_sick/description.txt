@@ -1,0 +1,15 @@
+Thyroid Disease (sick) dataset.
+
+Binary classification: predict whether a patient is sick (referred for thyroid
+dysfunction, class 1) or negative (class 0) from demographic details, clinical
+flags and thyroid hormone assays (TSH, T3, TT4, T4U, FTI). A classic highly
+imbalanced / anomaly-detection benchmark: roughly 6% of records are positive.
+
+Categorical t/f flags are encoded to 1/0, sex to Female=0/Male=1, the referral
+source is integer-encoded, missing values (sentinel '?') are median-imputed and
+the near-empty TBG assay column is dropped. The per-record id suffix on the
+class label is removed during loading.
+
+Source: https://archive.ics.uci.edu/dataset/102/thyroid+disease
+Files: thyroid-disease/sick.data and sick.names (Garavan Institute, Sydney).
+Stats: 2800 samples, 28 features after dropping TBG.

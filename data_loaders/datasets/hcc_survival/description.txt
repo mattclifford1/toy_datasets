@@ -1,0 +1,17 @@
+Hepatocellular Carcinoma (HCC) survival dataset.
+
+Binary classification: predict 1-year survival of HCC patients — lives (class 1)
+or dies (class 0). Collected at a University Hospital in Portugal for 165 real
+patients, with 49 features (23 quantitative, 26 qualitative) selected per the
+EASL-EORTC clinical guidelines: demographics, risk factors, comorbidities and
+laboratory measurements.
+
+A heterogeneous, partially missing dataset (~10% of values missing, sentinel
+'?'), with mild class imbalance (102 lives vs 63 dies). Missing values are
+median-imputed during loading.
+
+Citation: Santos et al., "A new cluster-based oversampling method for improving
+survival prediction of hepatocellular carcinoma patients", Journal of Biomedical
+Informatics, 58, 49-59, 2015.
+Source: https://archive.ics.uci.edu/dataset/423/hcc+survival
+Stats: 165 samples, 49 features.
