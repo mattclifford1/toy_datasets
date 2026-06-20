@@ -16,6 +16,11 @@ from .hepititus import HepatitisLoader
 from .ionosphere import IonosphereLoader
 from .sonar_rocks import SonarRocksLoader
 from .wheat_seeds import WheatSeedsLoader
+from .thyroid_sick import ThyroidSickLoader
+from .framingham import FraminghamLoader
+from .stroke import StrokeLoader
+from .hcc_survival import HCCSurvivalLoader
+from .zalizadeh_sani import ZAlizadehSaniLoader
 
 __all__ = [
     'AbaloneGenderLoader',
@@ -32,4 +37,9 @@ __all__ = [
     'IonosphereLoader',
     'SonarRocksLoader',
     'WheatSeedsLoader',
+    'ThyroidSickLoader',
+    'FraminghamLoader',
+    'StrokeLoader',
+    'HCCSurvivalLoader',
+    'ZAlizadehSaniLoader',
 ]

@@ -23,6 +23,12 @@ from .med_mnist import (
 from .parkinsons import ParkinsonsLoader
 from .liver import IndianLiverLoader
 from .arrhythmia import ArrhythmiaLoader
+from .thoracic import ThoracicSurgeryLoader
+from .spectf import SPECTFHeartLoader
+from .heart_failure import HeartFailureLoader
+from .mammographic import MammographicMassLoader
+from .wpbc import BreastCancerPrognosticLoader
+from .breast_cancer_coimbra import BreastCancerCoimbraLoader
 
 __all__ = [
     'IrisLoader',
@@ -46,4 +52,10 @@ __all__ = [
     'ParkinsonsLoader',
     'IndianLiverLoader',
     'ArrhythmiaLoader',
+    'ThoracicSurgeryLoader',
+    'SPECTFHeartLoader',
+    'HeartFailureLoader',
+    'MammographicMassLoader',
+    'BreastCancerPrognosticLoader',
+    'BreastCancerCoimbraLoader',
 ]
