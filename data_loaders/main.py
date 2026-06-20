@@ -66,6 +66,12 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     'CIFAR-10N': _create_lazy_loader('data_loaders.loaders.web_loaders.cifar10n', 'Cifar10NLoader'),
     'Sonar Rocks vs Mines': _create_lazy_loader('data_loaders.loaders.local_loaders.sonar_rocks', 'SonarRocksLoader'),
     'Wheat Seeds': _create_lazy_loader('data_loaders.loaders.local_loaders.wheat_seeds', 'WheatSeedsLoader'),
+
+    # Medical ICU datasets — data NOT shipped (PhysioNet licensing). Provide it
+    # via the `data_path` arg or the MIMIC_DATA_DIR env var; see the loaders.
+    'MIMIC-III Mortality': _create_lazy_loader('data_loaders.loaders.external_loaders.MIMIC_III', 'MIMICIIIMortalityLoader'),
+    'MIMIC-III Sepsis': _create_lazy_loader('data_loaders.loaders.external_loaders.MIMIC_III', 'MIMICIIISepsisLoader'),
+    'MIMIC-IV Ready for Discharge': _create_lazy_loader('data_loaders.loaders.external_loaders.MIMIC_IV', 'MIMICIVReadyForDischargeLoader'),
     }
 
 
