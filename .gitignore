@@ -1,6 +1,7 @@
-# big datasets
-data_loaders/loaders/datasets/cifar*
-data_loaders/loaders/datasets/CIFAR*
+# big datasets — auto-downloaded on first use (torchvision / MedMNIST caches),
+# never committed. Covers MNIST, Fashion-MNIST, SVHN, EuroSAT, CIFAR-*, MedMNIST.
+data_loaders/loaders/datasets/
+data_loaders/datasets/MNIST/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -212,5 +213,4 @@ __marimo__/
 
 # macOS
 .DS_Store
-data_loaders/datasets/MNIST/
 
