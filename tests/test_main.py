@@ -251,6 +251,25 @@ class TestCIFAR:
         y = loader.get_y()
         assert len(np.unique(y)) == 100
 
+    @pytest.mark.slow
+    def test_cifar10n_loads(self):
+        """CIFAR-10N auto-downloads its human label file and loads."""
+        loader = get_dataset('CIFAR-10N', size=256)
+        X = loader.get_X()
+        y = loader.get_y()
+
+        assert isinstance(X, np.ndarray)
+        assert X.shape[1] == 3072
+        assert X.shape[0] == y.shape[0]
+        assert set(np.unique(y).tolist()).issubset({0, 1})
+
+    @pytest.mark.slow
+    def test_cifar10n_multiclass(self):
+        """CIFAR-10N multiclass mode should produce 10 distinct classes."""
+        loader = get_dataset('CIFAR-10N', size=2500, binary=False)
+        y = loader.get_y()
+        assert len(np.unique(y)) == 10
+
 
 class TestExtraImageLoaders:
     """Separate tests for the additional image loaders (slow to download)."""

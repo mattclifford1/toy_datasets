@@ -12,6 +12,10 @@ from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 from data_loaders.loaders.web_loaders.cifar10 import CIFAR10_CLASSES
 
 _CIFAR10N_FILENAME = 'CIFAR-10_human.pt'
+# Official CIFAR-10N human-annotated label file (Wei et al., ICLR 2022).
+_CIFAR10N_URL = (
+    'https://github.com/UCSC-REAL/cifar-10-100n/raw/main/data/CIFAR-10_human.pt'
+)
 
 LabelNoiseType = Literal[
     'aggre_label', 'random_label1', 'random_label2', 'random_label3', 'worst_label'
@@ -25,11 +29,10 @@ class Cifar10NLoader(AbstractLoader):
     vectors) but replaces the clean labels with one of five human-annotated
     noisy label sets from the CIFAR-10N paper (Wei et al., 2022).
 
-    The noisy label file (``CIFAR-10_human.pt``) must be downloaded manually:
-
-    1. Visit https://github.com/UCSC-REAL/cifar-10n
-    2. Download ``CIFAR-10_human.pt``
-    3. Place it in ``data_loaders/loaders/datasets/CIFAR-10N/CIFAR-10_human.pt``
+    Both the CIFAR-10 images and the noisy label file (``CIFAR-10_human.pt``)
+    are downloaded automatically on first use (the label file comes from the
+    official CIFAR-10N release, https://github.com/UCSC-REAL/cifar-10-100n) and
+    cached under ``data_loaders/loaders/datasets/``.
 
     Dataset stats: up to 50 000 training samples, 3072 features per sample.
 
@@ -86,22 +89,24 @@ class Cifar10NLoader(AbstractLoader):
         self.label_noise_type = label_noise_type
         self.equal_test = equal_test
 
-    def _load_noisy_labels(self, label_path: str) -> dict:
-        """Load the CIFAR-10N human label file, raising a clear error if absent."""
+    def _load_noisy_labels(self, label_dir: str) -> dict:
+        """Load the CIFAR-10N human label file, downloading it on first use."""
+        label_path = os.path.join(label_dir, _CIFAR10N_FILENAME)
         if not os.path.exists(label_path):
-            raise FileNotFoundError(
-                f"CIFAR-10N label file not found at: {label_path}\n"
-                "Download it manually:\n"
-                "  1. Visit https://github.com/UCSC-REAL/cifar-10n\n"
-                f"  2. Download '{_CIFAR10N_FILENAME}' and place it at the path above."
-            )
-        return torch.load(label_path, weights_only=True)
+            from torchvision.datasets.utils import download_url
+
+            download_url(_CIFAR10N_URL, root=label_dir,
+                         filename=_CIFAR10N_FILENAME)
+        # weights_only=False is required because the official CIFAR-10N file
+        # pickles numpy arrays; it is safe here as the file is fetched from the
+        # pinned official release URL (_CIFAR10N_URL).
+        return torch.load(label_path, weights_only=False)
 
     def load_data(self) -> DataDict:
         """Load CIFAR-10N training images with human-annotated noisy labels.
 
-        The CIFAR-10 images are downloaded automatically; the noisy label file
-        must be placed manually (see class docstring).
+        Both the CIFAR-10 images and the noisy label file are downloaded
+        automatically on first use.
 
         Returns
         -------
@@ -133,8 +138,7 @@ class Cifar10NLoader(AbstractLoader):
                 if counter == self.size:
                     break
 
-        label_path = os.path.join(label_dir, _CIFAR10N_FILENAME)
-        noise_data = self._load_noisy_labels(label_path)
+        noise_data = self._load_noisy_labels(label_dir)
         noisy_labels = noise_data[self.label_noise_type]
         if hasattr(noisy_labels, 'numpy'):
             noisy_labels = noisy_labels.numpy()
