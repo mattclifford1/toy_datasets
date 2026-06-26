@@ -42,6 +42,7 @@ class HeartDiseaseLoader(AbstractLoader):
                          train_size=train_size,
                         #  minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Heart Disease',
+                         short_description='Cleveland Clinic ECG/clinical indicators for heart disease — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

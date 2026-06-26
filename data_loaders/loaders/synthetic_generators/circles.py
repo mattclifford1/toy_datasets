@@ -38,6 +38,7 @@ class CirclesGenerator(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Circles Synthetic',
+                         short_description='Concentric circles, non-linearly separable',
                          **kwargs)
 
     def load_data(self) -> DataDict:

@@ -42,6 +42,7 @@ class ThoracicSurgeryLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Thoracic Surgery',
+                         short_description='Pre-op features for post-thoracotomy survival prediction — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

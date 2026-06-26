@@ -42,6 +42,7 @@ class HCCSurvivalLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='HCC Survival',
+                         short_description='Hepatocellular carcinoma patient survival from clinical features — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

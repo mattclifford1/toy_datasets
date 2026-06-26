@@ -40,6 +40,7 @@ class ChronicKidneyDiseaseLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Chronic Kidney Disease',
+                         short_description='Clinical indicators for chronic kidney disease detection — binary',
                          **kwargs)
         
     def load_data(self) -> DataDict:

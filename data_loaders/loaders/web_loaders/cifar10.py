@@ -67,6 +67,7 @@ class Cifar10Loader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='CIFAR-10',
+                         short_description='Object recognition — 32×32 RGB, 10 classes (Krizhevsky 2009)',
                          **kwargs)
         self.size = size
         self.minority_id = minority_id if minority_id is not None else [0]

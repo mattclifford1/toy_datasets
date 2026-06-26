@@ -35,6 +35,7 @@ class XORGenerator(AbstractLoader):
          # work out the split size and ratio from the numbers
         super().__init__(shuffle=shuffle,
                          dataset_name='XOR Synthetic',
+                         short_description='2D XOR-patterned binary classification (4 quadrants)',
                          **kwargs)
 
     def load_data(self) -> DataDict:

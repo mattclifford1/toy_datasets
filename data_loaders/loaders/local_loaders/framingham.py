@@ -41,6 +41,7 @@ class FraminghamLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Framingham',
+                         short_description='10-year coronary heart disease risk — Framingham Heart Study, binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

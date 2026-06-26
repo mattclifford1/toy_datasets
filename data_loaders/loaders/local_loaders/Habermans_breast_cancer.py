@@ -45,6 +45,7 @@ class HabermansBreastCancerLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Habermans Breast Cancer',
+                         short_description='Post-operative survival of breast cancer patients (1958-1970) — binary',
                          **kwargs)
         
     def load_data(self) -> DataDict:

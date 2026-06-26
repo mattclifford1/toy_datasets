@@ -80,6 +80,7 @@ class Cifar100Loader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='CIFAR-100',
+                         short_description='Fine-grained object recognition — 32×32 RGB, 100 classes',
                          **kwargs)
         self.size = size
         self.minority_id = minority_id if minority_id is not None else [0]

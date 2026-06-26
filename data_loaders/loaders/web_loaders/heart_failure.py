@@ -41,6 +41,7 @@ class HeartFailureLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Heart Failure',
+                         short_description='Clinical records for heart failure event survival prediction — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

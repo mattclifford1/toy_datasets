@@ -42,6 +42,7 @@ class BreastCancerCoimbraLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Breast Cancer Coimbra',
+                         short_description='Anthropometric and blood biomarkers for breast cancer diagnosis — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

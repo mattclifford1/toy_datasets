@@ -44,6 +44,7 @@ class AbaloneGenderLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Abalone Gender',
+                         short_description='Physical measurements for abalone sex classification — 3 classes',
                          **kwargs)
         
     def load_data(self) -> DataDict:

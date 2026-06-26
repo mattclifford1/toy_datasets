@@ -84,6 +84,7 @@ class Cifar10NLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='CIFAR-10N',
+                         short_description='CIFAR-10 with noisy human labels for label-noise research',
                          **kwargs)
         self.size = size
         self.minority_id = minority_id if minority_id is not None else [0]

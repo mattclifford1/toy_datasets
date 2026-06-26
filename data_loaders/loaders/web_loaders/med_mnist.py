@@ -52,6 +52,8 @@ class MedMNISTLoader(AbstractLoader):
     flag: str = ''
     #: Registry-style display name, e.g. ``'PneumoniaMNIST'`` (set by subclasses).
     display_name: str = 'MedMNIST'
+    #: One-line description shown in get_info output (set by subclasses).
+    short_description: str | None = None
     #: Class index used as the minority (class 1) in default binary mode.
     default_minority: list[int] = [1]
     #: Number of image channels (1 for greyscale subsets, 3 for RGB subsets).
@@ -67,6 +69,7 @@ class MedMNISTLoader(AbstractLoader):
                  equal_test: bool = False,
                  size: int = 28,
                  **kwargs: Any) -> None:
+        kwargs.setdefault('short_description', type(self).short_description)
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
@@ -143,6 +146,7 @@ class PneumoniaMNISTLoader(MedMNISTLoader):
     """Chest X-ray pneumonia screening (binary). Minority = pneumonia."""
     flag = 'pneumoniamnist'
     display_name = 'PneumoniaMNIST'
+    short_description = 'Chest X-ray images for pneumonia detection — 28×28 greyscale, binary'
     default_minority = [1]
 
 
@@ -150,6 +154,7 @@ class BreastMNISTLoader(MedMNISTLoader):
     """Breast ultrasound (binary). Minority = malignant."""
     flag = 'breastmnist'
     display_name = 'BreastMNIST'
+    short_description = 'Breast ultrasound images for malignancy classification — 28×28 greyscale, binary'
     default_minority = [0]
 
 
@@ -157,6 +162,7 @@ class DermaMNISTLoader(MedMNISTLoader):
     """Dermatoscope skin lesions (7 classes). Minority = melanoma."""
     flag = 'dermamnist'
     display_name = 'DermaMNIST'
+    short_description = 'Dermatoscopic skin lesion images — 28×28 RGB, 7 classes'
     default_minority = [4]
     n_channels = 3
 
@@ -165,6 +171,7 @@ class BloodMNISTLoader(MedMNISTLoader):
     """Peripheral blood cell microscopy (8 classes). Minority = basophil."""
     flag = 'bloodmnist'
     display_name = 'BloodMNIST'
+    short_description = 'Peripheral blood cell microscopy images — 28×28 RGB, 8 classes'
     default_minority = [0]
     n_channels = 3
 
@@ -173,6 +180,7 @@ class PathMNISTLoader(MedMNISTLoader):
     """Colon pathology tissue patches (9 classes). Minority = adenocarcinoma."""
     flag = 'pathmnist'
     display_name = 'PathMNIST'
+    short_description = 'Colorectal cancer histology tissue patches — 28×28 RGB, 9 classes'
     default_minority = [8]
     n_channels = 3
 
@@ -181,6 +189,7 @@ class OCTMNISTLoader(MedMNISTLoader):
     """Retinal OCT (4 classes). Minority = choroidal neovascularization."""
     flag = 'octmnist'
     display_name = 'OCTMNIST'
+    short_description = 'Retinal optical coherence tomography images — 28×28 greyscale, 4 classes'
     default_minority = [0]
 
 

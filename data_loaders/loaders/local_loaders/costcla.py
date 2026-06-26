@@ -41,6 +41,7 @@ class CostclaCreditScoringKaggle2011Loader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='CreditScoring_Kaggle2011_costcla',
+                         short_description='Credit default scoring with misclassification costs (Kaggle 2011) — binary',
                          set_seed=True,
                          percent_of_data=percent_of_data,
                          **kwargs)
@@ -87,6 +88,7 @@ class CostclaCreditScoringPAKDD2009Loader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='CreditScoring_PAKDD2009_costcla',
+                         short_description='Credit scoring with misclassification costs (PAKDD 2009) — binary',
                          set_seed=True,
                          percent_of_data=percent_of_data,
                          **kwargs)
@@ -134,6 +136,7 @@ class CostclaDirectMarketingLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='DirectMarketing_costcla',
+                         short_description='Direct marketing response prediction with misclassification costs — binary',
                          set_seed=True,
                          percent_of_data=percent_of_data,
                          **kwargs)

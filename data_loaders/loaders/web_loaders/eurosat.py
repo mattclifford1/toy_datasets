@@ -69,6 +69,7 @@ class EuroSATLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='EuroSAT',
+                         short_description='Satellite land-use/cover classification — 64×64 RGB, 10 classes',
                          **kwargs)
         self.size = size
         self.minority_id = minority_id if minority_id is not None else [3]

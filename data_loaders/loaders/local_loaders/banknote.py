@@ -38,6 +38,7 @@ class BanknoteLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Banknote Authentication',
+                         short_description='Wavelet-transform features from banknote images — binary authentic/forged',
                          **kwargs)
 
     def load_data(self) -> DataDict:

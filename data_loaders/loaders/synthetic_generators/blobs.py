@@ -38,6 +38,7 @@ class BlobsGenerator(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Blobs Synthetic',
+                         short_description='Isotropic Gaussian blobs at random centres',
                          **kwargs)
 
     def load_data(self) -> DataDict:

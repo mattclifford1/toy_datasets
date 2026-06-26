@@ -4,7 +4,7 @@
 #### XOR
 
 ```
-Data Loader for XOR Synthetic
+XOR Synthetic — 2D XOR-patterned binary classification (4 quadrants)
 
  Label Names:
     - Label 0: 0
@@ -24,7 +24,7 @@ Data Loader for XOR Synthetic
 #### Moons
 
 ```
-Data Loader for Moons Synthetic
+Moons Synthetic — Two interleaving half-moons, non-linearly separable
 
  Label Names:
     - Label 0: 0
@@ -44,7 +44,7 @@ Data Loader for Moons Synthetic
 #### Blobs
 
 ```
-Data Loader for Blobs Synthetic
+Blobs Synthetic — Isotropic Gaussian blobs at random centres
 
  Label Names:
     - Label 0: 0
@@ -64,7 +64,7 @@ Data Loader for Blobs Synthetic
 #### Circles
 
 ```
-Data Loader for Circles Synthetic
+Circles Synthetic — Concentric circles, non-linearly separable
 
  Label Names:
     - Label 0: 0
@@ -84,7 +84,7 @@ Data Loader for Circles Synthetic
 #### Sklearn Normal
 
 ```
-Data Loader for Sklearn Synthetic Classification (Normal)
+Sklearn Synthetic Classification (Normal) — Sklearn make_classification with Gaussian cluster features
 
  Label Names:
     - Label 0: 0
@@ -104,7 +104,7 @@ Data Loader for Sklearn Synthetic Classification (Normal)
 #### Gaussian
 
 ```
-Data Loader for Gaussian Synthetic
+Gaussian Synthetic — Multi-class overlapping Gaussian distributions
 
  Feature Names:
     - Feature 0: Feature 1
@@ -131,7 +131,7 @@ Data Loader for Gaussian Synthetic
 #### Iris
 
 ```
-Data Loader for Iris
+Iris — Fisher's iris flower classification — 3 species, 4 morphological features
 
  Feature Names:
     - Feature 0: sepal length (cm)
@@ -155,7 +155,7 @@ Data Loader for Iris
 #### Wine
 
 ```
-Data Loader for Wine
+Wine — Wine cultivar classification from chemical analysis — 3 classes, 13 features
 
  Feature Names:
     - Feature 0: alcohol
@@ -188,7 +188,7 @@ Data Loader for Wine
 #### Breast Cancer
 
 ```
-Data Loader for Breast Cancer
+Breast Cancer — Digitised FNA cell-nuclei features — binary malignant/benign, 30 features
 
  Feature Names:
     - Feature 0: mean radius
@@ -243,7 +243,7 @@ Data Loader for Breast Cancer
 #### Diabetes Pima Indian
 
 ```
-Data Loader for Diabetes Pima Indians
+Diabetes Pima Indians — Pima Indians 8 clinical indicators for diabetes onset — binary
 
  Feature Names:
     - Feature 0: Pregnancies
@@ -271,7 +271,7 @@ Data Loader for Diabetes Pima Indians
 #### Heart Disease
 
 ```
-Data Loader for Heart Disease
+Heart Disease — Cleveland Clinic ECG/clinical indicators for heart disease — binary
 
  Label Names:
     - Label 0: no heart disease
@@ -289,7 +289,7 @@ Data Loader for Heart Disease
 #### Breast Cancer Wisconsin
 
 ```
-Data Loader for Wisconsin Breast Cancer
+Wisconsin Breast Cancer — Cell nucleus features for malignant/benign breast cancer classification — binary
 
  Feature Names:
     - Feature 0: radius1
@@ -339,7 +339,7 @@ Data Loader for Wisconsin Breast Cancer
 #### Habermans Breast Cancer
 
 ```
-Data Loader for Habermans Breast Cancer
+Habermans Breast Cancer — Post-operative survival of breast cancer patients (1958-1970) — binary
 
  Feature Names:
     - Feature 0: Age
@@ -362,7 +362,7 @@ Data Loader for Habermans Breast Cancer
 #### Chronic Kidney Disease
 
 ```
-Data Loader for Chronic Kidney Disease
+Chronic Kidney Disease — Clinical indicators for chronic kidney disease detection — binary
 
  Feature Names:
     - Feature 0: age
@@ -397,7 +397,7 @@ Data Loader for Chronic Kidney Disease
 #### Hepatitis
 
 ```
-Data Loader for Hepatitis
+Hepatitis — Clinical features for hepatitis patient survival prediction — binary
 
  Feature Names:
     - Feature 0: AGE
@@ -433,7 +433,7 @@ Data Loader for Hepatitis
 #### Parkinsons
 
 ```
-Data Loader for Parkinsons
+Parkinsons — Biomedical voice measures for Parkinson's disease diagnosis — binary
 
  Feature Names:
     - Feature 0: MDVP:Fo
@@ -475,7 +475,7 @@ Data Loader for Parkinsons
 #### Indian Liver Patient
 
 ```
-Data Loader for Indian Liver Patient
+Indian Liver Patient — Blood/enzyme test results for liver disease detection — binary
 
  Feature Names:
     - Feature 0: Age
@@ -505,7 +505,7 @@ Data Loader for Indian Liver Patient
 #### Cervical Cancer
 
 ```
-Data Loader for Cervical Cancer
+Cervical Cancer — Risk factors and test results for cervical cancer biopsy prediction — binary
 
  Feature Names:
     - Feature 0: Age
@@ -557,7 +557,7 @@ Data Loader for Cervical Cancer
 #### Arrhythmia
 
 ```
-Data Loader for Arrhythmia
+Arrhythmia — ECG-derived features across cardiac arrhythmia classes (279 features)
 
  Label Names:
     - Label 0: Normal
@@ -575,7 +575,7 @@ Data Loader for Arrhythmia
 #### Thyroid Sick
 
 ```
-Data Loader for Thyroid Sick
+Thyroid Sick — Clinical and lab measurements for thyroid disorder detection — binary
 
  Feature Names:
     - Feature 0: age
@@ -623,7 +623,7 @@ Data Loader for Thyroid Sick
 #### Stroke Prediction
 
 ```
-Data Loader for Stroke
+Stroke — Patient clinical and demographic data for stroke prediction — binary
 
  Feature Names:
     - Feature 0: gender
@@ -653,7 +653,7 @@ Data Loader for Stroke
 #### Framingham CHD
 
 ```
-Data Loader for Framingham
+Framingham — 10-year coronary heart disease risk — Framingham Heart Study, binary
 
  Feature Names:
     - Feature 0: male
@@ -688,7 +688,7 @@ Data Loader for Framingham
 #### Thoracic Surgery
 
 ```
-Data Loader for Thoracic Surgery
+Thoracic Surgery — Pre-op features for post-thoracotomy survival prediction — binary
 
  Feature Names:
     - Feature 0: DGN
@@ -724,7 +724,7 @@ Data Loader for Thoracic Surgery
 #### SPECTF Heart
 
 ```
-Data Loader for SPECTF Heart
+SPECTF Heart — SPECT cardiac imaging features for heart disease diagnosis — binary
 
  Feature Names:
     - Feature 0: F1R
@@ -788,7 +788,7 @@ Data Loader for SPECTF Heart
 #### Heart Failure
 
 ```
-Data Loader for Heart Failure
+Heart Failure — Clinical records for heart failure event survival prediction — binary
 
  Feature Names:
     - Feature 0: age
@@ -820,7 +820,7 @@ Data Loader for Heart Failure
 #### Mammographic Mass
 
 ```
-Data Loader for Mammographic Mass
+Mammographic Mass — Mammography BI-RADS attributes and patient age for mass malignancy — binary
 
  Feature Names:
     - Feature 0: BI-RADS
@@ -845,7 +845,7 @@ Data Loader for Mammographic Mass
 #### Breast Cancer Prognostic
 
 ```
-Data Loader for Breast Cancer Prognostic
+Breast Cancer Prognostic — FNA features for breast cancer recurrence prediction — binary
 
  Feature Names:
     - Feature 0: Time
@@ -898,7 +898,7 @@ Data Loader for Breast Cancer Prognostic
 #### Breast Cancer Coimbra
 
 ```
-Data Loader for Breast Cancer Coimbra
+Breast Cancer Coimbra — Anthropometric and blood biomarkers for breast cancer diagnosis — binary
 
  Feature Names:
     - Feature 0: Age
@@ -927,7 +927,7 @@ Data Loader for Breast Cancer Coimbra
 #### HCC Survival
 
 ```
-Data Loader for HCC Survival
+HCC Survival — Hepatocellular carcinoma patient survival from clinical features — binary
 
  Feature Names:
     - Feature 0: Gender
@@ -996,7 +996,7 @@ Data Loader for HCC Survival
 #### Z-Alizadeh Sani CAD
 
 ```
-Data Loader for Z-Alizadeh Sani CAD
+Z-Alizadeh Sani CAD — Coronary artery disease diagnosis from clinical features — binary
 
  Feature Names:
     - Feature 0: Age
@@ -1076,7 +1076,7 @@ Data Loader for Z-Alizadeh Sani CAD
 #### Banknote Authentication
 
 ```
-Data Loader for Banknote Authentication
+Banknote Authentication — Wavelet-transform features from banknote images — binary authentic/forged
 
  Feature Names:
     - Feature 0: variance of Wavelet Transformed image
@@ -1100,7 +1100,7 @@ Data Loader for Banknote Authentication
 #### Wheat Seeds
 
 ```
-Data Loader for Wheat Seeds
+Wheat Seeds — Geometric grain measurements for wheat variety classification — 3 classes
 
  Feature Names:
     - Feature 0: area
@@ -1127,7 +1127,7 @@ Data Loader for Wheat Seeds
 #### Ionosphere
 
 ```
-Data Loader for Ionosphere
+Ionosphere — Radar signal classification for ionosphere quality — binary
 
  Feature Names:
     - Feature 0: Pulse 1 real
@@ -1181,7 +1181,7 @@ Data Loader for Ionosphere
 #### Sonar Rocks vs Mines
 
 ```
-Data Loader for Sonar Rocks vs Mines
+Sonar Rocks vs Mines — Sonar frequency-response features for rock/mine classification — binary
 
  Feature Names:
     - Feature 0: 0
@@ -1261,7 +1261,7 @@ Data Loader for Sonar Rocks vs Mines
 #### Abalone Gender
 
 ```
-Data Loader for Abalone Gender
+Abalone Gender — Physical measurements for abalone sex classification — 3 classes
 
  Feature Names:
     - Feature 0: Length
@@ -1294,17 +1294,17 @@ Data Loader for Abalone Gender
 #### MNIST
 
 ```
-Data Loader for MNIST
+MNIST — Handwritten digit recognition — 28×28 greyscale, 10 classes
 
  Label Names:
-    - Label 0: Digits 0-8
-    - Label 1: Digit 9
+    - Label 0: Other digits
+    - Label 1: Digit 0
 
  Dataset Info:
     - Number of features: 784
     - Total instances: 3000
-      - Class 0: 2715 instances (Digits 0-8)
-      - Class 1: 285 instances (Digit 9)
+      - Class 0: 2715 instances (Other digits)
+      - Class 1: 285 instances (Digit 0)
 ```
 
 ![MNIST](assets/figures/mnist.png)
@@ -1312,7 +1312,7 @@ Data Loader for MNIST
 #### Fashion-MNIST
 
 ```
-Data Loader for Fashion-MNIST
+Fashion-MNIST — Clothing item recognition — 28×28 greyscale, 10 categories (Zalando)
 
  Label Names:
     - Label 0: Other classes
@@ -1330,7 +1330,7 @@ Data Loader for Fashion-MNIST
 #### SVHN
 
 ```
-Data Loader for SVHN
+SVHN — Real-world house-number digit recognition — 32×32 RGB (Google Street View)
 
  Label Names:
     - Label 0: Other digits
@@ -1348,7 +1348,7 @@ Data Loader for SVHN
 #### EuroSAT
 
 ```
-Data Loader for EuroSAT
+EuroSAT — Satellite land-use/cover classification — 64×64 RGB, 10 classes
 
  Label Names:
     - Label 0: Other classes
@@ -1366,7 +1366,7 @@ Data Loader for EuroSAT
 #### CIFAR-10
 
 ```
-Data Loader for CIFAR-10
+CIFAR-10 — Object recognition — 32×32 RGB, 10 classes (Krizhevsky 2009)
 
  Label Names:
     - Label 0: Other classes
@@ -1384,7 +1384,7 @@ Data Loader for CIFAR-10
 #### CIFAR-100
 
 ```
-Data Loader for CIFAR-100
+CIFAR-100 — Fine-grained object recognition — 32×32 RGB, 100 classes
 
  Label Names:
     - Label 0: Other classes
@@ -1407,7 +1407,7 @@ Data Loader for CIFAR-100
 #### PneumoniaMNIST
 
 ```
-Data Loader for PneumoniaMNIST
+PneumoniaMNIST — Chest X-ray images for pneumonia detection — 28×28 greyscale, binary
 
  Label Names:
     - Label 0: Other classes
@@ -1425,7 +1425,7 @@ Data Loader for PneumoniaMNIST
 #### BreastMNIST
 
 ```
-Data Loader for BreastMNIST
+BreastMNIST — Breast ultrasound images for malignancy classification — 28×28 greyscale, binary
 
  Label Names:
     - Label 0: Other classes
@@ -1443,7 +1443,7 @@ Data Loader for BreastMNIST
 #### DermaMNIST
 
 ```
-Data Loader for DermaMNIST
+DermaMNIST — Dermatoscopic skin lesion images — 28×28 RGB, 7 classes
 
  Label Names:
     - Label 0: Other classes
@@ -1461,7 +1461,7 @@ Data Loader for DermaMNIST
 #### BloodMNIST
 
 ```
-Data Loader for BloodMNIST
+BloodMNIST — Peripheral blood cell microscopy images — 28×28 RGB, 8 classes
 
  Label Names:
     - Label 0: Other classes
@@ -1479,7 +1479,7 @@ Data Loader for BloodMNIST
 #### PathMNIST
 
 ```
-Data Loader for PathMNIST
+PathMNIST — Colorectal cancer histology tissue patches — 28×28 RGB, 9 classes
 
  Label Names:
     - Label 0: Other classes
@@ -1497,7 +1497,7 @@ Data Loader for PathMNIST
 #### OCTMNIST
 
 ```
-Data Loader for OCTMNIST
+OCTMNIST — Retinal optical coherence tomography images — 28×28 greyscale, 4 classes
 
  Label Names:
     - Label 0: Other classes

@@ -40,6 +40,7 @@ class BreastCancerLoader(AbstractLoader):
                          train_size=train_size,
                         #  minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Breast Cancer',
+                         short_description='Digitised FNA cell-nuclei features — binary malignant/benign, 30 features',
                          **kwargs)
 
     def load_data(self) -> DataDict:

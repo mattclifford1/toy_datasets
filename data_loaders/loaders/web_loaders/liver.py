@@ -41,6 +41,7 @@ class IndianLiverLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Indian Liver Patient',
+                         short_description='Blood/enzyme test results for liver disease detection — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

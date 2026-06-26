@@ -40,6 +40,7 @@ class IrisLoader(AbstractLoader):
                          train_size=train_size,
                         #  minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Iris',
+                         short_description="Fisher's iris flower classification — 3 species, 4 morphological features",
                          **kwargs)
 
     def load_data(self) -> DataDict:

@@ -38,6 +38,7 @@ class MoonsGenerator(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Moons Synthetic',
+                         short_description='Two interleaving half-moons, non-linearly separable',
                          **kwargs)
 
     def load_data(self) -> DataDict:

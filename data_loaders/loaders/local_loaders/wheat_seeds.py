@@ -41,6 +41,7 @@ class WheatSeedsLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Wheat Seeds',
+                         short_description='Geometric grain measurements for wheat variety classification — 3 classes',
                          **kwargs)
         
     def load_data(self) -> DataDict:

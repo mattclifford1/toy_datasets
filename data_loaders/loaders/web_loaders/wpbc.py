@@ -43,6 +43,7 @@ class BreastCancerPrognosticLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Breast Cancer Prognostic',
+                         short_description='FNA features for breast cancer recurrence prediction — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

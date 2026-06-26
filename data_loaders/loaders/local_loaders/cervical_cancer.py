@@ -51,6 +51,7 @@ class CervicalCancerLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Cervical Cancer',
+                         short_description='Risk factors and test results for cervical cancer biopsy prediction — binary',
                          **kwargs)
         self.target = target
 

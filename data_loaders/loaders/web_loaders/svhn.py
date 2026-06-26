@@ -65,6 +65,7 @@ class SVHNLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='SVHN',
+                         short_description='Real-world house-number digit recognition — 32×32 RGB (Google Street View)',
                          **kwargs)
         self.size = size
         self.minority_id = minority_id if minority_id is not None else [0]

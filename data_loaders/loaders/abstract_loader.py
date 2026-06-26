@@ -61,6 +61,8 @@ class AbstractLoader(ABC):
         Random seed for shuffling and splitting. True uses 42, False disables.
     dataset_name : str or None, default=None
         Human-readable name used in plot titles and info output.
+    short_description : str or None, default=None
+        One-line summary shown in :meth:`get_info` output.
     scale : bool, default=False
         If True, apply MinMax normalisation (fitted on train) to both splits.
     dim_reducer : str or None, default=None
@@ -99,6 +101,7 @@ class AbstractLoader(ABC):
                  percent_of_data: float | None = None,
                  set_seed: bool | int = True,
                  dataset_name: str | None = None,
+                 short_description: str | None = None,
                  scale: bool = False,
                  dim_reducer: str | None = None,
                  reduce_to_dim: int = 2,
@@ -113,6 +116,7 @@ class AbstractLoader(ABC):
         self.equal_test = equal_test
         self.already_loaded = False
         self.dataset_name = dataset_name
+        self.short_description = short_description
         self.set_seed = set_seed
         self.scale = scale
         self.dim_reducer = dim_reducer
@@ -486,7 +490,9 @@ class AbstractLoader(ABC):
             Multi-line summary including feature names, label names, instance
             counts per class, and optionally the full description.
         """
-        msg = f"Data Loader for {self.name}"
+        msg = self.name
+        if self.short_description:
+            msg += f" — {self.short_description}"
         if long == True:
             msg += f"\n\n Description:\n{self.get_description()}"
 

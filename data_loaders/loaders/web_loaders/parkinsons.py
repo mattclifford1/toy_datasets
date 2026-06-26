@@ -37,6 +37,7 @@ class ParkinsonsLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Parkinsons',
+                         short_description='Biomedical voice measures for Parkinson\'s disease diagnosis — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

@@ -39,6 +39,7 @@ class SklearnNormalGenerator(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Sklearn Synthetic Classification (Normal)',
+                         short_description='Sklearn make_classification with Gaussian cluster features',
                          **kwargs)
 
     def load_data(self) -> DataDict:

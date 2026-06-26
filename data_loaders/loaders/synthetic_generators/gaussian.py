@@ -142,6 +142,7 @@ class GaussianGenerator(AbstractLoader):
         super().__init__(
             shuffle=shuffle,
             dataset_name=name,
+            short_description='Multi-class overlapping Gaussian distributions',
             **kwargs
         )
 

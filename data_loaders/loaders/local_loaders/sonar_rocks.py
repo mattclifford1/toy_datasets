@@ -51,6 +51,7 @@ class SonarRocksLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Sonar Rocks vs Mines',
+                         short_description='Sonar frequency-response features for rock/mine classification — binary',
                          **kwargs)
         
     def load_data(self) -> DataDict:

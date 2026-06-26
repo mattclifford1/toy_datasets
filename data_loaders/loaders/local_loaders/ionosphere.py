@@ -41,6 +41,7 @@ class IonosphereLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Ionosphere',
+                         short_description='Radar signal classification for ionosphere quality — binary',
                          **kwargs)
         
     def load_data(self) -> DataDict:

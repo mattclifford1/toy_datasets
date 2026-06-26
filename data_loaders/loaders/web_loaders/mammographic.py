@@ -41,6 +41,7 @@ class MammographicMassLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Mammographic Mass',
+                         short_description='Mammography BI-RADS attributes and patient age for mass malignancy — binary',
                          **kwargs)
 
     def load_data(self) -> DataDict:

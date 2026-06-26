@@ -71,6 +71,7 @@ class ArrhythmiaLoader(AbstractLoader):
         super().__init__(shuffle=shuffle,
                          train_size=train_size,
                          dataset_name='Arrhythmia',
+                         short_description='ECG-derived features across cardiac arrhythmia classes (279 features)',
                          **kwargs)
         self.binary = binary
 

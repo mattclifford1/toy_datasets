@@ -67,6 +67,7 @@ class FashionMnistLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Fashion-MNIST',
+                         short_description='Clothing item recognition — 28×28 greyscale, 10 categories (Zalando)',
                          **kwargs)
         self.size = size
         self.minority_id = minority_id if minority_id is not None else [0]

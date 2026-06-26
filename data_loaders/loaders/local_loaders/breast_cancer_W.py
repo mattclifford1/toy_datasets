@@ -45,6 +45,7 @@ class BreastCancerWLoader(AbstractLoader):
                          train_size=train_size,
                          minority_reduce_scaler=minority_reduce_scaler,
                          dataset_name='Wisconsin Breast Cancer',
+                         short_description='Cell nucleus features for malignant/benign breast cancer classification — binary',
                          **kwargs)
         
     def load_data(self) -> DataDict:
