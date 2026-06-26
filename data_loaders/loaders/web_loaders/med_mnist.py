@@ -77,12 +77,15 @@ class MedMNISTLoader(AbstractLoader):
         self.classes_remove = classes_remove if classes_remove is not None else []
         self.equal_test = equal_test
         self.size = size
-        # MedMNIST images are stored H, W (greyscale) or H, W, C (RGB), i.e.
-        # already in display order, so channels_first stays False.
-        self.image_shape = (
-            (self.size, self.size) if self.n_channels == 1
-            else (self.size, self.size, self.n_channels)
-        )
+        if self.n_channels == 1:
+            # Greyscale: stored H×W, no channel reordering needed.
+            self.image_shape = (self.size, self.size)
+            self.channels_first = False
+        else:
+            # RGB: MedMNIST stores H×W×C but we transpose to C×H×W (PyTorch
+            # convention) so the flat array is compatible with our models.
+            self.image_shape = (self.n_channels, self.size, self.size)
+            self.channels_first = True
 
     def load_data(self) -> DataDict:
         """Download (if needed) and load the MedMNIST training split.
@@ -105,7 +108,11 @@ class MedMNISTLoader(AbstractLoader):
         dataset = data_class(split='train', download=True, root=download_dir,
                              size=self.size)
 
-        X = dataset.imgs.astype(np.float32).reshape(len(dataset.imgs), -1) / 255.0
+        imgs = dataset.imgs  # (N, H, W) greyscale or (N, H, W, C) RGB
+        if self.n_channels > 1:
+            # Transpose HWC → CHW to match PyTorch convention (channels first).
+            imgs = imgs.transpose(0, 3, 1, 2)
+        X = imgs.astype(np.float32).reshape(len(imgs), -1) / 255.0
         y = np.asarray(dataset.labels).squeeze().astype(np.int64)
 
         class_names = [info['label'][str(i)] for i in range(len(info['label']))]
