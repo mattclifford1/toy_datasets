@@ -32,7 +32,7 @@ class MnistLoader(AbstractLoader):
         Number of samples to load from the training split (max 60 000).
     minority_id : list[int] or None, default=None
         Digit label(s) to treat as the minority class (class 1) in binary
-        mode.  Defaults to ``[0]`` (digit 9).
+        mode.  Defaults to ``[0]`` (digit 0).
     binary : bool, default=True
         If True, convert to binary classification (minority digit vs. rest).
         If False, keep all 10 digit classes.
@@ -120,8 +120,9 @@ class MnistLoader(AbstractLoader):
                 y[y == id] = 11  # take out of range of labels
             y[y != 11] = 0
             y[y == 11] = 1
-            # add label names
-            label_names = ['Digits 0-8', 'Digit 9']
+            # label names reflect the actual minority digit(s)
+            minority_names = ', '.join(str(i) for i in self.minority_id)
+            label_names = ['Other digits', f'Digit {minority_names}']
         else:
             label_names = [str(i) for i in range(10)]
         # formatting

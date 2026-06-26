@@ -1360,14 +1360,14 @@ Data Loader for Abalone Gender
 Data Loader for MNIST
 
  Label Names:
-    - Label 0: Digits 0-8
-    - Label 1: Digit 9
+    - Label 0: Other digits
+    - Label 1: Digit 0
 
  Dataset Info:
     - Number of features: 784
     - Total instances: 3000
-      - Class 0: 2715 instances (Digits 0-8)
-      - Class 1: 285 instances (Digit 9)
+      - Class 0: 2715 instances (Other digits)
+      - Class 1: 285 instances (Digit 0)
 ```
 
 ![MNIST](assets/figures/mnist.png)
