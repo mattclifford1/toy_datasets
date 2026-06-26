@@ -75,6 +75,19 @@ class AbstractLoader(ABC):
 
     default_dim_reducer: str = 'PCA'
 
+    #: Whether this loader's samples are images.  Image loaders set this True
+    #: (along with :attr:`image_shape`) to enable example-image previews in
+    #: :meth:`plot_class_samples` and the README gallery.
+    is_image: bool = False
+    #: Shape to reshape a single flattened sample into for display, e.g.
+    #: ``(28, 28)`` for greyscale or ``(32, 32, 3)`` for RGB.  ``None`` for
+    #: non-image datasets.
+    image_shape: tuple[int, ...] | None = None
+    #: True when the flattened image stores the channel axis first
+    #: (``C, H, W``), as produced by ``torchvision``'s ``ToTensor``.  Such
+    #: samples are transposed to ``H, W, C`` for display.
+    channels_first: bool = False
+
     def __init__(self,
                  shuffle: bool = True,
                  train_size: float = 0.5,
@@ -347,6 +360,103 @@ class AbstractLoader(ABC):
         data = self.get_data_dict()
         return data.get('label_names', [0, 1, 2, 3])
 
+
+    def as_image(self, sample: np.ndarray) -> np.ndarray:
+        """Reshape one flattened sample into a displayable image array.
+
+        Parameters
+        ----------
+        sample : np.ndarray
+            A single flattened sample (1-D row of ``X``).
+
+        Returns
+        -------
+        np.ndarray
+            Array of shape ``(H, W)`` (greyscale) or ``(H, W, C)`` (colour),
+            ready to pass to matplotlib's ``imshow``.
+
+        Raises
+        ------
+        ValueError
+            If this loader is not an image dataset (``is_image`` is False or
+            ``image_shape`` is None).
+        """
+        if not self.is_image or self.image_shape is None:
+            raise ValueError(
+                f"{self.name} is not an image dataset "
+                "(set is_image=True and image_shape on the loader)"
+            )
+        img = np.asarray(sample).reshape(self.image_shape)
+        if self.channels_first and img.ndim == 3:
+            img = np.transpose(img, (1, 2, 0))
+        return img
+
+    def sample_images_per_class(
+            self,
+            n_per_class: int = 4,
+            seed: bool | int = 42,
+    ) -> dict[int, list[np.ndarray]]:
+        """Collect a few example images for each class.
+
+        Parameters
+        ----------
+        n_per_class : int, default=4
+            Number of example images to sample for each class.
+        seed : bool or int, default=42
+            Seed for the random sample. True uses 42, False disables seeding.
+
+        Returns
+        -------
+        dict[int, list[np.ndarray]]
+            Mapping from class label to a list of displayable image arrays
+            (each as returned by :meth:`as_image`).
+        """
+        data = self.get_data_dict()
+        X, y = data['X'], data['y']
+        rng_seed = 42 if seed is True else (None if seed is False else seed)
+        rng = np.random.default_rng(rng_seed)
+        samples: dict[int, list[np.ndarray]] = {}
+        for cls in np.unique(y):
+            idx = np.where(y == cls)[0]
+            if len(idx) > n_per_class:
+                idx = rng.choice(idx, size=n_per_class, replace=False)
+            samples[int(cls)] = [self.as_image(X[i]) for i in idx]
+        return samples
+
+    def plot_class_samples(
+            self,
+            n_per_class: int = 4,
+            terminal_plot: bool = False,
+            axes: Any = None,
+    ) -> tuple[Any, Any] | None:
+        """Plot a grid of example images for each class.
+
+        Only valid for image loaders (``is_image=True``).
+
+        Parameters
+        ----------
+        n_per_class : int, default=4
+            Number of example images to show per class.
+        terminal_plot : bool, default=False
+            If True, render the grid in the terminal.
+        axes : np.ndarray of matplotlib Axes, optional
+            A ``(n_classes, n_per_class)`` array of axes to draw onto. If None,
+            a new figure is created.
+
+        Returns
+        -------
+        tuple or None
+            ``(fig, axes)`` when a new figure is created, otherwise None.
+        """
+        from data_loaders.plotting.visualisation import plot_class_samples
+        samples = self.sample_images_per_class(n_per_class=n_per_class)
+        return plot_class_samples(
+            samples,
+            label_names=self.get_label_names(),
+            dataset_name=self.name,
+            axes=axes,
+            terminal_plot=terminal_plot,
+        )
 
     @property
     def name(self) -> str:

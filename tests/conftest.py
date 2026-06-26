@@ -28,10 +28,45 @@ class MockLoader(AbstractLoader):
         }
 
 
+class MockImageLoader(AbstractLoader):
+    """A minimal mock image loader for testing image-preview functionality.
+
+    Generates flat samples that reshape into ``image_shape`` images.  Set
+    ``channels_first`` to mimic torchvision-style ``C, H, W`` storage.
+    """
+
+    is_image = True
+
+    def __init__(self, image_shape=(8, 8), channels_first=False,
+                 n_samples=40, n_classes=2, **kwargs):
+        self.image_shape = image_shape
+        self.channels_first = channels_first
+        self.n_samples = n_samples
+        self.n_classes = n_classes
+        super().__init__(dataset_name='Mock Image Dataset', **kwargs)
+
+    def load_data(self):
+        np.random.seed(0)
+        n_features = int(np.prod(self.image_shape))
+        X = np.random.rand(self.n_samples, n_features).astype(np.float32)
+        y = np.array([i % self.n_classes for i in range(self.n_samples)])
+        return {
+            'X': X,
+            'y': y,
+            'label_names': [f'class_{i}' for i in range(self.n_classes)],
+        }
+
+
 @pytest.fixture
 def mock_loader():
     """Fixture providing a fresh MockLoader instance."""
     return MockLoader()
+
+
+@pytest.fixture
+def mock_image_loader():
+    """Fixture providing a greyscale MockImageLoader instance."""
+    return MockImageLoader()
 
 
 @pytest.fixture

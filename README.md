@@ -18,6 +18,7 @@ it.
 - Dimensionality reduction (PCA, UMAP, t-SNE)
 - Classifier visualization: decision boundary shading and misclassification markers
 - Train/test overlay mode with configurable test transparency
+- Example-image previews for image datasets (`plot_class_samples()`)
 - Terminal-based plotting (sixel/kitty protocols)
 
 
@@ -1737,6 +1738,30 @@ loader.plot_train_test_split(overlay_train_test=True, clf=clf.predict)
 ```
 
 ![overlay_train_test](assets/figures/options/overlay_train_test.png)
+
+---
+
+### Image datasets — example images per class
+
+Image loaders (MNIST, Fashion-MNIST, SVHN, EuroSAT, CIFAR-10/100/10N and the
+MedMNIST sets) flag themselves with the `is_image` class attribute and know how
+to reshape a flattened sample back into a viewable image (`image_shape`,
+`channels_first`). This powers a `plot_class_samples()` preview that shows a few
+example images per class — handy for seeing what the raw data actually looks
+like, alongside the 2D projection in the gallery above.
+
+```python
+loader = get_dataset('CIFAR-10')
+
+# Grid of example images, one row per class
+loader.plot_class_samples(n_per_class=5)
+
+# Or reshape a single flat sample yourself for custom plots
+img = loader.as_image(loader.get_X()[0])   # -> (32, 32, 3) RGB array
+```
+
+Non-image loaders have `is_image = False`; calling `as_image()` on them raises
+a `ValueError`.
 
 </details>
 

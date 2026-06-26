@@ -47,6 +47,9 @@ class SVHNLoader(AbstractLoader):
     """
 
     default_dim_reducer: str = 'TSNE'
+    is_image: bool = True
+    image_shape: tuple[int, ...] = (3, 32, 32)
+    channels_first: bool = True
 
     def __init__(self,
                  shuffle: bool = True,

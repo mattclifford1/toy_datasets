@@ -46,6 +46,7 @@ class MedMNISTLoader(AbstractLoader):
     """
 
     default_dim_reducer: str = 'TSNE'
+    is_image: bool = True
 
     #: MedMNIST subset key, e.g. ``'pneumoniamnist'`` (set by subclasses).
     flag: str = ''
@@ -53,6 +54,8 @@ class MedMNISTLoader(AbstractLoader):
     display_name: str = 'MedMNIST'
     #: Class index used as the minority (class 1) in default binary mode.
     default_minority: list[int] = [1]
+    #: Number of image channels (1 for greyscale subsets, 3 for RGB subsets).
+    n_channels: int = 1
 
     def __init__(self,
                  shuffle: bool = True,
@@ -74,6 +77,12 @@ class MedMNISTLoader(AbstractLoader):
         self.classes_remove = classes_remove if classes_remove is not None else []
         self.equal_test = equal_test
         self.size = size
+        # MedMNIST images are stored H, W (greyscale) or H, W, C (RGB), i.e.
+        # already in display order, so channels_first stays False.
+        self.image_shape = (
+            (self.size, self.size) if self.n_channels == 1
+            else (self.size, self.size, self.n_channels)
+        )
 
     def load_data(self) -> DataDict:
         """Download (if needed) and load the MedMNIST training split.
@@ -142,6 +151,7 @@ class DermaMNISTLoader(MedMNISTLoader):
     flag = 'dermamnist'
     display_name = 'DermaMNIST'
     default_minority = [4]
+    n_channels = 3
 
 
 class BloodMNISTLoader(MedMNISTLoader):
@@ -149,6 +159,7 @@ class BloodMNISTLoader(MedMNISTLoader):
     flag = 'bloodmnist'
     display_name = 'BloodMNIST'
     default_minority = [0]
+    n_channels = 3
 
 
 class PathMNISTLoader(MedMNISTLoader):
@@ -156,6 +167,7 @@ class PathMNISTLoader(MedMNISTLoader):
     flag = 'pathmnist'
     display_name = 'PathMNIST'
     default_minority = [8]
+    n_channels = 3
 
 
 class OCTMNISTLoader(MedMNISTLoader):

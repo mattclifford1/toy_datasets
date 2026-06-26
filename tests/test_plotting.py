@@ -8,7 +8,9 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from data_loaders.main import get_dataset
-from data_loaders.plotting.visualisation import plot_dataset
+from data_loaders.plotting.visualisation import plot_dataset, plot_class_samples
+
+from tests.conftest import MockImageLoader, MockLoader
 
 
 class TestPlotDatasetAxesParameter:
@@ -173,6 +175,68 @@ class TestAbstractLoaderPlotting:
         assert len(ax1.collections) > 0
         assert len(ax2.collections) > 0
 
+        plt.close('all')
+
+
+class TestImageSamplePlotting:
+    """Tests for image-preview helpers (as_image, sampling, plot_class_samples)."""
+
+    def test_as_image_greyscale(self):
+        """Greyscale flat sample reshapes to (H, W)."""
+        loader = MockImageLoader(image_shape=(8, 8))
+        X = loader.get_X()
+        img = loader.as_image(X[0])
+        assert img.shape == (8, 8)
+
+    def test_as_image_channels_first_rgb(self):
+        """Channels-first RGB sample is transposed to (H, W, C)."""
+        loader = MockImageLoader(image_shape=(3, 8, 8), channels_first=True)
+        X = loader.get_X()
+        img = loader.as_image(X[0])
+        assert img.shape == (8, 8, 3)
+
+    def test_as_image_preserves_pixels(self):
+        """Reshaping round-trips the underlying pixel order for HWC storage."""
+        loader = MockImageLoader(image_shape=(8, 8, 3), channels_first=False)
+        X = loader.get_X()
+        img = loader.as_image(X[0])
+        assert img.shape == (8, 8, 3)
+        np.testing.assert_array_equal(img.reshape(-1), X[0])
+
+    def test_as_image_raises_for_non_image_loader(self):
+        """Non-image loaders refuse as_image."""
+        loader = MockLoader()
+        with pytest.raises(ValueError, match="not an image dataset"):
+            loader.as_image(loader.get_X()[0])
+
+    def test_sample_images_per_class_counts(self):
+        """Sampling returns the requested number of images per present class."""
+        loader = MockImageLoader(n_samples=40, n_classes=2)
+        samples = loader.sample_images_per_class(n_per_class=3)
+        assert set(samples) == {0, 1}
+        assert all(len(imgs) == 3 for imgs in samples.values())
+        assert all(img.shape == (8, 8) for imgs in samples.values() for img in imgs)
+
+    def test_plot_class_samples_creates_figure(self):
+        """plot_class_samples builds a grid figure when no axes are given."""
+        loader = MockImageLoader()
+        result = loader.plot_class_samples(n_per_class=4)
+        assert result is not None
+        fig, axes = result
+        assert isinstance(fig, Figure)
+        assert axes.shape == (2, 4)
+        # every cell drew an image
+        assert all(len(ax.images) == 1 for ax in axes.flat)
+        plt.close('all')
+
+    def test_plot_class_samples_on_provided_axes(self):
+        """plot_class_samples draws onto provided axes and returns None."""
+        loader = MockImageLoader()
+        samples = loader.sample_images_per_class(n_per_class=3)
+        fig, axes = plt.subplots(2, 3)
+        result = plot_class_samples(samples, label_names=loader.get_label_names(), axes=axes)
+        assert result is None
+        assert all(len(ax.images) == 1 for ax in axes.flat)
         plt.close('all')
 
 

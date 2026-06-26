@@ -45,6 +45,8 @@ class MnistLoader(AbstractLoader):
     """
 
     default_dim_reducer: str = 'TSNE'
+    is_image: bool = True
+    image_shape: tuple[int, ...] = (28, 28)
 
     def __init__(self,
                  shuffle: bool = True,

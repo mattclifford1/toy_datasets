@@ -16,8 +16,14 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import numpy as np
+
 from data_loaders.main import AVAILABLE_DATASETS, get_dataset
 from data_loaders.plotting.visualisation import plot_dataset as _plot_dataset
+from data_loaders.plotting.visualisation import plot_class_samples as _plot_class_samples
+
+# Example images shown per class beside the 2D projection for image datasets.
+SAMPLES_PER_CLASS = 5
 
 FIGURES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets', 'figures')
 
@@ -77,6 +83,41 @@ def safe_filename(name: str) -> str:
     return name.lower().replace(' ', '_').replace('/', '_').replace('(', '').replace(')', '')
 
 
+def _build_image_figure(loader, name, X, y, label_names):
+    """Combined figure: 2D projection on the left, example images per class on the right."""
+    samples = loader.sample_images_per_class(n_per_class=SAMPLES_PER_CLASS)
+    classes = sorted(samples)
+    n_classes = len(classes)
+    n_per = max((len(samples[c]) for c in classes), default=1)
+
+    fig = plt.figure(figsize=(6 + n_per * 1.3, 6.0))
+    outer = fig.add_gridspec(1, 2, width_ratios=[6, n_per * 1.3], wspace=0.2)
+    scatter_ax = fig.add_subplot(outer[0, 0])
+
+    # vertically centre the (usually 2-row) image grid against the tall scatter
+    # so the right-hand panel doesn't leave large empty margins
+    cell = n_per * 1.3 / n_per  # width of one square image cell in inches
+    pad = max((6.0 - n_classes * cell) / 2, 0.0)
+    centred = outer[0, 1].subgridspec(3, 1, height_ratios=[pad, n_classes * cell, pad])
+    inner = centred[1, 0].subgridspec(n_classes, n_per, wspace=0.08, hspace=0.15)
+    sample_axes = np.empty((n_classes, n_per), dtype=object)
+    for r in range(n_classes):
+        for c in range(n_per):
+            sample_axes[r, c] = fig.add_subplot(inner[r, c])
+
+    _plot_dataset(
+        X=X,
+        y=y,
+        dataset_name=None,
+        label_names=label_names if isinstance(label_names, list) else None,
+        dim_reducer_method=loader.default_dim_reducer,
+        ax=scatter_ax,
+    )
+    _plot_class_samples(samples, label_names=label_names, axes=sample_axes)
+    fig.suptitle(f'{name} dataset', fontsize=14)
+    return fig
+
+
 def generate_figure(name: str) -> str | None:
     """Load dataset, plot with PCA, save PNG. Returns relative path or None on failure."""
     print(f'  Generating figure for: {name}')
@@ -86,13 +127,18 @@ def generate_figure(name: str) -> str | None:
         y = loader.get_y()
         label_names = loader.get_label_names()
 
-        fig, _ = _plot_dataset(
-            X=X,
-            y=y,
-            dataset_name=name,
-            label_names=label_names if isinstance(label_names, list) else None,
-            dim_reducer_method=loader.default_dim_reducer,
-        )
+        if getattr(loader, 'is_image', False):
+            # image datasets get the scatter plus a grid of example images so
+            # readers can see what the raw data actually looks like
+            fig = _build_image_figure(loader, name, X, y, label_names)
+        else:
+            fig, _ = _plot_dataset(
+                X=X,
+                y=y,
+                dataset_name=name,
+                label_names=label_names if isinstance(label_names, list) else None,
+                dim_reducer_method=loader.default_dim_reducer,
+            )
         fname = f'{safe_filename(name)}.png'
         fpath = os.path.join(FIGURES_DIR, fname)
         fig.savefig(fpath, bbox_inches='tight', dpi=100)

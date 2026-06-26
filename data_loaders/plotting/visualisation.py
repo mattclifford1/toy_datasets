@@ -71,6 +71,97 @@ def _scatter_predictions(
             )
 
 
+def plot_class_samples(
+        samples_by_class: dict[int, list[np.ndarray]],
+        label_names: list[str | int] | None = None,
+        axes: Any = None,
+        dataset_name: str | None = None,
+        terminal_plot: bool = False,
+) -> tuple[Any, Any] | None:
+    """Plot a grid of example images, one row per class.
+
+    Parameters
+    ----------
+    samples_by_class : dict[int, list[np.ndarray]]
+        Mapping from class label to a list of displayable image arrays. Each
+        image is ``(H, W)`` greyscale or ``(H, W, C)`` colour with values in
+        ``[0, 1]``.
+    label_names : list, optional
+        Human-readable names for each class, used as row labels.
+    axes : np.ndarray of matplotlib Axes, optional
+        A ``(n_classes, n_per_class)`` array of axes to draw onto. If None, a
+        new figure is created sized to the grid.
+    dataset_name : str, optional
+        Title for the figure (only used when a new figure is created).
+    terminal_plot : bool, default=False
+        If True, render the grid in the terminal (requires ``axes=None``).
+
+    Returns
+    -------
+    tuple or None
+        ``(fig, axes)`` when a new figure is created, otherwise None.
+    """
+    import matplotlib.pyplot as plt
+    from data_loaders.plotting.terminal_plots import terminal_show
+
+    if terminal_plot and axes is not None:
+        raise ValueError("Cannot use terminal_plot=True with provided axes.")
+
+    classes = sorted(samples_by_class)
+    n_classes = len(classes)
+    n_per_class = max((len(samples_by_class[c]) for c in classes), default=0)
+
+    created_fig = axes is None
+    if created_fig:
+        fig, axes = plt.subplots(
+            n_classes, n_per_class,
+            figsize=(n_per_class * 1.4, n_classes * 1.5),
+            squeeze=False,
+        )
+    else:
+        fig = None
+        axes = np.atleast_2d(axes)
+
+    colors = ["#3ea3e6", "#e56a6a"]  # match scatter class colours
+
+    for row, cls in enumerate(classes):
+        imgs = samples_by_class[cls]
+        if isinstance(label_names, list) and cls < len(label_names):
+            row_label = str(label_names[cls])
+        else:
+            row_label = f"Class {cls}"
+        # keep row labels short so the grid stays tidy
+        if len(row_label) > 18:
+            row_label = row_label[:17] + '…'
+        for col in range(n_per_class):
+            ax = axes[row][col]
+            ax.set_xticks([])
+            ax.set_yticks([])
+            if col < len(imgs):
+                img = imgs[col]
+                if img.ndim == 2:
+                    ax.imshow(img, cmap='gray', vmin=0, vmax=1)
+                else:
+                    ax.imshow(np.clip(img, 0, 1))
+            else:
+                ax.axis('off')
+            if col == 0:
+                color = colors[cls] if cls < len(colors) else 'black'
+                ax.set_ylabel(row_label, fontsize=9, rotation=90,
+                              va='center', color=color)
+
+    if created_fig:
+        if dataset_name is not None:
+            fig.suptitle(f"{dataset_name} — example images per class", fontsize=12)
+        plt.tight_layout()
+        if terminal_plot:
+            terminal_show()
+        else:
+            plt.show()
+        return (fig, axes)
+    return None
+
+
 def plot_dataset(
         X: np.ndarray,
         y: np.ndarray,
