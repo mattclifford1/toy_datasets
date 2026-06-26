@@ -63,6 +63,7 @@ Config in `pyproject.toml`.
 - Loaders implement only `load_data()`; shuffling is done by `AbstractLoader.get_data_dict()` (don't re-shuffle inside `load_data()`)
 - Local loaders read bundled files via `self.local_dataset_path(name)` / `self.local_dataset_description(name)` — never rebuild `os.path` strings
 - Remap raw labels (string or numeric) to integer classes with `binarise_labels(y, mapping)` from `data_loaders.utils` — handles merges and swaps safely; don't do in-place `y[y==k]=v`
+- Image loaders set class attributes `is_image = True` plus `image_shape` (per-sample reshape) and `channels_first` (True for torchvision `C,H,W` storage, False for `H,W[,C]`). The base class then provides `as_image()`, `sample_images_per_class()` and `plot_class_samples()` for free, and the gallery script adds example-image previews automatically — don't hand-roll image reshaping in leaf loaders
 
 ## Public API
 
