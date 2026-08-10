@@ -45,6 +45,7 @@ it.
 **Other:**
 - `Banknote Authentication`, `Wheat Seeds`, `Ionosphere`
 - `Sonar Rocks vs Mines`, `Abalone Gender`
+- `German Credit`
 - `Costcla Credit Scoring Kaggle 2011`, `Costcla Credit Scoring PAKDD 2009`
 - `Costcla Direct Marketing`
 

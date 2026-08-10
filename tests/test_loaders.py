@@ -277,3 +277,52 @@ class TestEdgeCases:
 
         # Most data should be in test
         assert len(train['y']) < len(test['y'])
+
+
+class TestGermanCredit:
+    """German Credit needs its own tests: 13 of its 20 attributes arrive as UCI level
+    codes ('A11', 'A34') and are ordinal-encoded by the loader, which is the part most
+    likely to break silently."""
+
+    def test_shape_and_class_balance(self):
+        loader = get_dataset('German Credit')
+        X, y = loader.get_X(), loader.get_y()
+
+        assert X.shape == (1000, 20)
+        # UCI: 700 good risks, 300 bad. Bad is the minority and must be class 1.
+        classes, counts = np.unique(y, return_counts=True)
+        assert list(classes) == [0, 1]
+        assert list(counts) == [700, 300]
+
+    def test_all_attributes_are_numeric_and_finite(self):
+        """the categorical codes must all be encoded - a missed one gives NaN or a crash"""
+        X = get_dataset('German Credit').get_X()
+
+        assert X.dtype.kind == 'f'
+        assert np.isfinite(X).all()
+
+    def test_coded_attributes_are_encoded_as_ordinals(self):
+        """
+        'Status of existing checking account' has four levels A11-A14, so it should come
+        out as 0, 1, 2, 3 - not as an arbitrary relabelling and not left as strings.
+        """
+        loader = get_dataset('German Credit')
+        X, names = loader.get_X(), loader.get_feature_names()
+        column = X[:, names.index('Status of existing checking account')]
+
+        assert sorted(np.unique(column)) == [0.0, 1.0, 2.0, 3.0]
+
+    def test_numeric_attributes_are_left_alone(self):
+        """'Age in years' is already numeric and must not be re-coded"""
+        loader = get_dataset('German Credit')
+        X, names = loader.get_X(), loader.get_feature_names()
+        age = X[:, names.index('Age in years')]
+
+        assert age.min() == 19 and age.max() == 75
+
+    def test_description_records_the_cost_matrix(self):
+        """the 5:1 cost matrix is the reason this dataset is interesting"""
+        description = get_dataset('German Credit').get_description()
+
+        assert len(description) > 100
+        assert 'cost' in description.lower()

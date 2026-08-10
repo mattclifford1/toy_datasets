@@ -61,6 +61,7 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     'Costcla Direct Marketing': _create_lazy_loader('data_loaders.loaders.local_loaders.costcla', 'CostclaDirectMarketingLoader'),
     'Diabetes Pima Indian': _create_lazy_loader('data_loaders.loaders.local_loaders.diabetes', 'DiabetesPimaIndiansLoader'),
     'Framingham CHD': _create_lazy_loader('data_loaders.loaders.local_loaders.framingham', 'FraminghamLoader'),
+    'German Credit': _create_lazy_loader('data_loaders.loaders.local_loaders.german_credit', 'GermanCreditLoader'),
     'Habermans Breast Cancer': _create_lazy_loader('data_loaders.loaders.local_loaders.Habermans_breast_cancer', 'HabermansBreastCancerLoader'),
     'HCC Survival': _create_lazy_loader('data_loaders.loaders.local_loaders.hcc_survival', 'HCCSurvivalLoader'),
     'Heart Disease': _create_lazy_loader('data_loaders.loaders.web_loaders.heart_disease', 'HeartDiseaseLoader'),

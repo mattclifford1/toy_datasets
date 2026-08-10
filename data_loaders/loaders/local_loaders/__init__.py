@@ -11,6 +11,7 @@ from .costcla import (
     CostclaDirectMarketingLoader,
 )
 from .diabetes import DiabetesPimaIndiansLoader
+from .german_credit import GermanCreditLoader
 from .Habermans_breast_cancer import HabermansBreastCancerLoader
 from .hepititus import HepatitisLoader
 from .ionosphere import IonosphereLoader
@@ -32,6 +33,7 @@ __all__ = [
     'CostclaCreditScoringPAKDD2009Loader',
     'CostclaDirectMarketingLoader',
     'DiabetesPimaIndiansLoader',
+    'GermanCreditLoader',
     'HabermansBreastCancerLoader',
     'HepatitisLoader',
     'IonosphereLoader',
