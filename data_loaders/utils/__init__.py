@@ -1,3 +1,8 @@
+from data_loaders.utils.cross_validation import (
+    stratified_kfold_indices,
+    stratified_kfold_split,
+    subset_rows,
+)
 from data_loaders.utils.labels import binarise_labels
 from data_loaders.utils.missing import encode_categoricals, impute_missing
 from data_loaders.utils.normalisation import Normaliser
@@ -14,4 +19,7 @@ __all__ = [
     'shuffle_data',
     'shuffle_dataset',
     'proportional_split',
+    'stratified_kfold_indices',
+    'stratified_kfold_split',
+    'subset_rows',
 ]

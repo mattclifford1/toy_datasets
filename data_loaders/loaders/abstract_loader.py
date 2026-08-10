@@ -50,6 +50,12 @@ class AbstractLoader(ABC):
     minority_reduce_scaler_test : int or None, default=None
         If set, further reduce the minority class in the *test* set by this
         factor (applied after ``equal_test`` if both are set).
+    majority_max : int or None, default=None
+        If set, cap the majority class of the *train* set at this many
+        instances, applied before ``minority_reduce_scaler`` so the requested
+        ratio is taken against the capped count. Keeps very large datasets
+        trainable while preserving their natural imbalance. The test set is
+        untouched.
     train_post_process : callable or None, default=None
         Function ``(X, y) -> (X, y)`` applied to train data after splitting.
     test_post_process : callable or None, default=None
@@ -96,6 +102,7 @@ class AbstractLoader(ABC):
                  minority_reduce_scaler: int | None = None,
                  equal_test: bool = False,
                  minority_reduce_scaler_test: int | None = None,
+                 majority_max: int | None = None,
                  train_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
                  test_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
                  percent_of_data: float | None = None,
@@ -110,6 +117,7 @@ class AbstractLoader(ABC):
         self.train_size = train_size
         self.minority_reduce_scaler = minority_reduce_scaler
         self.minority_reduce_scaler_test = minority_reduce_scaler_test
+        self.majority_max = majority_max
         self.train_post_process = train_post_process
         self.test_post_process = test_post_process
         self.percent_of_data = percent_of_data
@@ -183,6 +191,7 @@ class AbstractLoader(ABC):
             minority_reduce_scaler: int | None = None,
             equal_test: bool | None = None,
             minority_reduce_scaler_test: int | None = None,
+            majority_max: int | None = None,
             train_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
             test_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
             seed: bool | int | None = None,
@@ -195,6 +204,7 @@ class AbstractLoader(ABC):
             minority_reduce_scaler: if not None, scale down the minority class by this factor
             equal_test: if True, balance test set classes first (reduces majority to match minority count)
             minority_reduce_scaler_test: if not None, scale down minority class in test set (applied after equal_test if both set)
+            majority_max: if not None, cap the majority class of the train split at this many instances (applied before minority_reduce_scaler)
             train_post_process: function to apply to the train data after splitting (takes in X_train, y_train and returns modified X_train, y_train)
             test_post_process: function to apply to the test data after splitting (takes in X_test, y_test and returns modified X_test, y_test)
             seed: random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
@@ -212,6 +222,8 @@ class AbstractLoader(ABC):
             minority_reduce_scaler_test = self.minority_reduce_scaler_test
         if equal_test is None:
             equal_test = self.equal_test
+        if majority_max is None:
+            majority_max = self.majority_max
         if train_post_process is None:
             train_post_process = self.train_post_process
         if test_post_process is None:
@@ -227,6 +239,7 @@ class AbstractLoader(ABC):
             minority_reduce_scaler=minority_reduce_scaler,
             equal_test=equal_test,
             minority_reduce_scaler_test=minority_reduce_scaler_test,
+            majority_max=majority_max,
             seed=seed
             )
 
@@ -269,6 +282,43 @@ class AbstractLoader(ABC):
             test_data['X'], test_data['y'] = test_post_process(test_data['X'], test_data['y'])
 
         return train_data, test_data
+
+
+    def get_cross_validation_folds(
+            self,
+            n_splits: int = 5,
+            seed: bool | int | None = None,
+            shuffle_folds: bool = True,
+            **split_kwargs: Any,
+    ) -> tuple[list[tuple[DataDict, DataDict]], DataDict]:
+        '''
+        split into k stratified cross validation folds, keeping the test set held out
+
+        The train split from :meth:`get_train_test_split` becomes the
+        development set that is folded; the test split is returned untouched so
+        it stays a clean estimate of generalisation. Class ratios are preserved
+        in every fold, which matters on imbalanced data where an unstratified
+        fold can contain no minority instances at all.
+            n_splits: number of folds, k
+            seed: random seed for the split and the folds (defaults to the loader's)
+            shuffle_folds: shuffle instances within each class before folding
+            split_kwargs: forwarded to :meth:`get_train_test_split` (train_size,
+                minority_reduce_scaler, equal_test, ...)
+
+        returns:
+            - folds: list of (train_fold, val_fold) data dict pairs, length n_splits
+            - test_data: the held-out test data dict
+        '''
+        if seed is None:
+            seed = self.set_seed
+        train_data, test_data = self.get_train_test_split(seed=seed, **split_kwargs)
+        folds = utils.stratified_kfold_split(
+            train_data,
+            n_splits=n_splits,
+            seed=seed,
+            shuffle=shuffle_folds,
+        )
+        return folds, test_data
 
 
     def get_data_dict(self) -> DataDict:

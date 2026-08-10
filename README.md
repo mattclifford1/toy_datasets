@@ -1594,6 +1594,29 @@ train, test = get_dataset('Moons', train_size=0.7).get_train_test_split()
 
 ---
 
+### `get_cross_validation_folds(n_splits=...)`
+
+Folds the *train* split into `n_splits` stratified cross validation folds and
+returns them alongside the untouched test split, so the test set stays a clean
+estimate of generalisation. Class ratios are preserved in every fold — on
+imbalanced data an unstratified fold can easily end up with no minority
+instances at all. Any `get_train_test_split` option can be passed through.
+
+```python
+loader = get_dataset('Habermans Breast Cancer', train_size=0.7)
+folds, test = loader.get_cross_validation_folds(n_splits=5)
+
+for train_fold, val_fold in folds:
+    clf.fit(train_fold['X'], train_fold['y'])
+    score(clf, val_fold['X'], val_fold['y'])
+```
+
+Use `utils.stratified_kfold_indices(y, n_splits)` instead when you need the raw
+index arrays — for example to resample the train fold only, without leaking
+resampled rows into validation.
+
+---
+
 ### `scale=True`
 
 Applies MinMax normalisation fitted on the train set, scaling all features to `[−1, 1]`.
@@ -1631,6 +1654,34 @@ train, test = dataset.get_train_test_split()
 ```
 
 ![minority_reduce](assets/figures/options/minority_reduce.png)
+
+---
+
+### `majority_max`
+
+Caps the majority class of the **train** split at a fixed number of instances.
+The test split is untouched.
+
+Use it when a dataset is too large to fit every model family on but you want
+to keep its natural imbalance — capping the majority is much better than
+subsampling both classes, which would throw away the minority data the
+imbalance story depends on.
+
+```python
+# MIMIC-IV has 1.6M majority rows: fine for a linear model, hopeless for an
+# O(n^2) kernel SVM. Cap the training majority and keep every minority point.
+dataset = get_dataset('MIMIC-IV Ready for Discharge', majority_max=50_000)
+train, test = dataset.get_train_test_split()
+```
+
+Applied **before** `minority_reduce_scaler`, so a requested imbalance ratio is
+taken against the capped count rather than the original one:
+
+```python
+# 100 majority / 10 minority, not 100 / (original_majority / 10)
+train, test = dataset.get_train_test_split(
+    majority_max=100, minority_reduce_scaler=10)
+```
 
 ---
 
@@ -1851,6 +1902,8 @@ All loaders inherit from `AbstractLoader` and provide:
 loader.get_X()                  # Feature array (numpy)
 loader.get_y()                  # Label array (numpy)
 loader.get_train_test_split()   # Returns (train_dict, test_dict)
+loader.get_cross_validation_folds(n_splits=5)
+                                # Returns ([(train_dict, val_dict), ...], test_dict)
 loader.get_description()        # Dataset description
 loader.get_feature_names()      # List of feature names
 loader.get_label_names()        # List of class names

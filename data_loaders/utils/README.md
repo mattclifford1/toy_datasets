@@ -15,10 +15,28 @@ MinMax scaler fitted on training data. Scales all features to the range
 `[-1, 1]`. Call the instance to transform a feature matrix; use
 `transform_instance()` for a single row.
 
-**`proportional_split(data, train_size, seed, minority_reduce_scaler, equal_test, minority_reduce_scaler_test)`**
+**`proportional_split(data, train_size, seed, minority_reduce_scaler, equal_test, minority_reduce_scaler_test, majority_max)`**
 Split a data dict into train and test sets while preserving class
-distributions. Supports optional minority-class reduction in both splits and
-test-set balancing via `equal_test`.
+distributions. Supports optional minority-class reduction in both splits,
+test-set balancing via `equal_test`, and capping the train-split majority via
+`majority_max` (applied first, so ratios are taken against the capped count).
+Every per-instance array in the dict — not just `X` and `y` — is split and
+trimmed together, so extras such as `cost_matrix` stay row-aligned.
+
+**`stratified_kfold_split(data, n_splits, seed, shuffle)`**
+Split a data dict into `n_splits` cross validation folds, returning a list of
+`(train_split, val_split)` pairs. Class ratios are preserved in every fold — on
+imbalanced data an unstratified fold can easily contain no minority instances
+at all. Per-instance arrays such as `cost_matrix` are split with their rows.
+
+**`stratified_kfold_indices(y, n_splits, seed, shuffle)`**
+The same folds as index arrays, yielding `(train_inds, val_inds)`. Use it when
+the folds index into something other than a data dict, or when the caller wants
+to resample the rows itself before building the splits.
+
+**`subset_rows(data, inds)`**
+Build a new data dict from the given row indices, subsetting every per-instance
+array together and carrying non-row entries over untouched.
 
 **`shuffle_data(data, seed)`**
 Shuffle `X` and `y` in unison using sklearn. Returns the modified data dict.

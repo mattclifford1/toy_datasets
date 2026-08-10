@@ -14,6 +14,7 @@ def proportional_split(
         minority_reduce_scaler: int | None = None,
         equal_test: bool = False,
         minority_reduce_scaler_test: int | None = None,
+        majority_max: int | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     '''
     create a train, test split that preserves the class distributions
@@ -23,6 +24,12 @@ def proportional_split(
         minority_reduce_scaler: if not None, scale down the minority class by this factor
         equal_test: if True, balance test set classes first (reduces majority to match minority count)
         minority_reduce_scaler_test: if not None, scale down minority class in test set (applied after equal_test if both set)
+        majority_max: if not None, cap the majority class of the TRAIN split at
+            this many instances. Applied before minority_reduce_scaler, so the
+            requested imbalance ratio is taken against the capped count. Use it
+            to keep a very large dataset trainable while preserving its natural
+            imbalance (e.g. MIMIC-IV has 1.6M majority rows, which is hopeless
+            for a kernel SVM but fine at 50k). The test split is untouched.
 
     returns: train_split, test_split (two new dicts)
     '''
@@ -35,6 +42,10 @@ def proportional_split(
     if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test < 1:
         raise ValueError(
             f'minority_reduce_scaler_test needs to be greater than 1 instead of :{minority_reduce_scaler_test}')
+
+    if not isinstance(majority_max, type(None)) and majority_max < 1:
+        raise ValueError(
+            f'majority_max needs to be at least 1 instead of :{majority_max}')
 
     set_seed(seed)
     # get current class proportions
@@ -51,16 +62,26 @@ def proportional_split(
         set_seed(seed)
         # now split the data inds into train/test
         split_point = int(counts[i]*train_size)
+        if cls == 0:  # majority class
+            if not isinstance(majority_max, type(None)) and majority_max != False:
+                # cap the train side only; the rest stays available to test
+                split_point = min(split_point, majority_max)
         if cls == 1: # minority class
             if not isinstance(minority_reduce_scaler, type(None)) and minority_reduce_scaler != False:
                 split_point = max(int(len(train_inds[0])/minority_reduce_scaler), 1)
+            # never ask for more minority train points than exist: doing so
+            # leaves this class an empty test list, and np.concatenate of an
+            # empty python list yields a float array which then fails as an index
+            split_point = min(split_point, len(cls_inds))
         train_inds.append(list(cls_inds[0:split_point]))
 
         test_inds.append(list(cls_inds[split_point:]))
 
     # concat all the inds from each class
-    train_inds_arr = np.concatenate(train_inds)
-    test_inds_arr = np.concatenate(test_inds)
+    # dtype is forced because np.concatenate over python lists returns float64
+    # when any of them is empty, and a float array cannot index
+    train_inds_arr = np.concatenate(train_inds).astype(int)
+    test_inds_arr = np.concatenate(test_inds).astype(int)
     # now apply the split to all data arrays
     train_split: dict[str, Any] = {}
     test_split: dict[str, Any] = {}
@@ -75,12 +96,12 @@ def proportional_split(
     if equal_test == True:
         classes, counts = np.unique(test_split['y'], return_counts=True)
         max_inst = min(counts)
+        drop = []
         for cls in classes:
             inds = np.arange(len(test_split['y']))
             inds = inds[test_split['y'] == cls]
-            inds_drop = inds[max_inst:]
-            test_split['y'] = np.delete(test_split['y'], inds_drop)
-            test_split['X'] = np.delete(test_split['X'], inds_drop, axis=0)
+            drop.extend(inds[max_inst:].tolist())
+        _drop_rows(test_split, drop)
 
     # Step 2: minority_reduce_scaler_test — reduce minority class further (applies after equal_test if both set)
     if not isinstance(minority_reduce_scaler_test, type(None)) and minority_reduce_scaler_test != False:
@@ -88,8 +109,24 @@ def proportional_split(
         inds = np.arange(len(test_split['y']))
         minority_inds = inds[test_split['y'] == minority_cls]
         n_keep = max(int(len(minority_inds) / minority_reduce_scaler_test), 1)
-        inds_drop = minority_inds[n_keep:]
-        test_split['y'] = np.delete(test_split['y'], inds_drop)
-        test_split['X'] = np.delete(test_split['X'], inds_drop, axis=0)
+        _drop_rows(test_split, minority_inds[n_keep:])
 
     return train_split, test_split
+
+
+def _drop_rows(split: dict[str, Any], inds_drop) -> None:
+    '''
+    delete rows from EVERY row-aligned array in the split, in place
+
+    Dropping from 'X' and 'y' alone silently desynchronises any other
+    per-instance array the loader supplied - 'cost_matrix' on the costcla
+    datasets is the case that bites, since it is (n, 4) and would keep the
+    dropped rows' costs against the wrong samples.
+    '''
+    inds_drop = np.asarray(inds_drop, dtype=int)
+    if len(inds_drop) == 0:
+        return
+    n = len(split['y'])
+    for key, val in split.items():
+        if isinstance(val, np.ndarray) and val.shape[0] == n:
+            split[key] = np.delete(val, inds_drop, axis=0)

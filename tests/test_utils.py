@@ -354,3 +354,184 @@ class TestEncodeCategoricals:
         df = pd.DataFrame({'flag': ['Y', 'N']})
         _ = utils.encode_categoricals(df)
         assert df['flag'].tolist() == ['Y', 'N']
+
+
+class TestMajorityMax:
+    """Tests for the majority_max cap in proportional_split."""
+
+    @staticmethod
+    def _imbalanced(n_maj=800, n_min=200, seed=0):
+        rng = np.random.default_rng(seed)
+        return {'X': rng.normal(size=(n_maj + n_min, 4)),
+                'y': np.r_[np.zeros(n_maj), np.ones(n_min)].astype(int)}
+
+    def test_majority_max_caps_the_train_majority(self):
+        """The train majority should be capped, the minority untouched."""
+        data = self._imbalanced()
+        train, _ = utils.proportional_split(
+            data, train_size=0.5, seed=0, majority_max=50)
+
+        assert int((train['y'] == 0).sum()) == 50
+        assert int((train['y'] == 1).sum()) == 100
+
+    def test_majority_max_leaves_the_test_split_alone(self):
+        """Capping is a training-cost measure; test data must not shrink."""
+        data = self._imbalanced()
+        _, uncapped = utils.proportional_split(data, train_size=0.5, seed=0)
+        _, capped = utils.proportional_split(
+            data, train_size=0.5, seed=0, majority_max=50)
+
+        assert int((capped['y'] == 0).sum()) >= int((uncapped['y'] == 0).sum())
+        assert int((capped['y'] == 1).sum()) == int((uncapped['y'] == 1).sum())
+
+    def test_majority_max_above_the_count_is_a_no_op(self):
+        data = self._imbalanced()
+        plain, _ = utils.proportional_split(data, train_size=0.5, seed=0)
+        capped, _ = utils.proportional_split(
+            data, train_size=0.5, seed=0, majority_max=10_000)
+
+        assert np.array_equal(plain['y'], capped['y'])
+        assert np.array_equal(plain['X'], capped['X'])
+
+    def test_ratio_is_taken_against_the_capped_count(self):
+        """
+        majority_max applies before minority_reduce_scaler, so the requested
+        imbalance is relative to the capped majority rather than the original.
+        """
+        data = self._imbalanced()
+        train, _ = utils.proportional_split(
+            data, train_size=0.5, seed=0,
+            majority_max=100, minority_reduce_scaler=10)
+
+        assert int((train['y'] == 0).sum()) == 100
+        assert int((train['y'] == 1).sum()) == 10
+
+    def test_majority_max_must_be_positive(self):
+        data = self._imbalanced()
+        with pytest.raises(ValueError):
+            utils.proportional_split(data, train_size=0.5, majority_max=0)
+
+
+class TestSplitKeepsRowsAligned:
+    """Every per-instance array must be split and trimmed together."""
+
+    @staticmethod
+    def _with_costs(n_maj=300, n_min=100, seed=0):
+        rng = np.random.default_rng(seed)
+        n = n_maj + n_min
+        return {'X': rng.normal(size=(n, 3)),
+                'y': np.r_[np.zeros(n_maj), np.ones(n_min)].astype(int),
+                'cost_matrix': np.arange(n * 4).reshape(n, 4)}
+
+    def test_cost_matrix_survives_equal_test(self):
+        """
+        equal_test used to delete from 'X' and 'y' only, silently leaving
+        cost_matrix rows attached to the wrong samples.
+        """
+        train, test = utils.proportional_split(
+            self._with_costs(), train_size=0.5, seed=0, equal_test=True)
+
+        for split in (train, test):
+            assert split['cost_matrix'].shape[0] == len(split['y'])
+
+    def test_cost_matrix_survives_minority_reduce_scaler_test(self):
+        train, test = utils.proportional_split(
+            self._with_costs(), train_size=0.5, seed=0,
+            minority_reduce_scaler_test=2)
+
+        for split in (train, test):
+            assert split['cost_matrix'].shape[0] == len(split['y'])
+
+    def test_cost_rows_still_match_their_samples(self):
+        """The surviving cost rows must be the ones belonging to those X rows."""
+        data = self._with_costs()
+        # cost_matrix[i, 0] identifies row i uniquely (0, 4, 8, ...)
+        _, test = utils.proportional_split(
+            data, train_size=0.5, seed=0, equal_test=True)
+
+        original = {tuple(x): c[0] for x, c in
+                    zip(data['X'], data['cost_matrix'])}
+        for x, c in zip(test['X'], test['cost_matrix']):
+            assert original[tuple(x)] == c[0]
+
+
+class TestSplitIndexDtype:
+    """np.concatenate over python lists goes float64 when one list is empty."""
+
+    def test_split_survives_an_empty_class_partition(self):
+        rng = np.random.default_rng(0)
+        data = {'X': rng.normal(size=(120, 3)),
+                'y': np.r_[np.zeros(100), np.ones(20)].astype(int)}
+        # ask for more minority train points than exist for that class
+        train, test = utils.proportional_split(
+            data, train_size=0.5, seed=0, minority_reduce_scaler=1)
+
+        assert len(train['y']) + len(test['y']) == 120
+        assert train['X'].dtype == data['X'].dtype
+
+
+class TestStratifiedKFold:
+    """Tests for the cross validation splitters."""
+
+    @staticmethod
+    def _imbalanced_data(n_majority=100, n_minority=17, seed=0):
+        rng = np.random.default_rng(seed)
+        return {'X': rng.normal(size=(n_majority + n_minority, 3)),
+                'y': np.r_[np.zeros(n_majority), np.ones(n_minority)].astype(int),
+                'cost_matrix': rng.normal(size=(n_majority + n_minority, 4)),
+                'description': 'not a row array'}
+
+    def test_folds_partition_the_data(self):
+        """Every instance is validated exactly once across the k folds."""
+        data = self._imbalanced_data()
+        folds = utils.stratified_kfold_split(data, n_splits=5, seed=0)
+
+        assert len(folds) == 5
+        val_rows = np.concatenate([val['X'] for _, val in folds])
+        assert len(val_rows) == len(data['y'])
+        assert len({tuple(x) for x in val_rows}) == len(data['y'])
+
+    def test_train_and_val_are_disjoint(self):
+        data = self._imbalanced_data()
+        for train, val in utils.stratified_kfold_split(data, n_splits=4, seed=0):
+            train_rows = {tuple(x) for x in train['X']}
+            val_rows = {tuple(x) for x in val['X']}
+            assert train_rows.isdisjoint(val_rows)
+            assert len(train['y']) + len(val['y']) == len(data['y'])
+
+    def test_every_fold_holds_minority_instances(self):
+        """The point of stratifying: no fold may come out all-majority."""
+        data = self._imbalanced_data(n_majority=200, n_minority=10)
+        for train, val in utils.stratified_kfold_split(data, n_splits=5, seed=0):
+            assert (val['y'] == 1).sum() == 2
+            assert (train['y'] == 1).sum() == 8
+
+    def test_extra_row_arrays_stay_aligned(self):
+        """cost_matrix must follow its own rows, like proportional_split."""
+        data = self._imbalanced_data()
+        original = {tuple(x): tuple(c) for x, c in
+                    zip(data['X'], data['cost_matrix'])}
+        for train, val in utils.stratified_kfold_split(data, n_splits=3, seed=0):
+            for split in (train, val):
+                for x, c in zip(split['X'], split['cost_matrix']):
+                    assert original[tuple(x)] == tuple(c)
+
+    def test_seed_is_reproducible(self):
+        data = self._imbalanced_data()
+        a = utils.stratified_kfold_split(data, n_splits=5, seed=3)
+        b = utils.stratified_kfold_split(data, n_splits=5, seed=3)
+        for (_, val_a), (_, val_b) in zip(a, b):
+            np.testing.assert_array_equal(val_a['X'], val_b['X'])
+
+    def test_too_few_minority_instances_raises(self):
+        data = self._imbalanced_data(n_majority=100, n_minority=3)
+        with pytest.raises(ValueError, match='only 3 instances'):
+            utils.stratified_kfold_split(data, n_splits=5, seed=0)
+
+    def test_indices_match_the_data_splitter(self):
+        data = self._imbalanced_data()
+        splits = utils.stratified_kfold_split(data, n_splits=5, seed=1)
+        inds = utils.stratified_kfold_indices(data['y'], n_splits=5, seed=1)
+        for (train, val), (train_inds, val_inds) in zip(splits, inds):
+            np.testing.assert_array_equal(train['X'], data['X'][train_inds])
+            np.testing.assert_array_equal(val['X'], data['X'][val_inds])

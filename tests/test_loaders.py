@@ -205,6 +205,24 @@ class TestLoaderReproducibility:
         # Same seed should give same shuffle order
         np.testing.assert_array_equal(X1, X2)
 
+    @pytest.mark.parametrize("dataset_name", [
+        'Costcla Credit Scoring Kaggle 2011',
+        'Costcla Credit Scoring PAKDD 2009',
+        'Costcla Direct Marketing',
+    ])
+    def test_seed_is_overridable(self, dataset_name):
+        """A loader must never pin set_seed itself, or the caller cannot vary it.
+
+        The costcla loaders used to pass ``set_seed=True`` into
+        ``super().__init__`` alongside ``**kwargs``, so ``get_dataset(name,
+        set_seed=0)`` raised TypeError for a duplicate keyword argument.
+        """
+        X0 = get_dataset(dataset_name, set_seed=0).get_X()
+        X1 = get_dataset(dataset_name, set_seed=1).get_X()
+
+        assert X0.shape == X1.shape
+        assert not np.array_equal(X0, X1)
+
 
 class TestLoaderScaling:
     """Tests for loader scaling functionality."""
