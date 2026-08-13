@@ -774,9 +774,13 @@ class ExampleDataset(AbstractLoader):
     """
 
     def __init__(self, **kwargs: Any) -> None:
-        super().__init__(shuffle=True,
-                         dataset_name='Example Dataloader',
-                         **kwargs)
+        # setdefault rather than a keyword in the call: ``shuffle`` is an
+        # ordinary AbstractLoader option, so a caller may pass it too, and
+        # spelling it out here as well raises "got multiple values for keyword
+        # argument".  This class is the template others are copied from, so the
+        # pattern matters more here than the one crash it avoids.
+        kwargs.setdefault('shuffle', True)
+        super().__init__(dataset_name='Example Dataloader', **kwargs)
 
     def load_data(self) -> DataDict:
         """Return a small hard-coded example dataset.

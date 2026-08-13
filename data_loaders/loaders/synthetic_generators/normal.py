@@ -23,10 +23,14 @@ class NormalDataLoader(AbstractLoader):
                  **kwargs: Any) -> None:
         # work out the split size and ratio from the numbers
         self.total_instances = num_train + num_test
-        train_size = num_train / self.total_instances
+        # Derived from num_train/num_test and train_ratio, but passed through
+        # setdefault so an explicit train_size / minority_reduce_scaler from the
+        # caller wins instead of colliding ("got multiple values for keyword
+        # argument") -- these are ordinary AbstractLoader options everywhere else
+        # in the library, so callers reasonably expect to be able to set them.
+        kwargs.setdefault('train_size', num_train / self.total_instances)
+        kwargs.setdefault('minority_reduce_scaler', train_ratio)
         super().__init__(shuffle=shuffle,
-                         train_size=train_size,
-                         minority_reduce_scaler=train_ratio,
                         #  equal_test=equal_test,
                          set_seed=set_seed,
                          dataset_name='Normal Synthetic',

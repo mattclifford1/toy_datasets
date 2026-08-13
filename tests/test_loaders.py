@@ -1,6 +1,8 @@
 """
 Detailed tests for individual loader categories.
 """
+import inspect
+
 import pytest
 import numpy as np
 from data_loaders.main import get_dataset
@@ -344,3 +346,56 @@ class TestGermanCredit:
 
         assert len(description) > 100
         assert 'cost' in description.lower()
+
+
+class TestNoHardCodedLoaderOptions:
+    """No loader may pin a caller-tunable option into ``super().__init__``.
+
+    Passing an option as a keyword *and* forwarding ``**kwargs`` makes it
+    impossible to set from outside: Python raises "got multiple values for
+    keyword argument" instead. This has been fixed twice by hand (the costcla
+    loaders' ``set_seed``, then two synthetic generators), so it is checked
+    statically across the whole library rather than dataset by dataset.
+
+    Identity options are exempt: every loader names itself, and no caller would
+    sensibly override that.
+    """
+
+    IDENTITY = {'dataset_name', 'short_description'}
+
+    def _offenders(self):
+        import ast
+        from pathlib import Path
+
+        from data_loaders.loaders.abstract_loader import AbstractLoader
+
+        tunable = set(inspect.signature(AbstractLoader.__init__).parameters)
+        tunable -= {'self', 'kwargs'} | self.IDENTITY
+
+        root = Path(inspect.getfile(AbstractLoader)).parent
+        found = []
+        for path in sorted(root.rglob('*.py')):
+            for cls in [n for n in ast.walk(ast.parse(path.read_text()))
+                        if isinstance(n, ast.ClassDef)]:
+                for fn in [n for n in cls.body
+                           if isinstance(n, ast.FunctionDef) and n.name == '__init__']:
+                    if fn.args.kwarg is None:
+                        continue          # no **kwargs, so nothing can collide
+                    own = ({a.arg for a in fn.args.args}
+                           | {a.arg for a in fn.args.kwonlyargs})
+                    for call in [n for n in ast.walk(fn) if isinstance(n, ast.Call)]:
+                        if not (isinstance(call.func, ast.Attribute)
+                                and call.func.attr == '__init__'):
+                            continue
+                        if not any(k.arg is None for k in call.keywords):
+                            continue      # **kwargs not forwarded to this call
+                        for kw in call.keywords:
+                            if kw.arg in tunable and kw.arg not in own:
+                                found.append(f'{cls.name}.{kw.arg} ({path.name})')
+        return found
+
+    def test_no_loader_pins_a_tunable_option(self):
+        offenders = self._offenders()
+        assert not offenders, (
+            'these loaders pin an option their caller cannot then set; pass it '
+            'via kwargs.setdefault(...) instead: ' + ', '.join(offenders))
