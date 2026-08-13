@@ -5,6 +5,11 @@ description = "Unified interface for loading synthetic and real-world toy datase
 authors = [
     {name = "Matt Clifford", email = "matt.clifford@bristol.ac.uk"},
 ]
+# Everything needed to load a tabular or synthetic dataset. Every heavier dependency is
+# imported inside the method that uses it, never at module scope, so `import data_loaders`
+# and the whole tabular half of the registry work with nothing below installed. The
+# extras below buy the loaders that genuinely need them - keeping them out of the base
+# set is what lets a numerics project depend on this package without acquiring CUDA.
 dependencies = [
     "numpy>=2.3.5",
     "scipy>=1.16.3",
@@ -12,18 +17,31 @@ dependencies = [
     "pandas>=2.3.3",
     "ucimlrepo>=0.0.7",
     "tqdm>=4.67.1",
-    "torch>=2.7.1",
-    "torchvision>=0.22.1",
-    "umap-learn>=0.5.9.post2",
     "matplotlib>=3.10.7",
-    "opentsne>=1.0.4",
     "imbalanced-learn>=0.14.1",
-    "medmnist>=3.0.2",
     "pillow>=11.0.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
+
+[project.optional-dependencies]
+# MNIST, Fashion-MNIST, SVHN, EuroSAT, CIFAR-10/100, CIFAR-10N
+image = [
+    "torch>=2.7.1",
+    "torchvision>=0.22.1",
+]
+# the MedMNIST family, which fetches through the medmnist package on top of torch
+medmnist = [
+    "medmnist>=3.0.2",
+    "torch>=2.7.1",
+    "torchvision>=0.22.1",
+]
+# DimReducer's non-linear backends; PCA and kernel PCA need only scikit-learn
+embeddings = [
+    "umap-learn>=0.5.9.post2",
+    "opentsne>=1.0.4",
+]
 
 
 [build-system]

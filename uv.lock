@@ -1713,18 +1713,28 @@ source = { editable = "." }
 dependencies = [
     { name = "imbalanced-learn" },
     { name = "matplotlib" },
-    { name = "medmnist" },
     { name = "numpy" },
-    { name = "opentsne" },
     { name = "pandas" },
     { name = "pillow" },
     { name = "scikit-learn" },
     { name = "scipy" },
-    { name = "torch" },
-    { name = "torchvision" },
     { name = "tqdm" },
     { name = "ucimlrepo" },
+]
+
+[package.optional-dependencies]
+embeddings = [
+    { name = "opentsne" },
     { name = "umap-learn" },
+]
+image = [
+    { name = "torch" },
+    { name = "torchvision" },
+]
+medmnist = [
+    { name = "medmnist" },
+    { name = "torch" },
+    { name = "torchvision" },
 ]
 
 [package.dev-dependencies]
@@ -1737,19 +1747,22 @@ dev = [
 requires-dist = [
     { name = "imbalanced-learn", specifier = ">=0.14.1" },
     { name = "matplotlib", specifier = ">=3.10.7" },
-    { name = "medmnist", specifier = ">=3.0.2" },
+    { name = "medmnist", marker = "extra == 'medmnist'", specifier = ">=3.0.2" },
     { name = "numpy", specifier = ">=2.3.5" },
-    { name = "opentsne", specifier = ">=1.0.4" },
+    { name = "opentsne", marker = "extra == 'embeddings'", specifier = ">=1.0.4" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pillow", specifier = ">=11.0.0" },
     { name = "scikit-learn", specifier = ">=1.7.2" },
     { name = "scipy", specifier = ">=1.16.3" },
-    { name = "torch", specifier = ">=2.7.1" },
-    { name = "torchvision", specifier = ">=0.22.1" },
+    { name = "torch", marker = "extra == 'image'", specifier = ">=2.7.1" },
+    { name = "torch", marker = "extra == 'medmnist'", specifier = ">=2.7.1" },
+    { name = "torchvision", marker = "extra == 'image'", specifier = ">=0.22.1" },
+    { name = "torchvision", marker = "extra == 'medmnist'", specifier = ">=0.22.1" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "ucimlrepo", specifier = ">=0.0.7" },
-    { name = "umap-learn", specifier = ">=0.5.9.post2" },
+    { name = "umap-learn", marker = "extra == 'embeddings'", specifier = ">=0.5.9.post2" },
 ]
+provides-extras = ["image", "medmnist", "embeddings"]
 
 [package.metadata.requires-dev]
 dev = [

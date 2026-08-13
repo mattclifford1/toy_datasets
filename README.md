@@ -1869,6 +1869,17 @@ uv sync
 uv sync --group dev
 ```
 
+The base install covers every synthetic and tabular dataset. The image datasets and the
+non-linear embeddings need extras, which are kept out of the base set because they pull
+in torch and CUDA:
+
+```bash
+uv sync --extra image        # MNIST, Fashion-MNIST, SVHN, EuroSAT, CIFAR-10/100/10N
+uv sync --extra medmnist     # the MedMNIST family
+uv sync --extra embeddings   # UMAP and openTSNE for DimReducer
+uv sync --all-extras         # all of the above
+```
+
 ## Quick Start
 
 ```python

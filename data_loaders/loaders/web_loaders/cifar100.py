@@ -5,8 +5,6 @@ import warnings
 from typing import Any
 
 import numpy as np
-from torchvision import transforms, datasets
-from torch.utils import data as torch_data
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 
 CIFAR100_CLASSES = [
@@ -97,6 +95,12 @@ class Cifar100Loader(AbstractLoader):
             Dict with keys ``'X'`` (shape ``(size, 3072)``), ``'y'``,
             ``'description'``, and ``'label_names'``.
         """
+        # torch and torchvision are needed only by the image loaders. Importing them
+        # here rather than at module scope keeps `import data_loaders` - and every
+        # tabular loader in this package - free of a ~3 GB deep-learning dependency.
+        from torchvision import transforms, datasets
+        from torch.utils import data as torch_data
+
         this_dir = os.path.dirname(os.path.abspath(__file__))
         download_dir = os.path.join(this_dir, '..', 'datasets', 'CIFAR-100')
         with warnings.catch_warnings():

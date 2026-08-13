@@ -34,8 +34,9 @@ Consistency across the datasets is key. Practical rules that follow from this:
 
 Always use uv for environment and dependency management.
 
-- `uv sync` - Install dependencies and create virtual environment
-- `uv sync --group dev` - Install with dev dependencies
+- `uv sync` - Install the base dependencies and create the virtual environment
+- `uv sync --all-extras --group dev` - what development actually needs; the base install
+  deliberately omits torch, torchvision, medmnist, umap-learn and openTSNE
 - `uv add <package>` - Add a new dependency
 - `uv run <command>` - Run command in the uv environment
 - `uv add --editable path/to/package --group dev` - Install a package in development mode
@@ -53,6 +54,22 @@ Config in `pyproject.toml`.
 - `data_loaders/utils/` - Normalization (`normalisation.py`), shuffling/seeding (`shuffling.py`), train/test splitting (`splitting.py`), label remapping (`labels.py`)
 - `data_loaders/embeddings/` - Dimensionality reduction subpackage: `base.py` (ABC), `pca.py`, `tsne.py`, `umap.py`, `dim_reducer.py` (string-dispatch orchestrator)
 - `data_loaders/plotting/` - Dataset visualisation (`visualisation.py`) and terminal rendering (`terminal_plots.py`)
+
+## Optional dependencies
+
+The base install is deliberately lean: `numpy`, `scipy`, `scikit-learn`, `pandas`,
+`ucimlrepo`, `tqdm`, `matplotlib`, `imbalanced-learn`, `pillow`. Everything heavier lives
+in an extra --- `image` (torch, torchvision), `medmnist`, `embeddings` (umap-learn,
+openTSNE). Together they weigh several GB, mostly CUDA, so a numerics project that only
+wants the tabular datasets should not have to install them.
+
+**This is load-bearing, not cosmetic. Every optional dependency must be imported inside
+the function or method that uses it, never at module scope** --- including in a package
+`__init__.py`, which runs whenever any of its submodules is imported. `main.py` builds
+`AVAILABLE_DATASETS` from lazy factories precisely so that requesting one tabular dataset
+does not import every loader; a module-level `from torchvision import ...` anywhere under
+`loaders/web_loaders/` silently defeats that for the whole package. See
+`embeddings/umap.py` and `web_loaders/mnist.py` for the pattern.
 
 ## Key Patterns
 
@@ -94,7 +111,9 @@ Other: banknote, wheat_seeds
 
 ## Testing
 
-Uses pytest for testing. Install dev dependencies first: `uv sync --group dev`
+Uses pytest for testing. Install first with `uv sync --all-extras --group dev` --- the
+image and embedding tests need the optional extras, and without them they fail rather
+than skip.
 
 ```bash
 uv run pytest                              # Run all tests

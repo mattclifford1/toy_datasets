@@ -5,9 +5,6 @@ import warnings
 from typing import Any, Literal
 
 import numpy as np
-import torch
-from torchvision import transforms, datasets
-from torch.utils import data as torch_data
 from data_loaders.loaders.abstract_loader import AbstractLoader, DataDict
 from data_loaders.loaders.web_loaders.cifar10 import CIFAR10_CLASSES
 
@@ -95,6 +92,10 @@ class Cifar10NLoader(AbstractLoader):
 
     def _load_noisy_labels(self, label_dir: str) -> dict:
         """Load the CIFAR-10N human label file, downloading it on first use."""
+        # imported here, not at module scope, so that `import data_loaders` stays free
+        # of torch - see the note in load_data below
+        import torch
+
         label_path = os.path.join(label_dir, _CIFAR10N_FILENAME)
         if not os.path.exists(label_path):
             from torchvision.datasets.utils import download_url
@@ -118,6 +119,12 @@ class Cifar10NLoader(AbstractLoader):
             Dict with keys ``'X'`` (shape ``(size, 3072)``), ``'y'``,
             ``'description'``, and ``'label_names'``.
         """
+        # torch and torchvision are needed only by the image loaders. Importing them
+        # here rather than at module scope keeps `import data_loaders` - and every
+        # tabular loader in this package - free of a ~3 GB deep-learning dependency.
+        from torchvision import transforms, datasets
+        from torch.utils import data as torch_data
+
         this_dir = os.path.dirname(os.path.abspath(__file__))
         cifar10_dir = os.path.join(this_dir, '..', 'datasets', 'CIFAR-10')
         label_dir = os.path.join(this_dir, '..', 'datasets', 'CIFAR-10N')
