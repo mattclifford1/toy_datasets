@@ -56,8 +56,10 @@ class NormalDataLoader(AbstractLoader):
         means = [self.m1, self.m2]
         covs = [self.cov1, self.cov2]
         num_samples = [self.N1, self.N2]
+        # seed once, not per class - see GaussianGenerator.load_data: re-seeding inside
+        # the loop gives every class the same underlying draws
+        set_seed(self.set_seed)
         for mean, cov, num_sample, label in zip(means, covs, num_samples, labels):
-            set_seed(self.set_seed)
             X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
             y.append(np.ones(num_sample)*label)
         X = np.vstack(X)

@@ -283,3 +283,35 @@ class TestGaussianReproducibility:
 
         np.testing.assert_array_equal(loader1.get_X(), loader2.get_X())
         np.testing.assert_array_equal(loader1.get_y(), loader2.get_y())
+
+
+class TestGaussianClassesIndependent:
+    """The two classes must be independent draws, not copies of one another.
+
+    Regression test: load_data used to re-seed before drawing each class, so every
+    class got the same standard-normal draws and class 1 was an exact translate of
+    class 0 (a scaled translate when cov1_scaler != 1).
+    """
+
+    @pytest.mark.parametrize('cov1_scaler', [1.0, 3.0])
+    def test_class_one_is_not_a_transform_of_class_zero(self, cov1_scaler):
+        loader = GaussianGenerator(n_features=3, class_separation=2.0, num_samples=[50, 50],
+                                   cov1_scaler=cov1_scaler, shuffle=False, set_seed=42)
+        data = loader.load_data()
+        X0 = data['X'][data['y'] == 0] - loader.means[0]
+        X1 = data['X'][data['y'] == 1] - loader.means[1]
+        # a translate would leave X1 == X0; a scaled one X1 == sqrt(r) * X0
+        assert not np.allclose(X1, X0)
+        assert not np.allclose(X1, np.sqrt(cov1_scaler)*X0)
+        # and they should not be correlated row for row either
+        assert abs(np.corrcoef(X0.ravel(), X1.ravel())[0, 1]) < 0.5
+
+    def test_normal_loader_classes_are_independent(self):
+        from data_loaders.loaders.synthetic_generators.normal import NormalDataLoader
+        loader = NormalDataLoader(num_train=100, num_test=100, train_ratio=1,
+                                  shuffle=False, set_seed=42)
+        data = loader.load_data()
+        n = min(np.sum(data['y'] == 0), np.sum(data['y'] == 1))
+        X0 = data['X'][data['y'] == 0][:n] - np.array(loader.m1)
+        X1 = data['X'][data['y'] == 1][:n] - np.array(loader.m2)
+        assert not np.allclose(X1, X0)

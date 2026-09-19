@@ -233,10 +233,15 @@ class GaussianGenerator(AbstractLoader):
         X_list = []
         y_list = []
 
+        # Seed once, before any class is drawn. Seeding inside the loop restarts the
+        # stream for every class, so each class gets the same standard-normal draws:
+        # class 1 came out as an exact translate of class 0 (a scaled one when
+        # cov1_scaler != 1), point for point - invisible in a scatter plot, wrong for
+        # anything fitted to the joint sample.
+        set_seed(self.set_seed)
         for label, (mean, cov, n_samples) in enumerate(
             zip(self.means, self.covs, self.num_samples)
         ):
-            set_seed(self.set_seed)
             X_class = np.random.multivariate_normal(mean, cov, size=n_samples)
             X_list.append(X_class)
             y_list.append(np.full(n_samples, label))
