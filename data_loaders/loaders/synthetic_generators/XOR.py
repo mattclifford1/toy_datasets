@@ -62,6 +62,10 @@ class XORGenerator(AbstractLoader):
             num_samples = [self.num_samples//2, self.num_samples//2]
         else:
             num_samples = self.num_samples
+        # Seed once, from the loader's own seed, before any cluster is drawn. The
+        # clusters used to call set_seed(None) each, which does nothing, so XOR
+        # ignored set_seed entirely and was different on every load.
+        set_seed(self.set_seed)
         mu = 5
         cov = [[1, 0], [0, 1]]
         covs = [cov, cov]
@@ -107,8 +111,10 @@ class XORGenerator(AbstractLoader):
         labels = [0, 1]
         X = []
         y = []
+        # draws continue the stream seeded in _get_XOR_single; re-seeding per class
+        # here would give every class the same draws (see GaussianGenerator)
+        set_seed(seed)
         for mean, cov, num_sample, label in zip(means, covs, num_samples, labels):
-            set_seed(seed)
             X.append(np.random.multivariate_normal(mean, cov, size=num_sample))
             y.append(np.full(num_sample, label, dtype=np.int64))
         X = np.vstack(X)

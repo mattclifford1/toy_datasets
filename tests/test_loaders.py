@@ -182,18 +182,27 @@ class TestLoaderReproducibility:
         np.testing.assert_array_equal(X1, X2)
 
     def test_xor_reproducible(self):
-        """XOR should be reproducible with same seed (uses internal seeding)."""
-        # XOR uses internal seeding differently, just verify it loads consistently
-        loader1 = get_dataset('XOR', set_seed=42, shuffle=False)
-        loader2 = get_dataset('XOR', set_seed=42, shuffle=False)
+        """XOR should be reproducible with the same seed, and differ with another.
 
-        X1 = loader1.get_X()
-        X2 = loader2.get_X()
+        It used to ignore set_seed entirely, so this only checked shapes.
+        """
+        X1 = get_dataset('XOR', set_seed=42, shuffle=False).get_X()
+        X2 = get_dataset('XOR', set_seed=42, shuffle=False).get_X()
+        X3 = get_dataset('XOR', set_seed=7, shuffle=False).get_X()
+        np.testing.assert_array_equal(X1, X2)
+        assert not np.array_equal(X1, X3)
 
-        # XOR generates data without proper seeding in _get_two_normal_classes
-        # Just verify shape and type are consistent
-        assert X1.shape == X2.shape
-        assert X1.dtype == X2.dtype
+    def test_xor_clusters_are_independent(self):
+        """No cluster may be a translate of another."""
+        loader = get_dataset('XOR', num_samples=400, set_seed=42, shuffle=False)
+        data = loader.load_data()
+        X = data['X']
+        quarter = len(X) // 4
+        blocks = [X[i*quarter:(i+1)*quarter] - X[i*quarter:(i+1)*quarter].mean(0)
+                  for i in range(4)]
+        for i in range(4):
+            for j in range(i + 1, 4):
+                assert not np.allclose(blocks[i], blocks[j])
 
     @pytest.mark.parametrize("dataset_name", ['Iris', 'Banknote Authentication'])
     def test_real_data_reproducible(self, dataset_name):
