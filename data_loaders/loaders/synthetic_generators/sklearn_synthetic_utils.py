@@ -37,11 +37,8 @@ def _generic_sklearn_loader(
     dict
         Data dict with keys ``'X'`` and ``'y'``.
     """
-    if seed == True:
-        seed = 42
-    elif seed == False:
-        seed = None
-    
+    seed = utils.resolve_seed(seed)
+
     if isinstance(seed, int) and test == True and load_func != sklearn.datasets.make_blobs:
         seed += 1
 

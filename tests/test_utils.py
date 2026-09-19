@@ -69,6 +69,57 @@ class TestSetSeed:
 
         assert val1 == val2
 
+    @pytest.mark.parametrize('seed', [0, 1])
+    def test_zero_and_one_are_ordinary_seeds(self, seed):
+        """0 and 1 are integers, not the booleans they compare equal to.
+
+        Regression test: set_seed tested ``seed == True`` first, so seed 1
+        became the default 42 and seed 0 matched ``seed == False`` and seeded
+        nothing at all.
+        """
+        utils.set_seed(seed)
+        val1 = np.random.rand()
+        utils.set_seed(seed)
+        val2 = np.random.rand()
+        np.random.seed(seed)
+        expected = np.random.rand()
+        assert val1 == val2 == expected
+
+    def test_none_leaves_the_stream_alone(self):
+        utils.set_seed(5)
+        np.random.rand()
+        expected = np.random.rand()
+        utils.set_seed(5)
+        np.random.rand()
+        utils.set_seed(None)
+        assert np.random.rand() == expected
+
+    def test_one_is_not_the_default(self):
+        utils.set_seed(1)
+        one = np.random.rand()
+        utils.set_seed(True)
+        default = np.random.rand()
+        assert one != default
+
+    def test_resolve_seed_convention(self):
+        assert utils.resolve_seed(True) == utils.RANDOM_STATE
+        assert utils.resolve_seed(False) is None
+        assert utils.resolve_seed(None) is None
+        assert utils.resolve_seed(0) == 0
+        assert utils.resolve_seed(1) == 1
+        assert utils.resolve_seed(np.int64(7)) == 7
+        with pytest.raises(TypeError):
+            utils.resolve_seed(1.5)
+
+    def test_shuffle_data_false_is_not_seed_zero(self):
+        """shuffle_data(seed=False) passed False to sklearn, which reads it as 0."""
+        X = np.arange(200).reshape(100, 2)
+        y = np.arange(100)
+        fixed = utils.shuffle_data({'X': X.copy(), 'y': y.copy()}, seed=0)['y']
+        results = [utils.shuffle_data({'X': X.copy(), 'y': y.copy()}, seed=False)['y']
+                   for _ in range(3)]
+        assert not all(np.array_equal(r, fixed) for r in results)
+
     def test_set_seed_with_false(self):
         """set_seed(False) should not set a fixed seed."""
         # This is harder to test definitively, just verify it runs

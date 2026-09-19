@@ -4,7 +4,7 @@ from typing import Any, Iterator
 
 import numpy as np
 
-from data_loaders.utils.shuffling import RANDOM_STATE
+from data_loaders.utils.shuffling import resolve_seed
 
 
 def subset_rows(data: dict[str, Any], inds: np.ndarray) -> dict[str, Any]:
@@ -124,10 +124,6 @@ def _stratified_fold_indices(
     return [np.sort(np.asarray(fold, dtype=int)) for fold in folds]
 
 
-def _seed_value(seed: bool | int) -> int | None:
+def _seed_value(seed: bool | int | None) -> int | None:
     '''map the package's bool/int seed convention onto a numpy generator seed'''
-    if seed is True:
-        return RANDOM_STATE
-    if seed is False:
-        return None
-    return int(seed)
+    return resolve_seed(seed)

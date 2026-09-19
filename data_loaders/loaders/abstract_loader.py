@@ -467,8 +467,7 @@ class AbstractLoader(ABC):
         """
         data = self.get_data_dict()
         X, y = data['X'], data['y']
-        rng_seed = 42 if seed is True else (None if seed is False else seed)
-        rng = np.random.default_rng(rng_seed)
+        rng = np.random.default_rng(utils.resolve_seed(seed))
         samples: dict[int, list[np.ndarray]] = {}
         for cls in np.unique(y):
             idx = np.where(y == cls)[0]
