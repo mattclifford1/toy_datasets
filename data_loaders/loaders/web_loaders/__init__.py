@@ -29,6 +29,7 @@ from .heart_failure import HeartFailureLoader
 from .mammographic import MammographicMassLoader
 from .wpbc import BreastCancerPrognosticLoader
 from .breast_cancer_coimbra import BreastCancerCoimbraLoader
+from .openml import OpenMLLoader, OPENML_DATASETS
 
 __all__ = [
     'IrisLoader',
@@ -58,4 +59,6 @@ __all__ = [
     'MammographicMassLoader',
     'BreastCancerPrognosticLoader',
     'BreastCancerCoimbraLoader',
+    'OpenMLLoader',
+    'OPENML_DATASETS',
 ]

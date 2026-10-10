@@ -28,6 +28,7 @@ They all inherit from `AbstractLoader` and expose the standard API
 | `Cifar100Loader` | 50 000 | 3072 | 100 | Fine-grained object images (slow) |
 | `Cifar10NLoader` | 50 000 | 3072 | 10 | CIFAR-10 with human label noise (slow) |
 | `MedMNISTLoader` subclasses | varies | 784 / 2352 | 2-9 | Biomedical images: Pneumonia/Breast/Derma/Blood/Path/OCT (slow) |
+| `OpenMLLoader` | 748 – 30 000 | 4 – 1776 | 2 | Twelve binary OpenML benchmarks, listed in `OPENML_DATASETS` |
 
 ## Usage
 

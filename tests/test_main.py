@@ -37,6 +37,12 @@ class TestAvailableDatasets:
         for name in expected:
             assert name in AVAILABLE_DATASETS, f"{name} missing from registry"
 
+    def test_openml_registry_matches_loader_specs(self):
+        """Every OpenML spec is registered, and nothing else under that loader."""
+        from data_loaders.main import _OPENML_NAMES
+        from data_loaders.loaders.web_loaders.openml import OPENML_DATASETS
+        assert set(_OPENML_NAMES) == set(OPENML_DATASETS)
+
 
 class TestGetDataset:
     """Tests for the get_dataset function."""

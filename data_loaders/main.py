@@ -7,7 +7,7 @@ import importlib
 import data_loaders
 
 
-def _create_lazy_loader(module_path: str, class_name: str) -> Callable[..., Any]:
+def _create_lazy_loader(module_path: str, class_name: str, **bound: Any) -> Callable[..., Any]:
     """Create a factory function that imports a loader class on first use.
 
     Defers the import of heavy dependencies (e.g. torch, ucimlrepo) until the
@@ -19,6 +19,9 @@ def _create_lazy_loader(module_path: str, class_name: str) -> Callable[..., Any]
         Dotted module path, e.g. ``'data_loaders.web_loaders.iris'``.
     class_name : str
         Name of the loader class inside that module.
+    **bound
+        Keyword arguments always passed to the class, e.g. ``name`` for
+        :class:`OpenMLLoader`.
 
     Returns
     -------
@@ -29,8 +32,16 @@ def _create_lazy_loader(module_path: str, class_name: str) -> Callable[..., Any]
     def loader_factory(**kwargs: Any) -> Any:
         module = importlib.import_module(module_path)
         loader_class = getattr(module, class_name)
-        return loader_class(**kwargs)
+        return loader_class(**bound, **kwargs)
     return loader_factory
+
+
+# Kept in step with OPENML_DATASETS in web_loaders/openml.py (checked by tests/test_main.py).
+_OPENML_NAMES = (
+    'Spambase', 'Phoneme', 'MAGIC Gamma Telescope', 'EEG Eye State',
+    'Default of Credit Card Clients', 'QSAR Biodegradation', 'Bioresponse', 'Hill-Valley',
+    'Steel Plates Fault', 'KC1 Software Defects', 'Blood Transfusion', 'Ozone Level 8hr',
+)
 
 
 AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
@@ -80,6 +91,10 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     'Thyroid Sick': _create_lazy_loader('data_loaders.loaders.local_loaders.thyroid_sick', 'ThyroidSickLoader'),
     'Wheat Seeds': _create_lazy_loader('data_loaders.loaders.local_loaders.wheat_seeds', 'WheatSeedsLoader'),
     'Z-Alizadeh Sani CAD': _create_lazy_loader('data_loaders.loaders.local_loaders.zalizadeh_sani', 'ZAlizadehSaniLoader'),
+
+    # OpenML binary benchmarks
+    **{name: _create_lazy_loader('data_loaders.loaders.web_loaders.openml', 'OpenMLLoader', name=name)
+       for name in _OPENML_NAMES},
 
     # Image datasets
     'MNIST': _create_lazy_loader('data_loaders.loaders.web_loaders.mnist', 'MnistLoader'),
