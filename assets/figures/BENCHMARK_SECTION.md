@@ -34,4 +34,10 @@ Classifiers: Logistic Regression, Random Forest, SVC (RBF), KNN, Gaussian NB.
 
 ![benchmark_clf_plots_other](assets/figures/benchmark_clf_plots_other.png)
 
+### OpenML
+
+![benchmark_openml](assets/figures/benchmark_openml.png)
+
+![benchmark_clf_plots_openml](assets/figures/benchmark_clf_plots_openml.png)
+
 </details>

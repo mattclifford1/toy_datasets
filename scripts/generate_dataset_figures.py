@@ -52,6 +52,11 @@ DATASET_GROUPS: dict[str, list[str]] = {
         'Banknote Authentication', 'Wheat Seeds', 'Ionosphere',
         'Sonar Rocks vs Mines', 'Abalone Gender',
     ],
+    'OpenML': [
+        'Spambase', 'Phoneme', 'MAGIC Gamma Telescope', 'EEG Eye State',
+        'Default of Credit Card Clients', 'QSAR Biodegradation', 'Bioresponse', 'Hill-Valley',
+        'Steel Plates Fault', 'KC1 Software Defects', 'Blood Transfusion', 'Ozone Level 8hr',
+    ],
     'Image': ['MNIST', 'Fashion-MNIST', 'SVHN', 'EuroSAT', 'CIFAR-10', 'CIFAR-100', 'CIFAR-10N'],
     'Medical Image (MedMNIST)': [
         'PneumoniaMNIST', 'BreastMNIST', 'DermaMNIST',
@@ -149,11 +154,25 @@ def generate_figure(name: str) -> str | None:
         return None
 
 
+MAX_FEATURE_LINES = 20
+
+
+def truncate_features(info: str, keep: int = MAX_FEATURE_LINES) -> str:
+    """Keep the first ``keep`` feature lines of a get_info block and count the rest."""
+    lines = info.split('\n')
+    feats = [i for i, line in enumerate(lines) if line.startswith('    - Feature ')]
+    if len(feats) <= keep:
+        return info
+    cut = feats[keep:]
+    lines[cut[0]:cut[-1] + 1] = [f'    - ... ({len(cut)} more features)']
+    return '\n'.join(lines)
+
+
 def get_stats_block(name: str) -> str:
-    """Return get_info(long=False) output for a dataset."""
+    """Return get_info(long=False) output for a dataset, with long feature lists truncated."""
     try:
         loader = get_dataset(name, set_seed=42, **DATASET_LOAD_KWARGS.get(name, {}))
-        return loader.get_info(long=False)
+        return truncate_features(loader.get_info(long=False))
     except Exception as e:
         return f'(stats unavailable: {e})'
 

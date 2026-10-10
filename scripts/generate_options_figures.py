@@ -180,6 +180,40 @@ def generate_minority_reduce_figure() -> str | None:
         return None
 
 
+def _side_by_side(option: str, title: str, panels: list[tuple[dict, str]]) -> str | None:
+    """Plot two train splits side by side and save them as options/<option>.png."""
+    print(f'  Generating {option} figure...')
+    try:
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+        fig.suptitle(title, fontsize=13)
+        for ax, (kwargs, panel_title) in zip(axes, panels):
+            loader = get_dataset('Moons', set_seed=42, num_samples=300, **kwargs)
+            train, _ = loader.get_train_test_split()
+            _plot_dataset(X=train['X'], y=train['y'], label_names=loader.get_label_names(),
+                          dim_reducer_method='PCA', ax=ax)
+            ax.set_title(panel_title)
+        fig.tight_layout()
+        fig.savefig(os.path.join(FIGURES_DIR, f'{option}.png'), bbox_inches='tight', dpi=100)
+        plt.close(fig)
+        return f'options/{option}.png'
+    except Exception as e:
+        print(f'  ERROR: {e}')
+        return None
+
+
+def generate_noise_features_figure() -> str | None:
+    """Show Moons with 20 appended N(0, 1) features, projected back to 2D with PCA."""
+    return _side_by_side('noise_features', 'noise_features — Moons dataset (train split, PCA to 2D)',
+                         [({}, 'Default  (2 features)'),
+                          ({'noise_features': 20}, 'noise_features=20  (22 features)')])
+
+
+def generate_label_noise_figure() -> str | None:
+    """Show Moons with 20% of the train labels flipped."""
+    return _side_by_side('label_noise', 'label_noise — Moons dataset (train split)',
+                         [({}, 'Default'), ({'label_noise': 0.2}, 'label_noise=0.2  (test labels untouched)')])
+
+
 def generate_clf_figure() -> str | None:
     """Show decision boundary and misclassification markers using clf on Moons (2D)."""
     print('  Generating clf figure...')
@@ -363,6 +397,33 @@ def build_options_markdown(results: dict[str, str | None]) -> str:
         '',
         '---',
         '',
+        "### `noise_features`",
+        '',
+        'Appends the given number of irrelevant N(0, 1) features to every instance, seeded',
+        'from `set_seed`, so a low-dimensional generator can be swept along dimensionality.',
+        '',
+        '```python',
+        "dataset = get_dataset('Moons', noise_features=20)",
+        '```',
+        '',
+        img_line('noise_features'),
+        '',
+        '---',
+        '',
+        "### `label_noise`",
+        '',
+        'Moves the given fraction of **train** labels to a different class; the test split',
+        'keeps its true labels.',
+        '',
+        '```python',
+        "dataset = get_dataset('Moons', label_noise=0.2)",
+        'train, test = dataset.get_train_test_split()',
+        '```',
+        '',
+        img_line('label_noise'),
+        '',
+        '---',
+        '',
         "### `dim_reducer`",
         '',
         'Applies dimensionality reduction to the split output.',
@@ -436,6 +497,8 @@ def main() -> None:
     results['scale'] = generate_scale_figure()
     results['percent_of_data'] = generate_percent_of_data_figure()
     results['minority_reduce'] = generate_minority_reduce_figure()
+    results['noise_features'] = generate_noise_features_figure()
+    results['label_noise'] = generate_label_noise_figure()
     results['dim_reducer'] = generate_dim_reducer_figure()
     results['clf'] = generate_clf_figure()
     results['overlay_train_test'] = generate_overlay_figure()

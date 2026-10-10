@@ -48,7 +48,8 @@ Config in `pyproject.toml`.
 - `data_loaders/main.py` - Central registry (`AVAILABLE_DATASETS`) and `get_dataset(name)` entry point
 - `data_loaders/abstract_loader.py` - Base `AbstractLoader` class all loaders inherit from
 - `data_loaders/loaders/synthetic_generators/` - XOR, Moons, Blobs, Circles, Gaussian, Madelon
-- `data_loaders/loaders/web_loaders/` - Iris, Wine, MNIST, Heart Disease, Breast Cancer (from sklearn/online)
+- `data_loaders/loaders/web_loaders/` - Iris, Wine, MNIST, Heart Disease, Breast Cancer (from sklearn/online); `openml.py` holds the OpenML benchmarks as one spec table
+- `data_loaders/loaders/array_loader.py` - `ArrayLoader` wraps in-memory `X`, `y`
 - `data_loaders/loaders/local_loaders/` - Breast cancer variants, diabetes, banknote, wheat seeds (from local CSV files in `data/`)
 - `data_loaders/loaders/external_loaders/` - MIMIC-III/IV medical datasets (require special access)
 - `data_loaders/utils/` - Normalization (`normalisation.py`), shuffling/seeding (`shuffling.py`), train/test splitting (`splitting.py`), label remapping (`labels.py`)

@@ -11,7 +11,7 @@ it.
 
 ## Features
 
-- Unified API for 40+ datasets via `get_dataset(name)`
+- Unified API for 60+ datasets via `get_dataset(name)`
 - Consistent dict format: `{'X': features, 'y': labels}`
 - Built-in train/test splitting with class balance preservation
 - MinMax normalization to [-1, 1] range
@@ -20,6 +20,8 @@ it.
 - Train/test overlay mode with configurable test transparency
 - Example-image previews for image datasets (`plot_class_samples()`)
 - Terminal-based plotting (sixel/kitty protocols)
+- `noise_features` and `label_noise` options add irrelevant features or flip a fraction of train labels
+- `ArrayLoader(X, y)` gives in-memory arrays the same interface
 
 
 ## Available Datasets
@@ -34,6 +36,11 @@ it.
 - `Diabetes Pima Indian`, `Heart Disease`, `Breast Cancer Wisconsin`
 - `Habermans Breast Cancer`, `Chronic Kidney Disease`, `Hepatitis`
 - `Parkinsons`, `Indian Liver Patient`, `Cervical Cancer`, `Arrhythmia`
+
+**OpenML (binary, numeric, no missing values):**
+- `Spambase`, `Phoneme`, `MAGIC Gamma Telescope`, `EEG Eye State`
+- `Default of Credit Card Clients`, `QSAR Biodegradation`, `Bioresponse`, `Hill-Valley`
+- `Steel Plates Fault`, `KC1 Software Defects`, `Blood Transfusion`, `Ozone Level 8hr`
 
 **Image:**
 - `MNIST`, `Fashion-MNIST`, `SVHN`, `EuroSAT`, `CIFAR-10`, `CIFAR-100`, `CIFAR-10N`
@@ -275,16 +282,7 @@ Breast Cancer — Digitised FNA cell-nuclei features — binary malignant/benign
     - Feature 17: concave points error
     - Feature 18: symmetry error
     - Feature 19: fractal dimension error
-    - Feature 20: worst radius
-    - Feature 21: worst texture
-    - Feature 22: worst perimeter
-    - Feature 23: worst area
-    - Feature 24: worst smoothness
-    - Feature 25: worst compactness
-    - Feature 26: worst concavity
-    - Feature 27: worst concave points
-    - Feature 28: worst symmetry
-    - Feature 29: worst fractal dimension
+    - ... (10 more features)
 
  Label Names:
     - Label 0: benign
@@ -376,16 +374,7 @@ Wisconsin Breast Cancer — Cell nucleus features for malignant/benign breast ca
     - Feature 17: concave_points2
     - Feature 18: symmetry2
     - Feature 19: fractal_dimension2
-    - Feature 20: radius3
-    - Feature 21: texture3
-    - Feature 22: perimeter3
-    - Feature 23: area3
-    - Feature 24: smoothness3
-    - Feature 25: compactness3
-    - Feature 26: concavity3
-    - Feature 27: concave_points3
-    - Feature 28: symmetry3
-    - Feature 29: fractal_dimension3
+    - ... (10 more features)
 
  Label Names:
     - Label 0: Benign
@@ -520,8 +509,7 @@ Parkinsons — Biomedical voice measures for Parkinson's disease diagnosis — b
     - Feature 17: DFA
     - Feature 18: spread1
     - Feature 19: spread2
-    - Feature 20: D2
-    - Feature 21: PPE
+    - ... (2 more features)
 
  Label Names:
     - Label 0: Healthy
@@ -592,18 +580,7 @@ Cervical Cancer — Risk factors and test results for cervical cancer biopsy pre
     - Feature 17: STDs:syphilis
     - Feature 18: STDs:pelvic inflammatory disease
     - Feature 19: STDs:genital herpes
-    - Feature 20: STDs:molluscum contagiosum
-    - Feature 21: STDs:AIDS
-    - Feature 22: STDs:HIV
-    - Feature 23: STDs:Hepatitis B
-    - Feature 24: STDs:HPV
-    - Feature 25: STDs: Number of diagnosis
-    - Feature 26: STDs: Time since first diagnosis
-    - Feature 27: STDs: Time since last diagnosis
-    - Feature 28: Dx:Cancer
-    - Feature 29: Dx:CIN
-    - Feature 30: Dx:HPV
-    - Feature 31: Dx
+    - ... (12 more features)
 
  Label Names:
     - Label 0: Healthy
@@ -662,14 +639,7 @@ Thyroid Sick — Clinical and lab measurements for thyroid disorder detection �
     - Feature 17: TSH
     - Feature 18: T3_measured
     - Feature 19: T3
-    - Feature 20: TT4_measured
-    - Feature 21: TT4
-    - Feature 22: T4U_measured
-    - Feature 23: T4U
-    - Feature 24: FTI_measured
-    - Feature 25: FTI
-    - Feature 26: TBG_measured
-    - Feature 27: referral_source
+    - ... (8 more features)
 
  Label Names:
     - Label 0: negative
@@ -811,30 +781,7 @@ SPECTF Heart — SPECT cardiac imaging features for heart disease diagnosis — 
     - Feature 17: F9S
     - Feature 18: F10R
     - Feature 19: F10S
-    - Feature 20: F11R
-    - Feature 21: F11S
-    - Feature 22: F12R
-    - Feature 23: F12S
-    - Feature 24: F13R
-    - Feature 25: F13S
-    - Feature 26: F14R
-    - Feature 27: F14S
-    - Feature 28: F15R
-    - Feature 29: F15S
-    - Feature 30: F16R
-    - Feature 31: F16S
-    - Feature 32: F17R
-    - Feature 33: F17S
-    - Feature 34: F18R
-    - Feature 35: F18S
-    - Feature 36: F19R
-    - Feature 37: F19S
-    - Feature 38: F20R
-    - Feature 39: F20S
-    - Feature 40: F21R
-    - Feature 41: F21S
-    - Feature 42: F22R
-    - Feature 43: F22S
+    - ... (24 more features)
 
  Label Names:
     - Label 0: Normal
@@ -932,19 +879,7 @@ Breast Cancer Prognostic — FNA features for breast cancer recurrence predictio
     - Feature 17: concavity2
     - Feature 18: concave_points2
     - Feature 19: symmetry2
-    - Feature 20: fractal_dimension2
-    - Feature 21: radius3
-    - Feature 22: texture3
-    - Feature 23: perimeter3
-    - Feature 24: area3
-    - Feature 25: smoothness3
-    - Feature 26: compactness3
-    - Feature 27: concavity3
-    - Feature 28: concave_points3
-    - Feature 29: symmetry3
-    - Feature 30: fractal_dimension3
-    - Feature 31: tumor_size
-    - Feature 32: lymph_node_status
+    - ... (13 more features)
 
  Label Names:
     - Label 0: Non-recurrent
@@ -1014,35 +949,7 @@ HCC Survival — Hepatocellular carcinoma patient survival from clinical feature
     - Feature 17: Varices
     - Feature 18: Splenomegaly
     - Feature 19: PHT
-    - Feature 20: PVT
-    - Feature 21: Metastasis
-    - Feature 22: Hallmark
-    - Feature 23: Age
-    - Feature 24: Grams_per_day
-    - Feature 25: Packs_per_year
-    - Feature 26: PS
-    - Feature 27: Encephalopathy
-    - Feature 28: Ascites
-    - Feature 29: INR
-    - Feature 30: AFP
-    - Feature 31: Hemoglobin
-    - Feature 32: MCV
-    - Feature 33: Leucocytes
-    - Feature 34: Platelets
-    - Feature 35: Albumin
-    - Feature 36: Total_Bil
-    - Feature 37: ALT
-    - Feature 38: AST
-    - Feature 39: GGT
-    - Feature 40: ALP
-    - Feature 41: TP
-    - Feature 42: Creatinine
-    - Feature 43: Nodules
-    - Feature 44: Major_Dim
-    - Feature 45: Dir_Bil
-    - Feature 46: Iron
-    - Feature 47: Sat
-    - Feature 48: Ferritin
+    - ... (29 more features)
 
  Label Names:
     - Label 0: Lives
@@ -1083,41 +990,7 @@ Z-Alizadeh Sani CAD — Coronary artery disease diagnosis from clinical features
     - Feature 17: BP
     - Feature 18: PR
     - Feature 19: Edema
-    - Feature 20: Weak Peripheral Pulse
-    - Feature 21: Lung rales
-    - Feature 22: Systolic Murmur
-    - Feature 23: Diastolic Murmur
-    - Feature 24: Typical Chest Pain
-    - Feature 25: Dyspnea
-    - Feature 26: Function Class
-    - Feature 27: Atypical
-    - Feature 28: Nonanginal
-    - Feature 29: Exertional CP
-    - Feature 30: LowTH Ang
-    - Feature 31: Q Wave
-    - Feature 32: St Elevation
-    - Feature 33: St Depression
-    - Feature 34: Tinversion
-    - Feature 35: LVH
-    - Feature 36: Poor R Progression
-    - Feature 37: BBB
-    - Feature 38: FBS
-    - Feature 39: CR
-    - Feature 40: TG
-    - Feature 41: LDL
-    - Feature 42: HDL
-    - Feature 43: BUN
-    - Feature 44: ESR
-    - Feature 45: HB
-    - Feature 46: K
-    - Feature 47: Na
-    - Feature 48: WBC
-    - Feature 49: Lymph
-    - Feature 50: Neut
-    - Feature 51: PLT
-    - Feature 52: EF-TTE
-    - Feature 53: Region RWMA
-    - Feature 54: VHD
+    - ... (35 more features)
 
  Label Names:
     - Label 0: Normal
@@ -1214,20 +1087,7 @@ Ionosphere — Radar signal classification for ionosphere quality — binary
     - Feature 17: Pulse 9 imaginary
     - Feature 18: Pulse 10 real
     - Feature 19: Pulse 10 imaginary
-    - Feature 20: Pulse 11 real
-    - Feature 21: Pulse 11 imaginary
-    - Feature 22: Pulse 12 real
-    - Feature 23: Pulse 12 imaginary
-    - Feature 24: Pulse 13 real
-    - Feature 25: Pulse 13 imaginary
-    - Feature 26: Pulse 14 real
-    - Feature 27: Pulse 14 imaginary
-    - Feature 28: Pulse 15 real
-    - Feature 29: Pulse 15 imaginary
-    - Feature 30: Pulse 16 real
-    - Feature 31: Pulse 16 imaginary
-    - Feature 32: Pulse 17 real
-    - Feature 33: Pulse 17 imaginary
+    - ... (14 more features)
 
  Label Names:
     - Label 0: bad
@@ -1268,46 +1128,7 @@ Sonar Rocks vs Mines — Sonar frequency-response features for rock/mine classif
     - Feature 17: 17
     - Feature 18: 18
     - Feature 19: 19
-    - Feature 20: 20
-    - Feature 21: 21
-    - Feature 22: 22
-    - Feature 23: 23
-    - Feature 24: 24
-    - Feature 25: 25
-    - Feature 26: 26
-    - Feature 27: 27
-    - Feature 28: 28
-    - Feature 29: 29
-    - Feature 30: 30
-    - Feature 31: 31
-    - Feature 32: 32
-    - Feature 33: 33
-    - Feature 34: 34
-    - Feature 35: 35
-    - Feature 36: 36
-    - Feature 37: 37
-    - Feature 38: 38
-    - Feature 39: 39
-    - Feature 40: 40
-    - Feature 41: 41
-    - Feature 42: 42
-    - Feature 43: 43
-    - Feature 44: 44
-    - Feature 45: 45
-    - Feature 46: 46
-    - Feature 47: 47
-    - Feature 48: 48
-    - Feature 49: 49
-    - Feature 50: 50
-    - Feature 51: 51
-    - Feature 52: 52
-    - Feature 53: 53
-    - Feature 54: 54
-    - Feature 55: 55
-    - Feature 56: 56
-    - Feature 57: 57
-    - Feature 58: 58
-    - Feature 59: 59
+    - ... (40 more features)
 
  Label Names:
     - Label 0: Rock
@@ -1349,6 +1170,452 @@ Abalone Gender — Physical measurements for abalone sex classification — 3 cl
 ```
 
 ![Abalone Gender](assets/figures/abalone_gender.png)
+
+</details>
+
+<details>
+<summary><strong>OpenML</strong></summary>
+
+#### Spambase
+
+```
+Spambase — Word and character frequencies of emails — spam vs ham
+
+ Feature Names:
+    - Feature 0: word_freq_make
+    - Feature 1: word_freq_address
+    - Feature 2: word_freq_all
+    - Feature 3: word_freq_3d
+    - Feature 4: word_freq_our
+    - Feature 5: word_freq_over
+    - Feature 6: word_freq_remove
+    - Feature 7: word_freq_internet
+    - Feature 8: word_freq_order
+    - Feature 9: word_freq_mail
+    - Feature 10: word_freq_receive
+    - Feature 11: word_freq_will
+    - Feature 12: word_freq_people
+    - Feature 13: word_freq_report
+    - Feature 14: word_freq_addresses
+    - Feature 15: word_freq_free
+    - Feature 16: word_freq_business
+    - Feature 17: word_freq_email
+    - Feature 18: word_freq_you
+    - Feature 19: word_freq_credit
+    - ... (37 more features)
+
+ Label Names:
+    - Label 0: Ham
+    - Label 1: Spam
+
+ Dataset Info:
+    - Number of features: 57
+    - Total instances: 4601
+      - Class 0: 2788 instances (Ham)
+      - Class 1: 1813 instances (Spam)
+```
+
+![Spambase](assets/figures/spambase.png)
+
+#### Phoneme
+
+```
+Phoneme — Five harmonic amplitudes of spoken vowels — nasal vs oral
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+    - Feature 4: V5
+
+ Label Names:
+    - Label 0: Nasal
+    - Label 1: Oral
+
+ Dataset Info:
+    - Number of features: 5
+    - Total instances: 5404
+      - Class 0: 3818 instances (Nasal)
+      - Class 1: 1586 instances (Oral)
+```
+
+![Phoneme](assets/figures/phoneme.png)
+
+#### MAGIC Gamma Telescope
+
+```
+MAGIC Gamma Telescope — Cherenkov telescope image moments — gamma signal vs hadron background
+
+ Feature Names:
+    - Feature 0: fLength:
+    - Feature 1: fWidth:
+    - Feature 2: fSize:
+    - Feature 3: fConc:
+    - Feature 4: fConc1:
+    - Feature 5: fAsym:
+    - Feature 6: fM3Long:
+    - Feature 7: fM3Trans:
+    - Feature 8: fAlpha:
+    - Feature 9: fDist:
+
+ Label Names:
+    - Label 0: Gamma
+    - Label 1: Hadron
+
+ Dataset Info:
+    - Number of features: 10
+    - Total instances: 19020
+      - Class 0: 12332 instances (Gamma)
+      - Class 1: 6688 instances (Hadron)
+```
+
+![MAGIC Gamma Telescope](assets/figures/magic_gamma_telescope.png)
+
+#### EEG Eye State
+
+```
+EEG Eye State — 14-channel EEG readings — eyes open vs closed
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+    - Feature 4: V5
+    - Feature 5: V6
+    - Feature 6: V7
+    - Feature 7: V8
+    - Feature 8: V9
+    - Feature 9: V10
+    - Feature 10: V11
+    - Feature 11: V12
+    - Feature 12: V13
+    - Feature 13: V14
+
+ Label Names:
+    - Label 0: Eyes open
+    - Label 1: Eyes closed
+
+ Dataset Info:
+    - Number of features: 14
+    - Total instances: 14980
+      - Class 0: 8257 instances (Eyes open)
+      - Class 1: 6723 instances (Eyes closed)
+```
+
+![EEG Eye State](assets/figures/eeg_eye_state.png)
+
+#### Default of Credit Card Clients
+
+```
+Default of Credit Card Clients — Taiwanese credit card payment history — default next month
+
+ Feature Names:
+    - Feature 0: x1
+    - Feature 1: x2
+    - Feature 2: x3
+    - Feature 3: x4
+    - Feature 4: x5
+    - Feature 5: x6
+    - Feature 6: x7
+    - Feature 7: x8
+    - Feature 8: x9
+    - Feature 9: x10
+    - Feature 10: x11
+    - Feature 11: x12
+    - Feature 12: x13
+    - Feature 13: x14
+    - Feature 14: x15
+    - Feature 15: x16
+    - Feature 16: x17
+    - Feature 17: x18
+    - Feature 18: x19
+    - Feature 19: x20
+    - ... (3 more features)
+
+ Label Names:
+    - Label 0: No default
+    - Label 1: Default
+
+ Dataset Info:
+    - Number of features: 23
+    - Total instances: 30000
+      - Class 0: 23364 instances (No default)
+      - Class 1: 6636 instances (Default)
+```
+
+![Default of Credit Card Clients](assets/figures/default_of_credit_card_clients.png)
+
+#### QSAR Biodegradation
+
+```
+QSAR Biodegradation — Molecular descriptors of chemicals — ready biodegradability
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+    - Feature 4: V5
+    - Feature 5: V6
+    - Feature 6: V7
+    - Feature 7: V8
+    - Feature 8: V9
+    - Feature 9: V10
+    - Feature 10: V11
+    - Feature 11: V12
+    - Feature 12: V13
+    - Feature 13: V14
+    - Feature 14: V15
+    - Feature 15: V16
+    - Feature 16: V17
+    - Feature 17: V18
+    - Feature 18: V19
+    - Feature 19: V20
+    - ... (21 more features)
+
+ Label Names:
+    - Label 0: Not biodegradable
+    - Label 1: Ready biodegradable
+
+ Dataset Info:
+    - Number of features: 41
+    - Total instances: 1055
+      - Class 0: 699 instances (Not biodegradable)
+      - Class 1: 356 instances (Ready biodegradable)
+```
+
+![QSAR Biodegradation](assets/figures/qsar_biodegradation.png)
+
+#### Bioresponse
+
+```
+Bioresponse — 1776 molecular descriptors — biological response, high-dimensional
+
+ Feature Names:
+    - Feature 0: D1
+    - Feature 1: D2
+    - Feature 2: D3
+    - Feature 3: D4
+    - Feature 4: D5
+    - Feature 5: D6
+    - Feature 6: D7
+    - Feature 7: D8
+    - Feature 8: D9
+    - Feature 9: D10
+    - Feature 10: D11
+    - Feature 11: D12
+    - Feature 12: D13
+    - Feature 13: D14
+    - Feature 14: D15
+    - Feature 15: D16
+    - Feature 16: D17
+    - Feature 17: D18
+    - Feature 18: D19
+    - Feature 19: D20
+    - ... (1756 more features)
+
+ Label Names:
+    - Label 0: Response
+    - Label 1: No response
+
+ Dataset Info:
+    - Number of features: 1776
+    - Total instances: 3751
+      - Class 0: 2034 instances (Response)
+      - Class 1: 1717 instances (No response)
+```
+
+![Bioresponse](assets/figures/bioresponse.png)
+
+#### Hill-Valley
+
+```
+Hill-Valley — 100-point noiseless series — hill vs valley shape
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+    - Feature 4: V5
+    - Feature 5: V6
+    - Feature 6: V7
+    - Feature 7: V8
+    - Feature 8: V9
+    - Feature 9: V10
+    - Feature 10: V11
+    - Feature 11: V12
+    - Feature 12: V13
+    - Feature 13: V14
+    - Feature 14: V15
+    - Feature 15: V16
+    - Feature 16: V17
+    - Feature 17: V18
+    - Feature 18: V19
+    - Feature 19: V20
+    - ... (80 more features)
+
+ Label Names:
+    - Label 0: Valley
+    - Label 1: Hill
+
+ Dataset Info:
+    - Number of features: 100
+    - Total instances: 1212
+      - Class 0: 606 instances (Valley)
+      - Class 1: 606 instances (Hill)
+```
+
+![Hill-Valley](assets/figures/hill-valley.png)
+
+#### Steel Plates Fault
+
+```
+Steel Plates Fault — Geometric and luminosity features of steel plate faults — other vs named type
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+    - Feature 4: V5
+    - Feature 5: V6
+    - Feature 6: V7
+    - Feature 7: V8
+    - Feature 8: V9
+    - Feature 9: V10
+    - Feature 10: V11
+    - Feature 11: V12
+    - Feature 12: V13
+    - Feature 13: V14
+    - Feature 14: V15
+    - Feature 15: V16
+    - Feature 16: V17
+    - Feature 17: V18
+    - Feature 18: V19
+    - Feature 19: V20
+    - ... (7 more features)
+
+ Label Names:
+    - Label 0: Named fault
+    - Label 1: Other fault
+
+ Dataset Info:
+    - Number of features: 27
+    - Total instances: 1941
+      - Class 0: 1268 instances (Named fault)
+      - Class 1: 673 instances (Other fault)
+```
+
+![Steel Plates Fault](assets/figures/steel_plates_fault.png)
+
+#### KC1 Software Defects
+
+```
+KC1 Software Defects — McCabe and Halstead code metrics of NASA modules — defect prediction
+
+ Feature Names:
+    - Feature 0: loc
+    - Feature 1: v(g)
+    - Feature 2: ev(g)
+    - Feature 3: iv(g)
+    - Feature 4: n
+    - Feature 5: v
+    - Feature 6: l
+    - Feature 7: d
+    - Feature 8: i
+    - Feature 9: e
+    - Feature 10: b
+    - Feature 11: t
+    - Feature 12: lOCode
+    - Feature 13: lOComment
+    - Feature 14: lOBlank
+    - Feature 15: locCodeAndComment
+    - Feature 16: uniq_Op
+    - Feature 17: uniq_Opnd
+    - Feature 18: total_Op
+    - Feature 19: total_Opnd
+    - ... (1 more features)
+
+ Label Names:
+    - Label 0: No defect
+    - Label 1: Defect
+
+ Dataset Info:
+    - Number of features: 21
+    - Total instances: 2109
+      - Class 0: 1783 instances (No defect)
+      - Class 1: 326 instances (Defect)
+```
+
+![KC1 Software Defects](assets/figures/kc1_software_defects.png)
+
+#### Blood Transfusion
+
+```
+Blood Transfusion — Donor recency, frequency and volume — donated in March 2007
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+
+ Label Names:
+    - Label 0: No donation
+    - Label 1: Donated
+
+ Dataset Info:
+    - Number of features: 4
+    - Total instances: 748
+      - Class 0: 570 instances (No donation)
+      - Class 1: 178 instances (Donated)
+```
+
+![Blood Transfusion](assets/figures/blood_transfusion.png)
+
+#### Ozone Level 8hr
+
+```
+Ozone Level 8hr — Weather measurements — 8-hour ozone alert days, highly imbalanced
+
+ Feature Names:
+    - Feature 0: V1
+    - Feature 1: V2
+    - Feature 2: V3
+    - Feature 3: V4
+    - Feature 4: V5
+    - Feature 5: V6
+    - Feature 6: V7
+    - Feature 7: V8
+    - Feature 8: V9
+    - Feature 9: V10
+    - Feature 10: V11
+    - Feature 11: V12
+    - Feature 12: V13
+    - Feature 13: V14
+    - Feature 14: V15
+    - Feature 15: V16
+    - Feature 16: V17
+    - Feature 17: V18
+    - Feature 18: V19
+    - Feature 19: V20
+    - ... (52 more features)
+
+ Label Names:
+    - Label 0: Normal day
+    - Label 1: Ozone day
+
+ Dataset Info:
+    - Number of features: 72
+    - Total instances: 2534
+      - Class 0: 2374 instances (Normal day)
+      - Class 1: 160 instances (Ozone day)
+```
+
+![Ozone Level 8hr](assets/figures/ozone_level_8hr.png)
 
 </details>
 
@@ -1594,29 +1861,6 @@ train, test = get_dataset('Moons', train_size=0.7).get_train_test_split()
 
 ---
 
-### `get_cross_validation_folds(n_splits=...)`
-
-Folds the *train* split into `n_splits` stratified cross validation folds and
-returns them alongside the untouched test split, so the test set stays a clean
-estimate of generalisation. Class ratios are preserved in every fold — on
-imbalanced data an unstratified fold can easily end up with no minority
-instances at all. Any `get_train_test_split` option can be passed through.
-
-```python
-loader = get_dataset('Habermans Breast Cancer', train_size=0.7)
-folds, test = loader.get_cross_validation_folds(n_splits=5)
-
-for train_fold, val_fold in folds:
-    clf.fit(train_fold['X'], train_fold['y'])
-    score(clf, val_fold['X'], val_fold['y'])
-```
-
-Use `utils.stratified_kfold_indices(y, n_splits)` instead when you need the raw
-index arrays — for example to resample the train fold only, without leaking
-resampled rows into validation.
-
----
-
 ### `scale=True`
 
 Applies MinMax normalisation fitted on the train set, scaling all features to `[−1, 1]`.
@@ -1657,31 +1901,30 @@ train, test = dataset.get_train_test_split()
 
 ---
 
-### `majority_max`
+### `noise_features`
 
-Caps the majority class of the **train** split at a fixed number of instances.
-The test split is untouched.
-
-Use it when a dataset is too large to fit every model family on but you want
-to keep its natural imbalance — capping the majority is much better than
-subsampling both classes, which would throw away the minority data the
-imbalance story depends on.
+Appends the given number of irrelevant N(0, 1) features to every instance, seeded
+from `set_seed`, so a low-dimensional generator can be swept along dimensionality.
 
 ```python
-# MIMIC-IV has 1.6M majority rows: fine for a linear model, hopeless for an
-# O(n^2) kernel SVM. Cap the training majority and keep every minority point.
-dataset = get_dataset('MIMIC-IV Ready for Discharge', majority_max=50_000)
+dataset = get_dataset('Moons', noise_features=20)
+```
+
+![noise_features](assets/figures/options/noise_features.png)
+
+---
+
+### `label_noise`
+
+Moves the given fraction of **train** labels to a different class; the test split
+keeps its true labels.
+
+```python
+dataset = get_dataset('Moons', label_noise=0.2)
 train, test = dataset.get_train_test_split()
 ```
 
-Applied **before** `minority_reduce_scaler`, so a requested imbalance ratio is
-taken against the capped count rather than the original one:
-
-```python
-# 100 majority / 10 minority, not 100 / (original_majority / 10)
-train, test = dataset.get_train_test_split(
-    majority_max=100, minority_reduce_scaler=10)
-```
+![label_noise](assets/figures/options/label_noise.png)
 
 ---
 
@@ -1697,52 +1940,6 @@ train, test = dataset.get_train_test_split()
 ```
 
 ![dim_reducer](assets/figures/options/dim_reducer.png)
-
-#### Reusing a reducer across plots
-
-When comparing multiple plots (e.g. the same dataset at different downsampling rates), you need all plots to share the **same** projection. TSNE and UMAP are non-deterministic and fit-dependent, so a fresh fit per plot produces incomparable coordinate spaces.
-
-**Option A — fit explicitly, then pass to each plot:**
-
-```python
-from data_loaders import get_dataset
-from data_loaders.plotting.visualisation import plot_dataset
-
-loader = get_dataset('Moons')
-
-# Fit once on the full dataset
-reducer = loader.fit_dim_reducer('TSNE')
-
-# Reuse the same projection for every plot
-for pct in [100, 50, 25]:
-    sub = get_dataset('Moons', percent_of_data=pct)
-    data = sub.get_data_dict()
-    plot_dataset(data['X'], data['y'],
-                 dim_reducer=reducer,
-                 dataset_name=f'Moons {pct}%')
-```
-
-**Option B — extract the reducer after the first plot:**
-
-```python
-loader = get_dataset('Moons')
-
-# First plot fits and stores the reducer automatically
-fig, ax = loader.plot_dataset(dim_reducer_method='TSNE')
-reducer = loader.last_dim_reducer   # retrieve the fitted reducer
-
-# Pass it to subsequent plots so they share the same projection
-loader2 = get_dataset('Moons', percent_of_data=50)
-loader2.plot_dataset(dim_reducer=reducer)
-
-# Works with plot_train_test_split too
-loader2.plot_train_test_split(dim_reducer=reducer)
-```
-
-The `dim_reducer` parameter is accepted by:
-- `plot_dataset()` in `data_loaders.plotting.visualisation`
-- `loader.plot_dataset()`
-- `loader.plot_train_test_split()`
 
 ---
 
@@ -1791,30 +1988,6 @@ loader.plot_train_test_split(overlay_train_test=True, clf=clf.predict)
 
 ![overlay_train_test](assets/figures/options/overlay_train_test.png)
 
----
-
-### Image datasets — example images per class
-
-Image loaders (MNIST, Fashion-MNIST, SVHN, EuroSAT, CIFAR-10/100/10N and the
-MedMNIST sets) flag themselves with the `is_image` class attribute and know how
-to reshape a flattened sample back into a viewable image (`image_shape`,
-`channels_first`). This powers a `plot_class_samples()` preview that shows a few
-example images per class — handy for seeing what the raw data actually looks
-like, alongside the 2D projection in the gallery above.
-
-```python
-loader = get_dataset('CIFAR-10')
-
-# Grid of example images, one row per class
-loader.plot_class_samples(n_per_class=5)
-
-# Or reshape a single flat sample yourself for custom plots
-img = loader.as_image(loader.get_X()[0])   # -> (32, 32, 3) RGB array
-```
-
-Non-image loaders have `is_image = False`; calling `as_image()` on them raises
-a `ValueError`.
-
 </details>
 
 <details>
@@ -1852,6 +2025,12 @@ Classifiers: Logistic Regression, Random Forest, SVC (RBF), KNN, Gaussian NB.
 ![benchmark_other](assets/figures/benchmark_other.png)
 
 ![benchmark_clf_plots_other](assets/figures/benchmark_clf_plots_other.png)
+
+### OpenML
+
+![benchmark_openml](assets/figures/benchmark_openml.png)
+
+![benchmark_clf_plots_openml](assets/figures/benchmark_clf_plots_openml.png)
 
 </details>
 

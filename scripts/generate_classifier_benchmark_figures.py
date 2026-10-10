@@ -55,6 +55,11 @@ DATASET_GROUPS: dict[str, list[str]] = {
         'Banknote Authentication', 'Wheat Seeds', 'Ionosphere',
         'Sonar Rocks vs Mines', 'Abalone Gender',
     ],
+    'OpenML': [
+        'Spambase', 'Phoneme', 'MAGIC Gamma Telescope', 'EEG Eye State',
+        'Default of Credit Card Clients', 'QSAR Biodegradation', 'Bioresponse', 'Hill-Valley',
+        'Steel Plates Fault', 'KC1 Software Defects', 'Blood Transfusion', 'Ozone Level 8hr',
+    ],
 }
 
 DATASET_SHORT_NAMES: dict[str, str] = {
@@ -93,6 +98,18 @@ DATASET_SHORT_NAMES: dict[str, str] = {
     'Ionosphere': 'Ionosphere',
     'Sonar Rocks vs Mines': 'Sonar',
     'Abalone Gender': 'Abalone',
+    'Spambase': 'Spambase',
+    'Phoneme': 'Phoneme',
+    'MAGIC Gamma Telescope': 'MAGIC',
+    'EEG Eye State': 'EEG Eye',
+    'Default of Credit Card Clients': 'Credit Default',
+    'QSAR Biodegradation': 'QSAR Biodeg',
+    'Bioresponse': 'Bioresponse',
+    'Hill-Valley': 'Hill-Valley',
+    'Steel Plates Fault': 'Steel Plates',
+    'KC1 Software Defects': 'KC1',
+    'Blood Transfusion': 'Blood Transf.',
+    'Ozone Level 8hr': 'Ozone 8hr',
 }
 
 CLASSIFIER_CONFIGS: list[dict] = [

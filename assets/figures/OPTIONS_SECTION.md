@@ -54,6 +54,33 @@ train, test = dataset.get_train_test_split()
 
 ---
 
+### `noise_features`
+
+Appends the given number of irrelevant N(0, 1) features to every instance, seeded
+from `set_seed`, so a low-dimensional generator can be swept along dimensionality.
+
+```python
+dataset = get_dataset('Moons', noise_features=20)
+```
+
+![noise_features](assets/figures/options/noise_features.png)
+
+---
+
+### `label_noise`
+
+Moves the given fraction of **train** labels to a different class; the test split
+keeps its true labels.
+
+```python
+dataset = get_dataset('Moons', label_noise=0.2)
+train, test = dataset.get_train_test_split()
+```
+
+![label_noise](assets/figures/options/label_noise.png)
+
+---
+
 ### `dim_reducer`
 
 Applies dimensionality reduction to the split output.
