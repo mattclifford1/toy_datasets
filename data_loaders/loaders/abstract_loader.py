@@ -77,6 +77,12 @@ class AbstractLoader(ABC):
         ``'UMAP_supervised'``.
     reduce_to_dim : int, default=2
         Target number of dimensions when ``dim_reducer`` is set.
+    noise_features : int, default=0
+        Append this many irrelevant N(0, 1) features to every instance, seeded
+        from ``set_seed``.
+    label_noise : float, default=0.0
+        Move this fraction of the *train* labels to a different class, seeded
+        from the split seed. The test set keeps its true labels.
     **kwargs
         Additional keyword arguments (ignored, allows flexible subclass init).
     """
@@ -112,6 +118,8 @@ class AbstractLoader(ABC):
                  scale: bool = False,
                  dim_reducer: str | None = None,
                  reduce_to_dim: int = 2,
+                 noise_features: int = 0,
+                 label_noise: float = 0.0,
                  **kwargs: Any) -> None:
         self.shuffle = shuffle
         self.train_size = train_size
@@ -129,6 +137,8 @@ class AbstractLoader(ABC):
         self.scale = scale
         self.dim_reducer = dim_reducer
         self.reduce_to_dim = reduce_to_dim
+        self.noise_features = noise_features
+        self.label_noise = label_noise
         self._load_lock = threading.Lock()
         self.last_dim_reducer: Any = None  # set after plot_dataset / plot_train_test_split
 
@@ -195,6 +205,7 @@ class AbstractLoader(ABC):
             train_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
             test_post_process: Callable[[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None = None,
             seed: bool | int | None = None,
+            label_noise: float | None = None,
             _print_info: bool = False,
     ) -> tuple[DataDict, DataDict]:
         '''
@@ -208,6 +219,7 @@ class AbstractLoader(ABC):
             train_post_process: function to apply to the train data after splitting (takes in X_train, y_train and returns modified X_train, y_train)
             test_post_process: function to apply to the test data after splitting (takes in X_test, y_test and returns modified X_test, y_test)
             seed: random seed for reproducibility (True means use default seed, False means do not set seed, int means use that as the seed)
+            label_noise: fraction of train labels moved to a different class (test labels stay true)
             _print_info: whether to print the class distributions in the train and test sets after splitting
         returns:
             - data: dict containing 'X', 'y'
@@ -231,6 +243,8 @@ class AbstractLoader(ABC):
 
         if seed is None:
             seed = self.set_seed
+        if label_noise is None:
+            label_noise = self.label_noise
 
         # split into train, test
         train_data, test_data = utils.proportional_split(
@@ -242,6 +256,8 @@ class AbstractLoader(ABC):
             majority_max=majority_max,
             seed=seed
             )
+        if label_noise:
+            train_data['y'] = utils.flip_labels(train_data['y'], label_noise, seed=seed)
 
         # reduce dims
         if self.dim_reducer is not None:
@@ -349,8 +365,16 @@ class AbstractLoader(ABC):
                         percent_of_data=self.percent_of_data,
                         seed=self.set_seed
                         )
+                if self.noise_features:
+                    self._append_noise_features()
 
         return self.data
+
+    def _append_noise_features(self) -> None:
+        self.data['X'] = utils.add_noise_features(self.data['X'], self.noise_features, seed=self.set_seed)
+        names = self.data.get('feature_names')
+        if isinstance(names, list):
+            self.data['feature_names'] = names + [f'noise_{i}' for i in range(self.noise_features)]
 
 
     def get_X(self) -> np.ndarray:

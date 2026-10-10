@@ -428,3 +428,43 @@ class TestAbstractLoaderInfo:
         info_output = mock_loader.get_info()
 
         assert str_output == info_output
+
+
+class TestAbstractLoaderNoise:
+    """Tests for the noise_features and label_noise options."""
+
+    def test_noise_features_appended_to_both_splits(self):
+        from tests.conftest import MockLoader
+        loader = MockLoader(n_features=4, noise_features=3, set_seed=0)
+        train, test = loader.get_train_test_split()
+        assert train['X'].shape[1] == test['X'].shape[1] == 7
+        np.testing.assert_array_equal(loader.get_X()[:, :4], MockLoader(n_features=4, set_seed=0).get_X())
+        assert loader.get_feature_names()[-1] == 'noise_2'
+
+    def test_noise_features_reproducible(self):
+        from tests.conftest import MockLoader
+        a = MockLoader(noise_features=2, set_seed=5).get_X()
+        b = MockLoader(noise_features=2, set_seed=5).get_X()
+        np.testing.assert_array_equal(a, b)
+
+    def test_label_noise_flips_train_only(self):
+        from tests.conftest import MockLoader
+        clean_tr, clean_te = MockLoader(n_samples=400, set_seed=0).get_train_test_split()
+        noisy_tr, noisy_te = MockLoader(n_samples=400, set_seed=0, label_noise=0.25).get_train_test_split()
+        np.testing.assert_array_equal(clean_te['y'], noisy_te['y'])
+        np.testing.assert_array_equal(clean_tr['X'], noisy_tr['X'])
+        assert np.sum(clean_tr['y'] != noisy_tr['y']) == round(0.25 * len(clean_tr['y']))
+
+    def test_flip_labels_multiclass_always_changes_class(self):
+        from data_loaders.utils import flip_labels
+        y = np.repeat([0, 1, 2], 100)
+        assert np.sum(flip_labels(y, 1.0, seed=3) == y) == 0
+
+
+def test_array_loader_splits_in_memory_data():
+    from data_loaders import ArrayLoader
+    X = np.arange(200, dtype=float).reshape(100, 2)
+    y = np.r_[np.zeros(80), np.ones(20)]
+    train, test = ArrayLoader(X, y, train_size=0.5, equal_test=True, set_seed=0).get_train_test_split()
+    assert np.bincount(train['y']).tolist() == [40, 10]
+    assert np.bincount(test['y']).tolist() == [10, 10]
