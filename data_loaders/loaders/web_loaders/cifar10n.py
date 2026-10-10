@@ -15,7 +15,7 @@ _CIFAR10N_URL = (
 )
 
 LabelNoiseType = Literal[
-    'aggre_label', 'random_label1', 'random_label2', 'random_label3', 'worst_label'
+    'aggre_label', 'random_label1', 'random_label2', 'random_label3', 'worse_label'
 ]
 
 
@@ -54,7 +54,7 @@ class Cifar10NLoader(AbstractLoader):
     label_noise_type : str, default='aggre_label'
         Which noisy label set to use. One of:
         ``'aggre_label'``, ``'random_label1'``, ``'random_label2'``,
-        ``'random_label3'``, ``'worst_label'``.
+        ``'random_label3'``, ``'worse_label'``.
     equal_test : bool, default=False
         If True, balance the test set classes.
     **kwargs
