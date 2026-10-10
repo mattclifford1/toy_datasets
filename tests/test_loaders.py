@@ -408,3 +408,19 @@ class TestNoHardCodedLoaderOptions:
         assert not offenders, (
             'these loaders pin an option their caller cannot then set; pass it '
             'via kwargs.setdefault(...) instead: ' + ', '.join(offenders))
+
+
+def test_truncated_normal_respects_each_class_support():
+    loader = get_dataset('Truncated Normal', num_samples=[500, 50], set_seed=3)
+    X, y = loader.get_X(), loader.get_y()
+    assert np.bincount(y.astype(int)).tolist() == [500, 50]
+    assert X[y == 0].min() >= -2 and X[y == 0].max() <= 2
+    assert X[y == 1].min() >= 0 and X[y == 1].max() <= 4
+
+
+def test_madelon_is_imbalanced_as_asked_and_reproducible():
+    a = get_dataset('Madelon', num_samples=[900, 100], set_seed=1)
+    b = get_dataset('Madelon', num_samples=[900, 100], set_seed=1)
+    assert a.get_X().shape == (1000, 500)
+    assert abs(np.bincount(a.get_y().astype(int))[1] - 100) < 30
+    np.testing.assert_array_equal(a.get_X(), b.get_X())

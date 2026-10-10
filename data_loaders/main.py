@@ -41,6 +41,8 @@ AVAILABLE_DATASETS: dict[str, Callable[..., Any]] = {
     'Circles': _create_lazy_loader('data_loaders.loaders.synthetic_generators.circles', 'CirclesGenerator'),
     'Sklearn Normal': _create_lazy_loader('data_loaders.loaders.synthetic_generators.classification', 'SklearnNormalGenerator'),
     'Gaussian': _create_lazy_loader('data_loaders.loaders.synthetic_generators.gaussian', 'GaussianGenerator'),
+    'Truncated Normal': _create_lazy_loader('data_loaders.loaders.synthetic_generators.truncated_normal', 'TruncatedNormalGenerator'),
+    'Madelon': _create_lazy_loader('data_loaders.loaders.synthetic_generators.madelon_generator', 'MadelonGenerator'),
 
     # Toy datasets from sklearn
     'Iris': _create_lazy_loader('data_loaders.loaders.web_loaders.iris', 'IrisLoader'),

@@ -73,6 +73,8 @@ class TestLoaderIntegration:
         'Blobs',
         'Circles',
         'Gaussian',
+        'Truncated Normal',
+        'Madelon',
     ])
     def test_synthetic_loaders(self, dataset_name):
         """Synthetic loaders should return valid data."""
